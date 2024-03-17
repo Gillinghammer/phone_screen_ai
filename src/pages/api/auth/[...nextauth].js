@@ -1,0 +1,57 @@
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs'; // Make sure to install bcryptjs if you haven't
+
+const prisma = new PrismaClient();
+
+export default NextAuth({
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+      },
+      authorize: async (credentials) => {
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+      
+        if (user && bcrypt.compareSync(credentials.password, user.password)) {
+          console.log('User from database:', user);
+          return { id: user.id, name: user.name, email: user.email };
+        }
+        return null;
+      },
+    }),
+  ],
+  adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: 'jwt',
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      
+      if (user) {
+        token.id = user.id;
+      } else if (!token.id && token.sub) {
+        // Use the 'sub' claim as the user ID if the 'user' object is not present
+        token.id = token.sub;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user = { ...session.user, id: token.id };
+      return session;
+    },
+  },
+  pages: {
+    signIn: '/auth/signin',
+    signOut: '/auth/signout',
+    error: '/auth/error',
+    verifyRequest: '/auth/verify-request',
+    newUser: null,
+  },
+});

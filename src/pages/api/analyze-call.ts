@@ -1,0 +1,64 @@
+// pages/api/analyze-call.ts
+import { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from '@prisma/client';
+import axios from 'axios';
+
+const prisma = new PrismaClient();
+
+export default async function analyzeCall(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
+    const { callId, jobId, phoneScreenId } = req.body;
+
+    try {
+      // Fetch the job and its interview questions
+      const job = await prisma.job.findUnique({
+        where: { id: parseInt(jobId) },
+        select: { interviewQuestions: true },
+      });
+
+      if (!job) {
+        return res.status(404).json({ message: 'Job not found' });
+      }
+
+      // Prepare the questions array for the 3rd party API request
+      const questions = job.interviewQuestions.set.map((question) => [
+        question,
+        'Based on the human\'s response to this question rate their qualification on a 0 to 100 point scale. 0 indicates no answer or examples provided that demonstrate any experience or awareness of the question. 100 demonstrates a detailed, nuanced response with direct personal examples that perfectly answer the question. 50 indicates an acknowledgement and awareness of what is being asked but vaguely specified experience.',
+      ]);
+
+      // Prepare the payload for the 3rd party API request
+      const payload = {
+        goal: 'Determine if the human is qualified for the role based on the answers they provide to the agents questions.',
+        questions,
+      };
+
+      // Send the request to the 3rd party API using Axios
+      const response = await axios.post(`https://api.bland.ai/v1/calls/${callId}/analyze`, payload, {
+        headers: {
+          'Accept': '*/*',
+          'Content-Type': 'application/json',
+          'authorization': process.env.BLAND_API_KEY,
+        },
+      });
+
+      // Update the PhoneScreen with the analysis result
+      const updatedPhoneScreen = await prisma.phoneScreen.update({
+        where: { id: phoneScreenId },
+        data: {
+          analysis: response.data,
+          qualificationScore: response.data.answers.filter((item, index) => index % 2 !== 0).reduce((acc, score) => acc + score, 0) / (response.data.answers.length / 2),
+        },
+      });
+
+      // Send the analysis result back to the client
+      res.status(200).json(updatedPhoneScreen);
+    } catch (error) {
+      console.error('Error analyzing the call:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  } else {
+    // If the request method is not POST, return a 405 Method Not Allowed error
+    res.setHeader('Allow', ['POST']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+}

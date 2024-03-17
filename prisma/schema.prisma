@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  jobs      Job[]
+}
+
+model Job {
+  id                 Int         @id @default(autoincrement())
+  userId             Int
+  company            String
+  jobTitle           String
+  jobLocation        String
+  jobDescription     String
+  remoteFriendly     Boolean     @default(false)
+  seniority          String
+  salary             Int?
+  requirements       Json
+  responsibilities   Json
+  interviewQuestions Json
+  user               User        @relation(fields: [userId], references: [id])
+  candidates         Candidate[]
+  phoneScreens       PhoneScreen[]
+}
+
+enum CandidateStatus {
+  OPEN
+  ACCEPTED
+  REJECTED
+  ARCHIVED
+}
+
+model Candidate {
+  id                 Int             @id @default(autoincrement())
+  jobPostId          Int
+  jobPost            Job             @relation(fields: [jobPostId], references: [id])
+  name               String
+  phone              String
+  email              String          
+  resumeUrl          String
+  linkedinUrl        String?
+  status             CandidateStatus @default(OPEN)
+  phoneScreen        PhoneScreen?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+}
+
+model PhoneScreen {
+  id                 Int       @id @default(autoincrement())
+  candidateId        Int       @unique
+  candidate          Candidate @relation(fields: [candidateId], references: [id])
+  jobId              Int       
+  job                Job       @relation(fields: [jobId], references: [id])
+  callId             String    // Unique identifier for the call
+  callLength         Float?    // Length of the call in minutes
+  batchId            String?   // Batch ID, if applicable
+  to                 String?   // Phone number called
+  from               String?   // Phone number from which the call was made
+  requestPhoneNumber String?   // Requested phone number
+  wait               Boolean?  // Wait flag
+  language           String?   // Language
+  completed          Boolean?  // Whether the call was completed
+  createdAt          DateTime? // When the call was created
+  inbound            Boolean?  // Whether the call was inbound
+  queueStatus        String?   // Status of the call queue
+  endpointUrl        String?   // URL of the endpoint
+  maxDuration        Int?      // Maximum duration of the call
+  errorMessage       String?   // Error message, if any
+  variables          Json?     // Additional variables
+  answeredBy         String?   // Who answered the call
+  record             Boolean?  // Whether the call was recorded
+  recordingUrl       String?   // URL of the call recording
+  concatenatedTranscript String? // Concatenated transcript of the call
+  transcripts        Json?     // Array of individual transcripts
+  status             String?   // Status of the call
+  correctedDuration  Int?      // Corrected duration of the call
+  endAt              DateTime? // When the call ended
+  price              Float?    // Price of the call
+  analysis           Json?     // Analysis of the call
+  qualificationScore Float?    // Average qualification score based on analysis
+  updatedAt          DateTime  @updatedAt
+}
