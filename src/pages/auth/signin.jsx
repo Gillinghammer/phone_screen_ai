@@ -11,7 +11,7 @@ export default function SignIn() {
 
   // Redirect if user is already logged in
   if (session) {
-    router.push("/jobs");
+    router.push("/");
   }
 
   const handleSubmit = async (e) => {
@@ -26,7 +26,7 @@ export default function SignIn() {
       } else {
         console.log('debug')
         console.log(result);
-        router.push("/jobs");
+        router.push("/");
       }
     });
   };
