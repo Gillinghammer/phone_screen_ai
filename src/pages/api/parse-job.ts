@@ -91,7 +91,7 @@ const generateInterviewQuestions = async (details) => {
 };
 
 // API route handler
-export default async (NextApiRequest, NextApiResponse) => {
+const parseJob = async (NextApiRequest, NextApiResponse) => {
   if (NextApiRequest.method === 'POST') {
     const details = NextApiRequest.body.details;
     const extractedInfo = {
@@ -113,3 +113,5 @@ export default async (NextApiRequest, NextApiResponse) => {
     NextApiResponse.status(405).end(`Method ${req.method} Not Allowed`);
   }
 };
+
+export default parseJob;
