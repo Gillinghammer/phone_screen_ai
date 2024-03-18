@@ -16,6 +16,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/Layout.js", "src/pages/jobs/index.tsx.bak", "src/pages/candidates/index.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/Layout.js", "src/pages/jobs/index.tsx.bak", "src/pages/candidates/index.js", "src/pages/_app.jsx", "src/middleware.js"],
   "exclude": ["node_modules"]
 }
