@@ -1,3 +1,4 @@
+// pages/api/auth/[...nextauth].js
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -36,16 +37,21 @@ export default NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
+      console.log("JWT callback - User:", user);
+      console.log("JWT callback - Token before:", token);
       if (user) {
         token.id = user.id;
       } else if (!token.id && token.sub) {
-        // Use the 'sub' claim as the user ID if the 'user' object is not present
         token.id = token.sub;
       }
+      console.log("JWT callback - Token after:", token);
       return token;
     },
     async session({ session, token }) {
+      console.log("Session callback - Token:", token);
+      console.log("Session callback - Session before:", session);
       session.user = { ...session.user, id: token.id };
+      console.log("Session callback - Session after:", session);
       return session;
     },
   },
