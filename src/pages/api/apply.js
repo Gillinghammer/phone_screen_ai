@@ -34,27 +34,30 @@ export default async function handle(req, res) {
     }
 
     // Call the make-call API route with the necessary details
-    const callResponse = await fetch("http://localhost:3000/api/make-call", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        phone,
-        jobId: jobId,
-        company: job.company,
-        candidateId: candidate.id,
-        jobTitle: job.jobTitle,
-        jobDescription: job.jobDescription,
-        jobRequirements: job.requirements,
-        jobResponsibilities: job.responsibilities,
-        jobLocation: job.jobLocation,
-        remoteFriendly: job.remoteFriendly,
-        salary: job.salary,
-        interviewQuestions: job.interviewQuestions,
-      }),
-    });
+    const callResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/make-call`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          phone,
+          jobId: jobId,
+          company: job.company,
+          candidateId: candidate.id,
+          jobTitle: job.jobTitle,
+          jobDescription: job.jobDescription,
+          jobRequirements: job.requirements,
+          jobResponsibilities: job.responsibilities,
+          jobLocation: job.jobLocation,
+          remoteFriendly: job.remoteFriendly,
+          salary: job.salary,
+          interviewQuestions: job.interviewQuestions,
+        }),
+      }
+    );
 
     if (!callResponse.ok) {
       throw new Error("Failed to make call");
