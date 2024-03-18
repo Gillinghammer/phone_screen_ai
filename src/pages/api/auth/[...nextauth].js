@@ -1,27 +1,30 @@
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs'; // Make sure to install bcryptjs if you haven't
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs"; // Make sure to install bcryptjs if you haven't
 
 const prisma = new PrismaClient();
 
 export default NextAuth({
   providers: [
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-      
-        if (user && bcrypt.compareSync(credentials.password, user.password)) {
-          console.log('User from database:', user);
-          return { id: user.id, name: user.name, email: user.email };
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (user && bcrypt.compareSync(credentials.password, user.password)) {
+            return { id: user.id, name: user.name, email: user.email };
+          }
+        } catch (error) {
+          console.error("Authentication error:", error);
         }
         return null;
       },
@@ -29,11 +32,10 @@ export default NextAuth({
   ],
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
   },
   callbacks: {
     async jwt({ token, user }) {
-      
       if (user) {
         token.id = user.id;
       } else if (!token.id && token.sub) {
@@ -48,10 +50,10 @@ export default NextAuth({
     },
   },
   pages: {
-    signIn: '/auth/signin',
-    signOut: '/auth/signout',
-    error: '/auth/error',
-    verifyRequest: '/auth/verify-request',
+    signIn: "/auth/signin",
+    signOut: "/auth/signout",
+    error: "/auth/error",
+    verifyRequest: "/auth/verify-request",
     newUser: null,
   },
 });
