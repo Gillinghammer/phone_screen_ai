@@ -30,39 +30,44 @@ export async function getServerSideProps(context) {
 
   let jobs = await prisma.job.findMany({
     where: { userId },
-    include: {
+    select: {
+      id: true,  // Include the id field from jobs
+      company: true,  // Include the company field from jobs
+      jobTitle: true,  // Include the jobTitle field from jobs
       candidates: {
-        include: {
+        select: {
+          id: true,  // Include the id field from candidates
+          name: true,  // Include the name field from candidates
+          email: true,  // Include the email field from candidates
+          phone: true,  // Include the phone field from candidates
+          status: true,  // Include the status field from candidates
           phoneScreen: {
             select: {
-              id: true,  // Include the id field
-              callLength: true,  // Include the callLength field
-              qualificationScore: true,  // Include the qualificationScore field
-              // Add other fields as needed
+              id: true,  // Include the id field from phoneScreen
+              callLength: true,  // Include the callLength field from phoneScreen
+              qualificationScore: true,  // Include the qualificationScore field from phoneScreen
             },
           },
         },
       },
     },
   });
+  
+  
 
   // Convert DateTime fields to strings
   jobs = jobs.map((job) => ({
     ...job,
     candidates: job.candidates.map((candidate) => ({
       ...candidate,
-      createdAt: candidate.createdAt.toISOString(),
-      updatedAt: candidate.updatedAt.toISOString(),
       phoneScreen: candidate.phoneScreen
         ? {
             ...candidate.phoneScreen,
-            createdAt: candidate.phoneScreen.createdAt?.toISOString(),
-            updatedAt: candidate.phoneScreen.updatedAt.toISOString(),
-            endAt: candidate.phoneScreen.endAt?.toISOString(),
           }
         : null,
     })),
   }));
+  
 
   return {
     props: {
