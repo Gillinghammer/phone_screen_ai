@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);
-
+  console.log("debug session", session)
   if (!session || !session.user?.email) {
     return {
       redirect: {
@@ -33,7 +33,14 @@ export async function getServerSideProps(context) {
     include: {
       candidates: {
         include: {
-          phoneScreen: true,
+          phoneScreen: {
+            select: {
+              id: true,  // Include the id field
+              callLength: true,  // Include the callLength field
+              qualificationScore: true,  // Include the qualificationScore field
+              // Add other fields as needed
+            },
+          },
         },
       },
     },

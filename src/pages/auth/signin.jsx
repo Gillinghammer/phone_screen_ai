@@ -26,7 +26,7 @@ export default function SignIn() {
       } else {
         console.log('debug')
         console.log(result);
-        router.push(result.url || "/jobs");
+        router.push("/jobs");
       }
     });
   };
