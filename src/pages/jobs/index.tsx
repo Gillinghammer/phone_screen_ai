@@ -4,6 +4,7 @@ import Head from "next/head";
 import React from "react";
 import Layout from "../../components/Layout";
 import { getSession } from "next-auth/react";
+import Link from "next/link";
 
 const prisma = new PrismaClient();
 
@@ -73,12 +74,12 @@ export default function JobsPage({ jobs }) {
         <div className="container mx-auto mt-10">
           <h1 className="text-4xl font-bold mb-6">Active Job Screens</h1>
           <div className="overflow-x-auto">
-            <a
+            <Link
               href={`/add`}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded float-right"
             >
               Add Job
-            </a>{" "}
+            </Link>{" "}
             <table className="table-auto w-full">
               <thead className="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
                 <tr className="text-left">
@@ -130,22 +131,22 @@ export default function JobsPage({ jobs }) {
                         </td>
                         <td className="p-2 whitespace-nowrap">
                           <div className="text-left">
-                            <a
+                            <Link
                               href={`/jobs/${job.id}`}
                               className="text-blue-500 hover:text-blue-600"
                             >
                               {job.jobTitle}
-                            </a>
+                            </Link>
                           </div>
                         </td>
                         <td className="p-2 whitespace-nowrap">
                           <div className="text-left">
-                            <a
+                            <Link
                               href={`/apply/${job.id}`}
                               className="text-blue-500 hover:text-blue-600"
                             >
                               Apply here
-                            </a>
+                            </Link>
                           </div>
                         </td>
                         <td className="p-2 whitespace-nowrap">

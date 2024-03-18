@@ -1,14 +1,18 @@
 // src/pages/index.tsx
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import Layout from '../components/Layout';
+import type { NextPage } from "next";
+import Head from "next/head";
+import Layout from "../components/Layout";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   return (
     <Layout>
       <Head>
         <title>PhoneScreen.AI - Home</title>
-        <meta name="description" content="PhoneScreen.AI - Streamline your recruitment process" />
+        <meta
+          name="description"
+          content="PhoneScreen.AI - Streamline your recruitment process"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -20,12 +24,12 @@ const Home: NextPage = () => {
           Streamline your recruitment process with automated phone screening.
         </p>
         <div className="mt-8">
-          <a
+          <Link
             href="/auth/signup"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             Get Started
-          </a>
+          </Link>
         </div>
       </main>
     </Layout>

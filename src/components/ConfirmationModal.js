@@ -103,7 +103,7 @@ const ConfirmationModal = ({ company, isOpen, onClose, onConfirm }) => {
               allChecked ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400"
             } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
           >
-            I'm ready for my phone screen
+            Ready for my phone screen!
           </button>
         </div>
       </div>

@@ -81,13 +81,7 @@ export default function CandidateDetailPage({ phoneScreen }) {
               <p>
                 LinkedIn:{" "}
                 {phoneScreen.candidate.linkedinUrl ? (
-                  <a
-                    href={phoneScreen.candidate.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Profile
-                  </a>
+                  <Link href={phoneScreen.candidate.linkedinUrl}>Profile</Link>
                 ) : (
                   "N/A"
                 )}

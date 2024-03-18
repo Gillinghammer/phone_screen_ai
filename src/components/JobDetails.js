@@ -131,20 +131,6 @@ const JobDetailsForm = ({ jobDetails, setJobDetails }) => {
     setJobDetails({ ...jobDetails, [e.target.name]: e.target.checked });
   };
 
-  const handleAddRequirement = () => {
-    setJobDetails({
-      ...jobDetails,
-      requirements: [...jobDetails.requirements, ""],
-    });
-  };
-
-  const handleAddResponsibility = () => {
-    setJobDetails({
-      ...jobDetails,
-      responsibilities: [...jobDetails.responsibilities, ""],
-    });
-  };
-
   const handleAddQuestion = () => {
     setJobDetails({
       ...jobDetails,

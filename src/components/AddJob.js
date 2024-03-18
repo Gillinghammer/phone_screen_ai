@@ -66,7 +66,7 @@ const AddJob = () => {
         <ol className="text-sm list-decimal list-inside mb-4 space-y-4">
           <li>Copy the job listing text from your careers page.</li>
           <li>Paste it into the text area on this page.</li>
-          <li>Click "Generate Job Listing" to proceed.</li>
+          <li>Click Generate Job Listing to proceed.</li>
           <li>
             Our AI will parse the details and generate interview questions.
           </li>

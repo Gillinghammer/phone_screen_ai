@@ -107,11 +107,7 @@ export default function JobDetailPage({ job }) {
                   <td>{candidate.phone}</td>
                   <td>
                     {candidate.linkedinUrl ? (
-                      <Link href={candidate.linkedinUrl}>
-                        <a target="_blank" rel="noopener noreferrer">
-                          visit
-                        </a>
-                      </Link>
+                      <Link href={candidate.linkedinUrl}>visit</Link>
                     ) : (
                       "N/A"
                     )}
