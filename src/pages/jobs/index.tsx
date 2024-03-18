@@ -2,6 +2,7 @@
 import { PrismaClient } from "@prisma/client";
 import Head from "next/head";
 import React from "react";
+import Layout from "../../components/Layout";
 import { getSession } from "next-auth/react";
 
 const prisma = new PrismaClient();
@@ -68,79 +69,102 @@ export default function JobsPage({ jobs }) {
       <Head>
         <title>Active Job Screens</title>
       </Head>
-      <div className="container mx-auto mt-10">
-        <h1 className="text-4xl font-bold mb-6">Active Job Screens</h1>
-        <div className="overflow-x-auto">
-          <table className="table-auto w-full">
-            <thead className="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
-              <tr>
-                <th className="p-2 whitespace-nowrap">
-                  <div className="font-semibold text-left">Company</div>
-                </th>
-                <th className="p-2 whitespace-nowrap">
-                  <div className="font-semibold text-left">Job Title</div>
-                </th>
-                <th className="p-2 whitespace-nowrap">
-                  <div className="font-semibold text-center">Candidates</div>
-                </th>
-                <th className="p-2 whitespace-nowrap">
-                  <div className="font-semibold text-center">Avg Score</div>
-                </th>
-                <th className="p-2 whitespace-nowrap">
-                  <div className="font-semibold text-center">Actions</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-sm divide-y divide-gray-100">
-              {jobs.map((job) => {
-                const avgScore =
-                  job.candidates.reduce((acc, candidate) => {
+      <Layout>
+        <div className="container mx-auto mt-10">
+          <h1 className="text-4xl font-bold mb-6">Active Job Screens</h1>
+          <div className="overflow-x-auto">
+            <a
+              href={`/add`}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded float-right"
+            >
+              Add Job
+            </a>{" "}
+            <table className="table-auto w-full">
+              <thead className="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                <tr className="text-left">
+                  <th className="p-2 whitespace-nowrap">
+                    <div className="font-semibold text-left">Company</div>
+                  </th>
+                  <th className="p-2 whitespace-nowrap">
+                    <div className="font-semibold text-left">Job Title</div>
+                  </th>
+                  <th className="p-2 whitespace-nowrap">
+                    <div className="font-semibold text-left">
+                      Job Screening URL
+                    </div>
+                  </th>
+                  <th className="p-2 whitespace-nowrap">
+                    <div className="font-semibold text-center">Candidates</div>
+                  </th>
+                  <th className="p-2 whitespace-nowrap">
+                    <div className="font-semibold text-center">Avg Score</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="text-sm divide-y divide-gray-100">
+                {jobs.map((job) => {
+                  const totalScore = job.candidates.reduce((acc, candidate) => {
                     return (
-                      acc + (candidate.phoneScreen?.qualificationScore || 0)
+                      acc +
+                      Number(candidate.phoneScreen?.qualificationScore || 0)
                     );
-                  }, 0) / job.candidates.length;
+                  }, 0);
 
-                return (
-                  <tr key={job.id}>
-                    <td className="p-2 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="font-medium text-gray-800">
-                          {job.company}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-2 whitespace-nowrap">
-                      <div className="text-left">{job.jobTitle}</div>
-                    </td>
-                    <td className="p-2 whitespace-nowrap">
-                      <div className="text-center">{job.candidates.length}</div>
-                    </td>
-                    <td className="p-2 whitespace-nowrap">
-                      <div className="text-center">{avgScore.toFixed(2)}</div>
-                    </td>
-                    <td className="p-2 whitespace-nowrap">
-                      <div className="text-lg text-center">
-                        <a
-                          href="#"
-                          className="text-blue-500 hover:text-blue-600"
-                        >
-                          view
-                        </a>{" "}
-                        <a
-                          href="#"
-                          className="text-blue-500 hover:text-blue-600"
-                        >
-                          archive
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  const avgScore =
+                    job.candidates.length > 0
+                      ? totalScore / job.candidates.length
+                      : NaN;
+
+                  const displayAvgScore = isNaN(avgScore)
+                    ? "-"
+                    : avgScore.toFixed(2);
+                  return (
+                    <>
+                      <tr key={job.id}>
+                        <td className="p-2 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="font-medium text-gray-800">
+                              {job.company}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-2 whitespace-nowrap">
+                          <div className="text-left">
+                            <a
+                              href={`/jobs/${job.id}`}
+                              className="text-blue-500 hover:text-blue-600"
+                            >
+                              {job.jobTitle}
+                            </a>
+                          </div>
+                        </td>
+                        <td className="p-2 whitespace-nowrap">
+                          <div className="text-left">
+                            <a
+                              href={`/apply/${job.id}`}
+                              className="text-blue-500 hover:text-blue-600"
+                            >
+                              Apply here
+                            </a>
+                          </div>
+                        </td>
+                        <td className="p-2 whitespace-nowrap">
+                          <div className="text-center">
+                            {job.candidates.length}
+                          </div>
+                        </td>
+                        <td className="p-2 whitespace-nowrap">
+                          <div className="text-center">{displayAvgScore}</div>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </Layout>
     </>
   );
 }

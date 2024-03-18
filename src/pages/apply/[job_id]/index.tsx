@@ -1,8 +1,7 @@
-// pages/jobs/[job_id].tsx
 import { useState } from "react";
 import { PrismaClient } from "@prisma/client";
 import { GetServerSideProps } from "next";
-
+import ConfirmationModal from "../../../components/ConfirmationModal";
 const prisma = new PrismaClient();
 
 const JobPage = ({ job }) => {
@@ -13,15 +12,14 @@ const JobPage = ({ job }) => {
     resumeUrl: "",
     jobId: job.id,
   });
-  console.log("job", job);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     setApplicantDetails({ ...applicantDetails, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     try {
       const response = await fetch("/api/apply", {
         method: "POST",
@@ -32,7 +30,6 @@ const JobPage = ({ job }) => {
       });
 
       if (response.ok) {
-        // Clear form or show success message
         setApplicantDetails({
           name: "",
           email: "",
@@ -42,102 +39,139 @@ const JobPage = ({ job }) => {
         });
         alert("Application submitted successfully!");
       } else {
-        // Handle error, show an error message
         alert("Failed to submit application.");
       }
     } catch (error) {
-      // Handle the error, show an error message
       console.error("An error occurred while submitting the form:", error);
       alert("An error occurred while submitting the application.");
     }
   };
 
   return (
-    <div>
-      {/* ... existing job page JSX ... */}
-      <form onSubmit={handleSubmit} className="w-full max-w-lg my-5">
-        <div className="flex flex-wrap -mx-3 mb-6">
-          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-              id="name"
-              type="text"
-              placeholder="Jane Doe"
-              name="name"
-              value={applicantDetails.name}
-              onChange={handleInputChange}
-              required
-            />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
+      <div className="container mx-auto bg-white rounded shadow-md overflow-hidden max-w-4xl">
+        <div className="md:flex">
+          <div className="md:w-1/2 p-5 border-r">
+            <h1 className="text-2xl font-bold">
+              {job.jobTitle} at {job.company}
+            </h1>
+            <div className="mb-5">
+              <h2 className="font-semibold">Location</h2>
+              <p className="text-gray-600">
+                {job.jobLocation}{" "}
+                {job.remoteFriendly ? "(Remote friendly)" : ""}
+              </p>
+            </div>
+            <div className="mb-5">
+              <h2 className="font-semibold">Job Description</h2>
+              <p className="text-sm">{job.jobDescription}</p>
+            </div>
+            <div className="mb-5">
+              <h2 className="font-semibold">Seniority</h2>
+              <p className="text-sm">{job.seniority}</p>
+            </div>
+            {/* Include more job details as needed */}
           </div>
-          <div className="w-full md:w-1/2 px-3">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="email"
-            >
-              Email
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-              id="email"
-              type="email"
-              placeholder="jane.doe@example.com"
-              name="email"
-              value={applicantDetails.email}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="phone"
-            >
-              Phone
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-              id="phone"
-              type="text"
-              placeholder="+1234567890"
-              name="phone"
-              value={applicantDetails.phone}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="w-full md:w-1/2 px-3">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="resumeUrl"
-            >
-              Resume URL (optional)
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-              id="resumeUrl"
-              type="url"
-              placeholder="http://linkedin.com/in/jane-doe"
-              name="resumeUrl"
-              value={applicantDetails.resumeUrl}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="w-full px-3 text-right">
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Apply
-            </button>
+          <div className="md:w-1/2 p-5">
+            <form className="space-y-4">
+              <div className="mb-4">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Full name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={applicantDetails.name}
+                  onChange={handleInputChange}
+                  required
+                  className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
+                  placeholder="Jane Doe"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  value={applicantDetails.email}
+                  onChange={handleInputChange}
+                  required
+                  className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
+                  placeholder="jane.doe@example.com"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Phone number
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  id="phone"
+                  value={applicantDetails.phone}
+                  onChange={handleInputChange}
+                  required
+                  className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
+                  placeholder="+1234567890"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="resumeUrl"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Resume URL (optional)
+                </label>
+                <input
+                  type="url"
+                  name="resumeUrl"
+                  id="resumeUrl"
+                  value={applicantDetails.resumeUrl}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
+                  placeholder="http://linkedin.com/in/jane-doe"
+                />
+              </div>
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  disabled={
+                    applicantDetails.name === "" ||
+                    applicantDetails.email === "" ||
+                    applicantDetails.phone === ""
+                  }
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Apply for this job
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </form>
+      </div>
+      <ConfirmationModal
+        company={job.company}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={() => {
+          setIsModalOpen(false);
+          handleSubmit(); // Call your form submission function here
+        }}
+      />
     </div>
   );
 };

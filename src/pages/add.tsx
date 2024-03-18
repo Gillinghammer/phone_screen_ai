@@ -1,6 +1,6 @@
 // pages/jobs.tsx
-import Layout from "../../components/Layout";
-import AddJob from "../../components/AddJob";
+import Layout from "../components/Layout";
+import AddJob from "../components/AddJob";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import Link from "next/link";
@@ -12,19 +12,6 @@ const JobsPage = ({ jobs }) => {
   return (
     <Layout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Your Jobs</h1>
-        <ul className="mt-4">
-          {jobs.map((job) => (
-            <li key={job.id} className="mb-2">
-              <Link
-                href={`/jobs/${job.id}`}
-                className="text-blue-500 hover:text-blue-700"
-              >
-                {job.jobTitle}
-              </Link>
-            </li>
-          ))}
-        </ul>
         <h3 className="text-2xl font-semibold text-gray-900">Post a New Job</h3>
         <AddJob />
       </div>

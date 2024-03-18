@@ -3,10 +3,21 @@ import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
+import Layout from "../../components/Layout";
 
 const prisma = new PrismaClient();
 
 export async function getServerSideProps(context) {
+  const session = await getSession(context);
+
+  if (!session || !session.user?.email) {
+    return {
+      redirect: {
+        destination: "/auth/signin",
+        permanent: false,
+      },
+    };
+  }
   const { job_id } = context.params;
   const job = await prisma.job.findUnique({
     where: { id: parseInt(job_id) },
@@ -61,49 +72,60 @@ export default function JobDetailPage({ job }) {
           {job.jobTitle} - {job.company}
         </title>
       </Head>
-      <div className="container mx-auto mt-10">
-        <h1 className="text-4xl font-bold mb-6">
-          {job.company} - {job.jobTitle}
-        </h1>
-        {/* Add a button to archive job */}
-        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded float-right">
-          Archive Job
-        </button>
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>LinkedIn</th>
-              <th>Duration</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {job.candidates.map((candidate) => (
-              <tr key={candidate.id}>
-                <td>{candidate.name}</td>
-                <td>{candidate.email}</td>
-                <td>{candidate.phone}</td>
-                <td>
-                  {candidate.linkedinUrl ? (
-                    <Link href={candidate.linkedinUrl}>
-                      <a target="_blank" rel="noopener noreferrer">
-                        visit
-                      </a>
-                    </Link>
-                  ) : (
-                    "N/A"
-                  )}
-                </td>
-                <td>{candidate.phoneScreen?.callLength}</td>
-                <td>{candidate.phoneScreen?.qualificationScore ?? "N/A"}</td>
+      <Layout>
+        <div className="container mx-auto mt-10">
+          <h1 className="text-4xl font-bold mb-6">
+            {job.company} - {job.jobTitle}
+          </h1>
+          {/* Add a button to archive job */}
+          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded float-right">
+            Archive Job
+          </button>
+          <table className="min-w-full leading-normal">
+            <thead>
+              <tr className="text-left">
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>LinkedIn</th>
+                <th>Duration</th>
+                <th>Score</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {job.candidates.map((candidate) => (
+                <tr key={candidate.id}>
+                  <td>
+                    <Link
+                      href={`/jobs/${job.id}/${candidate.id}`}
+                      className="text-indigo-500"
+                    >
+                      {candidate.name}
+                    </Link>
+                  </td>
+                  <td>{candidate.email}</td>
+                  <td>{candidate.phone}</td>
+                  <td>
+                    {candidate.linkedinUrl ? (
+                      <Link href={candidate.linkedinUrl}>
+                        <a target="_blank" rel="noopener noreferrer">
+                          visit
+                        </a>
+                      </Link>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td>{candidate.phoneScreen?.callLength}</td>
+                  <td>
+                    {candidate.phoneScreen?.qualificationScore.toFixed(2) ?? 0}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Layout>
     </>
   );
 }

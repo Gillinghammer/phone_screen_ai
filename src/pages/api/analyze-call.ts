@@ -45,9 +45,11 @@ export default async function analyzeCall(req: NextApiRequest, res: NextApiRespo
       const updatedPhoneScreen = await prisma.phoneScreen.update({
         where: { id: phoneScreenId },
         data: {
-          analysis: response.data,
-          qualificationScore: response.data.answers.filter((item, index) => index % 2 !== 0).reduce((acc, score) => acc + score, 0) / (response.data.answers.length / 2),
-        },
+            analysis: response.data,
+            qualificationScore: response.data.answers
+              .filter((item, index) => index % 2 !== 0)
+              .reduce((acc, score) => acc + (Number(score) || 0), 0) / (response.data.answers.length / 2),
+          },
       });
 
       // Send the analysis result back to the client

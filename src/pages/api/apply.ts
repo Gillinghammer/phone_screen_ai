@@ -45,6 +45,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         name,
         phone,
         jobId: jobId,
+        company: job.company,
         candidateId: candidate.id,
         jobTitle: job.jobTitle,
         jobDescription: job.jobDescription,

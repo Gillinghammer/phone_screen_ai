@@ -11,7 +11,7 @@ export default function SignIn() {
 
   // Redirect if user is already logged in
   if (session) {
-    router.push("/dashboard");
+    router.push("/jobs");
   }
 
   const handleSubmit = async (e) => {
@@ -24,8 +24,8 @@ export default function SignIn() {
       if (result.error) {
         alert(result.error);
       } else {
-        // Redirect to the dashboard or other intended page
-        router.push(result.url || "/dashboard");
+        // Redirect to the /jobs
+        router.push(result.url || "/jobs");
       }
     });
   };
