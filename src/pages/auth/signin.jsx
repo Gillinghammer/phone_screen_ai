@@ -24,8 +24,7 @@ export default function SignIn() {
       if (result.error) {
         alert(result.error);
       } else {
-        // Redirect to the /jobs
-        router.push(result.url || "/jobs");
+        router.push(result.url || "/");
       }
     });
   };
