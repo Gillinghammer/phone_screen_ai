@@ -1,5 +1,5 @@
 // pages/_document.tsx
-import Document, { Html, Head, Main, NextScript } from 'next/document';
+import Document, { Html, Head, Main, NextScript } from "next/document";
 
 class MyDocument extends Document {
   render() {
@@ -13,7 +13,6 @@ class MyDocument extends Document {
           <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-            integrity="sha384-SZXxX4whJ79/GFf0DWbrkABub6GpeADjkS3gzEzAB6neJiet/mkS9nupP69yKHk"
             crossOrigin="anonymous"
           />
           <meta name="theme-color" content="#FFFFFF" />

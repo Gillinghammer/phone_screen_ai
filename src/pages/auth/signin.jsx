@@ -19,12 +19,14 @@ export default function SignIn() {
     signIn("credentials", {
       email,
       password,
-      redirect: false, // Set redirect to false to handle redirecting here
+      redirect: false, 
     }).then((result) => {
       if (result.error) {
         alert(result.error);
       } else {
-        router.push(result.url || "/");
+        console.log('debug')
+        console.log(result);
+        router.push(result.url || "/jobs");
       }
     });
   };
