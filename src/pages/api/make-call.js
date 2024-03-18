@@ -50,6 +50,11 @@ export default async function handler(req, res) {
     Thank the candidate for their time and participation in the interview.
     Inform them that their responses will be reviewed, and they will be contacted for further steps if they are shortlisted.
     Wish them good luck and end the call on a positive note.
+
+    IMPORTANT:
+    Do not give the candidate any indication of how well they are doing in the phone screen.
+    Do no promise they will hear from you soon or that they will be contacted if they are shortlisted.
+    Do stick to the interview questions ensuring you have asked each and every one of them. Do not make up questions on the fly.
   
     EXAMPLE DIALOGUE:
     You: Hello, this is the AI agent from ${company}. May I speak with ${name}?
@@ -75,7 +80,7 @@ export default async function handler(req, res) {
     const data = {
       phone_number: phone,
       task: task,
-      voice: "mason",
+      voice: "RL0",
       request_data: {
         job_title: jobTitle,
         job_location: jobTitle,
@@ -89,17 +94,17 @@ export default async function handler(req, res) {
       voice_settings: {
         speed: 1,
       },
-      interruption_threshold: 320,
-      temperature: 0.3,
+      interruption_threshold: 400,
+      temperature: 0.2,
       voicemail_action: "hangup",
       start_time: null,
       transfer_phone_number: null,
       answered_by_enabled: false,
       from: null,
-      first_sentence: "The following conversation is simulated by an AI agent.",
+      first_sentence: null,
       record: true,
       wait_for_greeting: true,
-      max_duration: 30,
+      max_duration: 25,
       model: "enhanced",
       language: "ENG",
       webhook: `${process.env.WEBHOOK_URL}/api/webhook/${jobId}/${candidateId}`,
