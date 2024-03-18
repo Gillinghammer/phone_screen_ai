@@ -4,6 +4,10 @@
     "pages/api/parse-job.js": {
       "memory": 3008,
       "maxDuration": 25
+    },
+    "pages/api/analyze-call.js": {
+      "memory": 3008,
+      "maxDuration": 25
     }
   }
 }
