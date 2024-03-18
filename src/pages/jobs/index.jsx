@@ -11,14 +11,14 @@ const prisma = new PrismaClient();
 export async function getServerSideProps(context) {
   const session = await getSession(context);
   console.log("debug session", session)
-  if (!session || !session.user?.email) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
+  // if (!session || !session.user?.email) {
+  //   return {
+  //     redirect: {
+  //       destination: "/auth/signin",
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   const user = await prisma.user.findUnique({
     where: {
