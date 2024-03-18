@@ -1,9 +1,7 @@
 // pages/jobs.tsx
 import Layout from "../components/Layout";
 import AddJob from "../components/AddJob";
-import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
-import Link from "next/link";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
