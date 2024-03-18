@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { PrismaClient } from "@prisma/client";
-import { GetServerSideProps } from "next";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 const prisma = new PrismaClient();
 
@@ -176,11 +175,11 @@ const JobPage = ({ job }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps = async (context) => {
   const { job_id } = context.params;
 
   const job = await prisma.job.findUnique({
-    where: { id: parseInt(job_id as string) },
+    where: { id: parseInt(job_id) },
     select: {
       id: true,
       jobTitle: true,

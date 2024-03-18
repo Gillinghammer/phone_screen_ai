@@ -1,11 +1,10 @@
-// pages/api/analyze-call.ts
-import { NextApiRequest, NextApiResponse } from 'next';
+// pages/api/analyze-call.js
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
 
 const prisma = new PrismaClient();
 
-export default async function analyzeCall(req: NextApiRequest, res: NextApiResponse) {
+export default async function analyzeCall(req, res) {
   if (req.method === 'POST') {
     const { callId, jobId, phoneScreenId } = req.body;
 
@@ -21,7 +20,7 @@ export default async function analyzeCall(req: NextApiRequest, res: NextApiRespo
       }
 
       // Prepare the questions array for the 3rd party API request
-      const questions = job.interviewQuestions.set.map((question) => [
+      const questions = job.interviewQuestions?.set?.map((question) => [
         question,
         'Based on the human\'s response to this question rate their qualification on a 0 to 100 point scale. 0 indicates no answer or examples provided that demonstrate any experience or awareness of the question. 100 demonstrates a detailed, nuanced response with direct personal examples that perfectly answer the question. 50 indicates an acknowledgement and awareness of what is being asked but vaguely specified experience.',
       ]);

@@ -19,7 +19,7 @@ const JobsPage = ({ jobs }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps = async (context) => {
   const session = await getSession(context);
 
   if (!session || !session.user?.email) {

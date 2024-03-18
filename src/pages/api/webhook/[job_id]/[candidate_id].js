@@ -1,11 +1,10 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
-import axios from 'axios';
+import { PrismaClient } from "@prisma/client";
+import axios from "axios";
 
 const prisma = new PrismaClient();
 
-export default async function webhook(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
+export default async function webhook(req, res) {
+  if (req.method === "POST") {
     // Extract the job_id and candidate_id from the query parameters
     const { job_id, candidate_id } = req.query;
 
@@ -41,7 +40,7 @@ export default async function webhook(req: NextApiRequest, res: NextApiResponse)
     try {
       const phoneScreen = await prisma.phoneScreen.upsert({
         where: {
-          candidateId: parseInt(candidate_id as string),
+          candidateId: parseInt(candidate_id),
         },
         update: {
           callId: call_id,
@@ -70,8 +69,8 @@ export default async function webhook(req: NextApiRequest, res: NextApiResponse)
           qualificationScore: parseFloat(price), // Assuming qualificationScore comes from 'price', update accordingly
         },
         create: {
-          jobId: parseInt(job_id as string),
-          candidateId: parseInt(candidate_id as string),
+          jobId: parseInt(job_id),
+          candidateId: parseInt(candidate_id),
           callId: call_id,
           callLength: call_length,
           to,
@@ -101,21 +100,29 @@ export default async function webhook(req: NextApiRequest, res: NextApiResponse)
       });
 
       // Call the analyze-call API route with the necessary details
-      const analyzeResponse = await axios.post('http://localhost:3000/api/analyze-call', {
-        jobId: job_id,
-        callId: call_id,
-        phoneScreenId: phoneScreen.id,
-      });
+      const analyzeResponse = await axios.post(
+        "http://localhost:3000/api/analyze-call",
+        {
+          jobId: job_id,
+          callId: call_id,
+          phoneScreenId: phoneScreen.id,
+        }
+      );
 
       // Send a response back to acknowledge receipt of the data
-      res.status(200).json({ message: 'Webhook data received and stored successfully', analyzeResponse: analyzeResponse.data });
+      res.status(200).json({
+        message: "Webhook data received and stored successfully",
+        analyzeResponse: analyzeResponse.data,
+      });
     } catch (error) {
-      console.error('Error storing webhook data:', error);
-      res.status(500).json({ message: 'Internal server error', error: error.message });
+      console.error("Error storing webhook data:", error);
+      res
+        .status(500)
+        .json({ message: "Internal server error", error: error.message });
     }
   } else {
     // If the request method is not POST, return a 405 Method Not Allowed error
-    res.setHeader('Allow', ['POST']);
+    res.setHeader("Allow", ["POST"]);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
