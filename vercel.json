@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "functions": {
+    "pages/api/parse-job.js": {
+      "memory": 3008,
+      "maxDuration": 25
+    }
+  }
+}
