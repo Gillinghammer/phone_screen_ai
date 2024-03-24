@@ -53,9 +53,11 @@ const Home: NextPage = () => {
               <span className="block">AI Powered</span>
               <span className="block text-indigo-600">Candidate Screening</span>
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
-              Natural sounding AI agents call and screen job applicants, saving
-              teams immense amounts of time and money.
+            <p className="mt-3 max-w-md mx-auto text-lg text-black sm:text-xl md:mt-5 md:max-w-3xl">
+              Recoup lost hours spent sifting resumes, and screening applicants.
+              Our AI agent automatically calls applicants, screens for
+              qualifications, and presents the top candidates for your
+              interviews.
             </p>
             <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
               <div className="rounded-md shadow">
