@@ -106,7 +106,7 @@ const Home: NextPage = () => {
           </div>
         </div>
       </section>
-      <section className="py-12 bg-white overflow-hidden md:py-20 lg:py-24">
+      <section className="py-12 bg-gray-50 overflow-hidden md:py-20 lg:py-24">
         <div className="relative max-w-xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             Want to give it a try?
@@ -116,7 +116,7 @@ const Home: NextPage = () => {
             you a call to screen you for the job.
           </p>
           <p className="mt-4 text-lg leading-7 text-black">
-            Don't worry if you're not a fit, it's just a demo!
+            Don&apos;t worry if you&apos;re not a fit, it&apos;s just a demo!
           </p>
           <div className="mt-8">
             <Link
