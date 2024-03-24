@@ -16,6 +16,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/Layout.js", "src/pages/jobs/index.tsx.bak", "src/pages/candidates/index.js", "src/pages/_app.jsx", "src/middleware.tsx", "src/pages/api/analyze-call.js", "src/pages/api/apply.js", "src/pages/api/candidates/[candidate_id].js", "src/pages/api/make-call.js", "src/pages/api/parse-job.js", "src/pages/jobs/index.jsx", "src/pages/jobs/[job_id]/[candidate_id].jsx", "src/pages/jobs/[job_id].jsx", "src/pages/auth/signup.jsx", "src/pages/auth/signin.jsx", "src/pages/apply/[job_id]/index.jsx", "src/pages/api/webhook/[job_id]/[candidate_id].js", "src/pages/add.jsx", "src/pages/index.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/Layout.js", "src/pages/jobs/index.tsx.bak", "src/pages/candidates/index.js", "src/pages/_app.jsx", "src/middleware.tsx", "src/pages/api/analyze-call.js", "src/pages/api/apply.js", "src/pages/api/candidates/[candidate_id].js", "src/pages/api/make-call.js", "src/pages/api/parse-job.js", "src/pages/jobs/index.jsx", "src/pages/jobs/[job_id]/[candidate_id].jsx", "src/pages/jobs/[job_id].jsx", "src/pages/auth/signup.jsx", "src/pages/auth/signin.jsx", "src/pages/apply/[job_id]/index.jsx", "src/pages/api/webhook/[job_id]/[candidate_id].js", "src/pages/add.jsx", "src/pages/index.tsx"],
   "exclude": ["node_modules"]
 }

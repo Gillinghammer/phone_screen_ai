@@ -5,29 +5,6 @@ import Head from "next/head";
 import PilotForm from "../components/PilotForm";
 import Link from "next/link";
 
-const submitApplication = async (formData) => {
-  try {
-    const response = await fetch("/api/add-applicant", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log("Application submitted successfully", result);
-    // You can redirect the user or clear the form here
-  } catch (error) {
-    console.error("Error submitting application", error);
-    // Handle errors here
-  }
-};
-
 const Home: NextPage = () => {
   return (
     <>
