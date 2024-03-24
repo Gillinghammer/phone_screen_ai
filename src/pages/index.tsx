@@ -9,8 +9,41 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>PhoneScreen.ai - Streamline Your Hiring Process</title>
+        <title>PhoneScreen.ai - AI powered recruiting</title>
+        <meta
+          name="description"
+          content="Revolutionize your hiring process with AI-powered phone screening. Save time and improve candidate selection with PhoneScreen.ai."
+        />
         <link rel="icon" href="/favicon.ico" />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://phonescreen.ai/" />
+        <meta
+          property="og:title"
+          content="PhoneScreen.ai - AI powered recruiting"
+        />
+        <meta
+          property="og:description"
+          content="Revolutionize your hiring process with AI-powered phone screening. Save time and improve candidate selection with PhoneScreen.ai."
+        />
+        <meta property="og:image" content="https://phonescreen.ai/og.jpeg" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://phonescreen.ai/" />
+        <meta
+          property="twitter:title"
+          content="PhoneScreen.ai - AI powered recruiting"
+        />
+        <meta
+          property="twitter:description"
+          content="Revolutionize your hiring process with AI-powered phone screening. Save time and improve candidate selection with PhoneScreen.ai."
+        />
+        <meta
+          property="twitter:image"
+          content="https://yourwebsite.com/images/twitter-og-image.jpg"
+        />
       </Head>
 
       <div className="relative bg-white overflow-hidden">
@@ -97,7 +130,7 @@ const Home: NextPage = () => {
           </p>
           <div className="mt-8">
             <Link
-              href="/apply/12"
+              href="/apply/17"
               className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
             >
               Start your phone screen

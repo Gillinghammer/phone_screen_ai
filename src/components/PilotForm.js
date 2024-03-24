@@ -127,6 +127,7 @@ const PilotForm = () => {
         <label htmlFor="weeklyApplicants" className="sr-only">
           Average # of weekly job applicants
         </label>
+        <p className="text-white">Average number of weekly job applicants</p>
         <input
           onChange={handleChange}
           value={formState.weeklyApplicants}
