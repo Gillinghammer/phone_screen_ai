@@ -95,3 +95,14 @@ model PhoneScreen {
   qualificationScore Float?    // Average qualification score based on analysis
   updatedAt          DateTime  @updatedAt
 }
+
+
+model PilotProgramApplicant {
+  id         Int    @id @default(autoincrement())
+  company    String
+  firstName  String
+  lastName   String
+  email      String @unique
+  weeklyApplicants Int
+  createdAt  DateTime @default(now())
+}
