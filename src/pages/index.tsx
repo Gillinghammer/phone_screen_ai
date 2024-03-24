@@ -105,6 +105,28 @@ const Home: NextPage = () => {
           </div>
         </div>
       </section>
+      <section className="py-12 bg-white overflow-hidden md:py-20 lg:py-24">
+        <div className="relative max-w-xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+            Want to give it a try?
+          </h2>
+          <p className="mt-4 text-lg leading-7 text-black">
+            Enter your phone number on our demo page and our AI Agent will give
+            you a call to screen you for the job.
+          </p>
+          <p className="mt-4 text-lg leading-7 text-black">
+            Don't worry if you're not a fit, it's just a demo!
+          </p>
+          <div className="mt-8">
+            <a
+              href="/apply/12" // Replace "/demo-landing-page" with the actual path to your landing page
+              className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              Start your phone screen
+            </a>
+          </div>
+        </div>
+      </section>
 
       <div id="pilot-program" className="bg-indigo-600">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">

@@ -132,7 +132,7 @@ const JobPage = ({ job }) => {
                   htmlFor="resumeUrl"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Resume URL (optional)
+                  LinkedIn URL (optional)
                 </label>
                 <input
                   type="url"
