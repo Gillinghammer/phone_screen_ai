@@ -3,6 +3,7 @@ import type { NextPage } from "next";
 import TimeChart from "../components/TimeChart";
 import Head from "next/head";
 import PilotForm from "../components/PilotForm";
+import Link from "next/link";
 
 const submitApplication = async (formData) => {
   try {
@@ -118,12 +119,12 @@ const Home: NextPage = () => {
             Don't worry if you're not a fit, it's just a demo!
           </p>
           <div className="mt-8">
-            <a
-              href="/apply/12" // Replace "/demo-landing-page" with the actual path to your landing page
+            <Link
+              href="/apply/12"
               className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
             >
               Start your phone screen
-            </a>
+            </Link>
           </div>
         </div>
       </section>
