@@ -2,8 +2,8 @@
   "version": 2,
   "functions": {
     "pages/api/parse-job.js": {
-      "memory": 3008,
-      "maxDuration": 25
+      "memory": 6008,
+      "maxDuration": 30
     },
     "pages/api/analyze-call.js": {
       "memory": 3008,
