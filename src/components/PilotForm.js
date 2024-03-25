@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { track } from "@vercel/analytics";
 
 const PilotForm = () => {
   const [formState, setFormState] = useState({
@@ -23,6 +24,7 @@ const PilotForm = () => {
     const data = await response.json();
     if (response.ok) {
       console.log("Application submitted", data);
+      track("Pilot submission", data);
       // Handle success case
       setFormState({
         company: "",

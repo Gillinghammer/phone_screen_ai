@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PrismaClient } from "@prisma/client";
 import ConfirmationModal from "../../../components/ConfirmationModal";
+import { track } from "@vercel/analytics";
 const prisma = new PrismaClient();
 
 const JobPage = ({ job }) => {
@@ -29,6 +30,7 @@ const JobPage = ({ job }) => {
       });
 
       if (response.ok) {
+        track('Candidate application', { ...applicantDetails, jobId: job.id, jobTitle: job.jobTitle, company: job.company});
         setApplicantDetails({
           name: "",
           email: "",
