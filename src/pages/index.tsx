@@ -114,6 +114,8 @@ const Home: NextPage = () => {
               <div className="relative w-full h-96 bg-gray-800 rounded-lg shadow-xl overflow-hidden lg:h-96">
                 <Image
                   src="/office-shot.jpg"
+                  layout="fill"
+                  objectFit="cover"
                   alt="the"
                   className="w-full h-full object-center object-cover"
                 />
@@ -125,17 +127,30 @@ const Home: NextPage = () => {
       <div className="bg-yellow-200 border-b-4 border-gray-300">
         <div className="max-w-7xl mx-auto pb-6 px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center space-x-6 lg:justify-start">
-            <Image
-              className="h-20"
-              src="/dunder.png"
-              alt="Dunder Mifflin logo"
-            />
-            <Image className="h-32" src="/schrute_farms.webp" alt="Logo 3" />
-            <Image
-              className="h-36"
-              src="/vance.png"
-              alt="Vance Refridgeration logo"
-            />
+            <div className="relative h-40 w-40">
+              <Image
+                src="/dunder.png"
+                alt="Dunder Mifflin logo"
+                layout="fill"
+                objectFit="contain"
+              />
+            </div>
+            <div className="relative h-32 w-32">
+              <Image
+                src="/schrute_farms.webp"
+                alt="Schrute Farms logo"
+                layout="fill"
+                objectFit="contain"
+              />
+            </div>
+            <div className="relative h-36 w-36">
+              <Image
+                src="/vance.png"
+                alt="Vance Refrigeration logo"
+                layout="fill"
+                objectFit="contain"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -195,10 +210,12 @@ const Home: NextPage = () => {
                 >
                   &#x3c; {/* Left arrow */}
                 </button>
-                <Image
+                <img
                   src={images[currentImageIndex]}
                   alt={`Image ${currentImageIndex + 1}`}
                   className="w-full h-auto"
+                  // layout="fill"
+                  // objectFit="contain"
                 />
                 <button
                   onClick={nextImage}
@@ -216,10 +233,12 @@ const Home: NextPage = () => {
         <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           {/* First row */}
           <div className="flex flex-col md:flex-row items-center justify-between mb-12">
-            <div className="md:w-1/2 mb-8 md:mb-0">
+            <div className="md:w-1/2 mb-8 md:mb-0 relative h-96 w-full">
               <Image
                 src="/michael-scott.jpeg"
                 alt="Michael Scott"
+                layout="fill"
+                objectFit="cover"
                 className="rounded-lg shadow-2xl"
               />
             </div>
@@ -239,10 +258,12 @@ const Home: NextPage = () => {
         <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           {/* First row */}
           <div className="flex flex-col md:flex-row-reverse items-center justify-between mb-12">
-            <div className="md:w-1/2 mb-8 md:mb-0">
+            <div className="md:w-1/2 mb-8 md:mb-0 relative h-96 w-full">
               <Image
                 src="/phyllis-smith.jpeg"
                 alt="Phyllis Smith"
+                layout="fill"
+                objectFit="cover"
                 className="rounded-lg shadow-2xl"
               />
             </div>
@@ -261,10 +282,12 @@ const Home: NextPage = () => {
         <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           {/* First row */}
           <div className="flex flex-col md:flex-row items-center justify-between mb-12">
-            <div className="md:w-1/2 mb-8 md:mb-0">
+            <div className="md:w-1/2 mb-8 md:mb-0 relative h-96 w-full">
               <Image
                 src="/dwight-schrute.jpeg"
-                alt="Dwigth Schrute"
+                alt="Dwight Schrute"
+                layout="fill"
+                objectFit="cover"
                 className="rounded-lg shadow-2xl"
               />
             </div>
