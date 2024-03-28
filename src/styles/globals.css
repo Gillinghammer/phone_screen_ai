@@ -13,10 +13,11 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', serif;
   background-color: rgb(var(--background-color));
   color: rgb(var(--text-color));
 }
+
 
 button, .button {
   background-color: rgb(var(--primary-color));

@@ -73,7 +73,7 @@ const PilotForm = () => {
           id="company"
           autoComplete="company"
           required
-          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-yellow-200 focus:border-yellow-200 sm:text-sm border-gray-300 rounded-md"
           placeholder="Company"
         />
       </div>
@@ -89,7 +89,7 @@ const PilotForm = () => {
           id="firstName"
           autoComplete="given-name"
           required
-          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-yellow-200 focus:border-yellow-200 sm:text-sm border-gray-300 rounded-md"
           placeholder="First Name"
         />
       </div>
@@ -105,7 +105,7 @@ const PilotForm = () => {
           id="lastName"
           autoComplete="family-name"
           required
-          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-yellow-200 focus:border-yellow-200 sm:text-sm border-gray-300 rounded-md"
           placeholder="Last Name"
         />
       </div>
@@ -121,7 +121,7 @@ const PilotForm = () => {
           id="email"
           autoComplete="email"
           required
-          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-yellow-200 focus:border-yellow-200 sm:text-sm border-gray-300 rounded-md"
           placeholder="Email"
         />
       </div>
@@ -137,14 +137,14 @@ const PilotForm = () => {
           name="weeklyApplicants"
           id="weeklyApplicants"
           required
-          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+          className="block w-full shadow-sm py-3 px-4 placeholder-gray-500 focus:ring-yellow-200 focus:border-yellow-200 sm:text-sm border-gray-300 rounded-md"
           placeholder="Average # of weekly job applicants"
         />
       </div>
       <div className="sm:col-span-2">
         <button
           type="submit"
-          className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-500 hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-gray-800 bg-yellow-200 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-200"
         >
           Submit
         </button>
