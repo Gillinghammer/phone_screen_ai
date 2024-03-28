@@ -50,7 +50,7 @@ const Home: NextPage = () => {
           property="og:description"
           content="Revolutionize Phone Screen AI's hiring process with AI-powered phone screening. Save time and improve candidate selection with PhoneScreen.ai."
         />
-        <meta property="og:image" content="https://phonescreen.ai/og.jpeg" />
+        <meta property="og:image" content="https://phonescreen.ai/og2.png" />
 
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
