@@ -5,6 +5,7 @@ import TimeChart from "../components/TimeChart";
 import Head from "next/head";
 import PilotForm from "../components/PilotForm";
 import Link from "next/link";
+import Image from "next/image";
 
 const Home: NextPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -111,7 +112,7 @@ const Home: NextPage = () => {
             <div className="relative">
               {/* Image Block */}
               <div className="relative w-full h-96 bg-gray-800 rounded-lg shadow-xl overflow-hidden lg:h-96">
-                <img
+                <Image
                   src="/office-shot.jpg"
                   alt="the"
                   className="w-full h-full object-center object-cover"
@@ -124,9 +125,13 @@ const Home: NextPage = () => {
       <div className="bg-yellow-200 border-b-4 border-gray-300">
         <div className="max-w-7xl mx-auto pb-6 px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center space-x-6 lg:justify-start">
-            <img className="h-20" src="/dunder.png" alt="Dunder Mifflin logo" />
-            <img className="h-32" src="/schrute_farms.webp" alt="Logo 3" />
-            <img
+            <Image
+              className="h-20"
+              src="/dunder.png"
+              alt="Dunder Mifflin logo"
+            />
+            <Image className="h-32" src="/schrute_farms.webp" alt="Logo 3" />
+            <Image
               className="h-36"
               src="/vance.png"
               alt="Vance Refridgeration logo"
@@ -168,20 +173,20 @@ const Home: NextPage = () => {
               </h2>
               <p className="mt-3 text-lg leading-7 text-gray-800">
                 At Dunder Mifflin, we used to have a room called the Resume
-                Dungeon, where resumes would pile up like Dwight's beet harvest.
-                But now, with PhoneScreen.AI, we've turned it into the cafe
-                disco! Say goodbye to endless hours of sifting through resumes
-                and hello to more time for office pranks.
+                Dungeon, where resumes would pile up like Dwight&rsquo;s beet
+                harvest. But now, with PhoneScreen.AI, we&apos;ve turned it into
+                the cafe disco! Say goodbye to endless hours of sifting through
+                resumes and hello to more time for office pranks.
               </p>
               <h2 className="text-3xl font-extrabold tracking-tight text-gray-800 sm:text-4xl">
                 Screen Like a Boss
               </h2>
               <p className="mt-3 text-lg leading-7 text-gray-800">
                 Remember when Michael accidentally screened out the perfect
-                candidate because their paper resume didn't mention anything
-                about paper!? With PhoneScreen.AI, we ensure that no qualified
-                candidate is left behind, open up your screening to all who
-                apply.
+                candidate because their paper resume didn&apos;t mention
+                anything about paper!? With PhoneScreen.AI, we ensure that no
+                qualified candidate is left behind, open up your screening to
+                all who apply.
               </p>
               <div className="relative w-full h-auto flex items-center">
                 <button
@@ -190,7 +195,7 @@ const Home: NextPage = () => {
                 >
                   &#x3c; {/* Left arrow */}
                 </button>
-                <img
+                <Image
                   src={images[currentImageIndex]}
                   alt={`Image ${currentImageIndex + 1}`}
                   className="w-full h-auto"
@@ -212,7 +217,7 @@ const Home: NextPage = () => {
           {/* First row */}
           <div className="flex flex-col md:flex-row items-center justify-between mb-12">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <img
+              <Image
                 src="/michael-scott.jpeg"
                 alt="Michael Scott"
                 className="rounded-lg shadow-2xl"
@@ -220,10 +225,10 @@ const Home: NextPage = () => {
             </div>
             <div className="md:w-1/2 md:pl-8">
               <p className="text-2xl font-semibold mb-4">
-                "It's like having a robot assistant, but better because it
-                doesn't need a plug. It's like the HAL 9000 of recruiting, but
-                without the whole 'taking over the spaceship' thing. It's
-                genius, really."
+                &quot;It&apos;s like having a robot assistant, but better
+                because it doesn&apos;t need a plug. It&apos;s like the HAL 9000
+                of recruiting, but without the whole &apos;taking over the
+                spaceship&apos; thing. It&apos;s genius, really.&quot;
               </p>
               <p className="text-gray-600 text-xl">- Michael Scott</p>
             </div>
@@ -235,7 +240,7 @@ const Home: NextPage = () => {
           {/* First row */}
           <div className="flex flex-col md:flex-row-reverse items-center justify-between mb-12">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <img
+              <Image
                 src="/phyllis-smith.jpeg"
                 alt="Phyllis Smith"
                 className="rounded-lg shadow-2xl"
@@ -243,9 +248,9 @@ const Home: NextPage = () => {
             </div>
             <div className="md:w-1/2 md:pr-8">
               <p className="text-2xl font-semibold mb-4">
-                "It's so nice to not have to read through a pile of resumes
-                anymore. Now I can spend more time with Bob Vance, Vance
-                Refrigeration."
+                &quot;It&apos;s so nice to not have to read through a pile of
+                resumes anymore. Now I can spend more time with Bob Vance, Vance
+                Refrigeration.&quot;
               </p>
               <p className="text-gray-600 text-xl">- Phyllis Smith</p>
             </div>
@@ -257,7 +262,7 @@ const Home: NextPage = () => {
           {/* First row */}
           <div className="flex flex-col md:flex-row items-center justify-between mb-12">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <img
+              <Image
                 src="/dwight-schrute.jpeg"
                 alt="Dwigth Schrute"
                 className="rounded-lg shadow-2xl"
@@ -265,9 +270,9 @@ const Home: NextPage = () => {
             </div>
             <div className="md:w-1/2 md:pl-8">
               <p className="text-2xl font-semibold mb-4">
-                "I was skeptical at first, but I have to admit, it's like having
-                an army of Dwights screening candidates, minus the beet juice
-                breaks."
+                &quot;I was skeptical at first, but I have to admit, it&apos;s
+                like having an army of Dwights screening candidates, minus the
+                beet juice breaks.&quot;
               </p>
               <p className="text-gray-600 text-xl">- Dwight Schrute</p>
             </div>
