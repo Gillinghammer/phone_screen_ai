@@ -2,6 +2,8 @@
 import { useState } from "react";
 import type { NextPage } from "next";
 import TimeChart from "../components/TimeChart";
+import QuoteSlider from "../components/QuoteSlider";
+import ProductScreenshots from "../components/ProductScreenshots";
 import Head from "next/head";
 import PilotForm from "../components/PilotForm";
 import Link from "next/link";
@@ -171,8 +173,8 @@ const Home: NextPage = () => {
           </div>
         </div>
       )}
-
-      <section className="py-12 bg-gray-100 overflow-hidden md:py-20 lg:py-24">
+      <QuoteSlider />
+      <section className="bg-gray-900 overflow-hidden md:py-20 lg:py-16">
         <div className="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
           <div className="lg:flex lg:items-center lg:space-x-10">
             {" "}
@@ -203,106 +205,11 @@ const Home: NextPage = () => {
                 qualified candidate is left behind, open up your screening to
                 all who apply.
               </p>
-              <div className="relative w-full h-auto flex items-center">
-                <button
-                  onClick={prevImage}
-                  className="absolute left-[-20px] bg-gray-800 text-white p-2 rounded-full"
-                >
-                  &#x3c; {/* Left arrow */}
-                </button>
-                <img
-                  src={images[currentImageIndex]}
-                  alt={`Image ${currentImageIndex + 1}`}
-                  className="w-full h-auto"
-                  // layout="fill"
-                  // objectFit="contain"
-                />
-                <button
-                  onClick={nextImage}
-                  className="absolute right-[-20px] bg-gray-800 text-white p-2 rounded-full"
-                >
-                  &#x3e; {/* Right arrow */}
-                </button>
-              </div>
             </div>
           </div>
         </div>
       </section>
-
-      <section className="bg-gray-100">
-        <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          {/* First row */}
-          <div className="flex flex-col md:flex-row items-center justify-between mb-12">
-            <div className="md:w-1/2 mb-8 md:mb-0 relative h-96 w-full">
-              <Image
-                src="/michael-scott.jpeg"
-                alt="Michael Scott"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-lg shadow-2xl"
-              />
-            </div>
-            <div className="md:w-1/2 md:pl-8">
-              <p className="text-2xl font-semibold mb-4">
-                &quot;It&apos;s like having a robot assistant, but better
-                because it doesn&apos;t need a plug. It&apos;s like the HAL 9000
-                of recruiting, but without the whole &apos;taking over the
-                spaceship&apos; thing. It&apos;s genius, really.&quot;
-              </p>
-              <p className="text-gray-600 text-xl">- Michael Scott</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="bg-gray-100">
-        <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          {/* First row */}
-          <div className="flex flex-col md:flex-row-reverse items-center justify-between mb-12">
-            <div className="md:w-1/2 mb-8 md:mb-0 relative h-96 w-full">
-              <Image
-                src="/phyllis-smith.jpeg"
-                alt="Phyllis Smith"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-lg shadow-2xl"
-              />
-            </div>
-            <div className="md:w-1/2 md:pr-8">
-              <p className="text-2xl font-semibold mb-4">
-                &quot;It&apos;s so nice to not have to read through a pile of
-                resumes anymore. Now I can spend more time with Bob Vance, Vance
-                Refrigeration.&quot;
-              </p>
-              <p className="text-gray-600 text-xl">- Phyllis Smith</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="bg-gray-100">
-        <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          {/* First row */}
-          <div className="flex flex-col md:flex-row items-center justify-between mb-12">
-            <div className="md:w-1/2 mb-8 md:mb-0 relative h-96 w-full">
-              <Image
-                src="/dwight-schrute.jpeg"
-                alt="Dwight Schrute"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-lg shadow-2xl"
-              />
-            </div>
-            <div className="md:w-1/2 md:pl-8">
-              <p className="text-2xl font-semibold mb-4">
-                &quot;I was skeptical at first, but I have to admit, it&apos;s
-                like having an army of Dwights screening candidates, minus the
-                beet juice breaks.&quot;
-              </p>
-              <p className="text-gray-600 text-xl">- Dwight Schrute</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <ProductScreenshots />
       <section className="py-16 bg-yellow-200 overflow-hidden  border-t-4 border-gray-300">
         <div className="relative max-w-xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-800 sm:text-4xl">
@@ -311,9 +218,6 @@ const Home: NextPage = () => {
           <p className="mt-4 text-lg leading-7 text-gray-800">
             Enter your phone number on our demo page and our AI Agent will give
             you a call to screen you for a job at Dunder&nbsp;Miffilin.
-          </p>
-          <p className="mt-4 text-lg leading-7 text-gray-800">
-            Don&apos;t worry if you&apos;re not a fit, it&apos;s just a demo!
           </p>
           <div className="mt-8">
             <Link

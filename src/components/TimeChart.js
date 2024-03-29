@@ -30,17 +30,41 @@ const TimeChart = () => {
           x={225} // Adjust the x-coordinate to center the title
           y={30} // Adjust the y-coordinate to position the title appropriately
           textAnchor="middle" // Centers the text
-          style={{ fontSize: 20 }} // Adjust font styling as needed
+          style={{
+            fontSize: 20,
+            fill: "#FFF",
+            fontFamily: "Inter",
+          }}
         />
         <VictoryLabel
           text="Based on the screening process for 10 open roles"
           x={225}
           y={250} // Position at the bottom of the chart
           textAnchor="middle"
-          style={{ fontSize: 14, fontStyle: "italic" }}
+          style={{
+            paddingTop: "20px",
+            fontSize: 14,
+            fontStyle: "italic",
+            fill: "#FFF",
+          }}
         />
-        <VictoryAxis tickFormat={() => ""} />
-        <VictoryAxis dependentAxis tickFormat={(x) => `${x} hrs`} />
+        <VictoryAxis
+          tickFormat={() => ""}
+          style={{
+            axis: { stroke: "#FFF" },
+            ticks: { stroke: "#FFF" },
+            tickLabels: { fill: "#FFF" },
+          }}
+        />
+        <VictoryAxis
+          dependentAxis
+          tickFormat={(x) => `${x} hrs`}
+          style={{
+            axis: { stroke: "#FFF" },
+            ticks: { stroke: "#FFF" },
+            tickLabels: { fill: "#FFF" },
+          }}
+        />
         <VictoryStack colorScale={["#059669", "#0891b2", "#e11d48"]}>
           {manualData.map((data, index) => (
             <VictoryBar
@@ -50,6 +74,7 @@ const TimeChart = () => {
               y="hours"
               labels={({ datum }) => (datum.hours ? `${datum.hours} hrs` : "")}
               barWidth={40}
+              style={{ labels: { fill: "#FFF" } }}
             />
           ))}
         </VictoryStack>
@@ -59,7 +84,7 @@ const TimeChart = () => {
           y="hours"
           barWidth={30}
           labels="30 mins"
-          style={{ data: { fill: "#4F46E5" } }}
+          style={{ data: { fill: "#4F46E5" }, labels: { fill: "#FFF" } }}
         />
         <VictoryLegend
           x={250}
@@ -67,12 +92,28 @@ const TimeChart = () => {
           centerTitle
           orientation="vertical"
           gutter={0}
-          style={{ title: { fontSize: 14 } }}
+          style={{ title: { fontSize: 14, fill: "#fff" } }}
           data={[
-            { name: "Reviewing resumes", symbol: { fill: "#059669" } },
-            { name: "Scheduling screens", symbol: { fill: "#0891b2" } },
-            { name: "Having phone calls", symbol: { fill: "#e11d48" } },
-            { name: "PhoneScreen.AI", symbol: { fill: "#4F46E5" } },
+            {
+              name: "Reviewing resumes",
+              symbol: { fill: "#059669" },
+              labels: { fill: "#FFF" },
+            },
+            {
+              name: "Scheduling screens",
+              symbol: { fill: "#0891b2" },
+              labels: { fill: "#FFF" },
+            },
+            {
+              name: "Having phone calls",
+              symbol: { fill: "#e11d48" },
+              labels: { fill: "#FFF" },
+            },
+            {
+              name: "PhoneScreen.AI",
+              symbol: { fill: "#4F46E5" },
+              labels: { fill: "#FFF" },
+            },
           ]}
         />
       </VictoryChart>
