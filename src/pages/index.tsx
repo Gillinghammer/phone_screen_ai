@@ -177,11 +177,7 @@ const Home: NextPage = () => {
       <section className="bg-gray-900 overflow-hidden md:py-20 lg:py-16">
         <div className="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
           <div className="lg:flex lg:items-center lg:space-x-10">
-            {" "}
-            {/* Add spacing between items on larger screens */}
             <div className="lg:flex-1">
-              {" "}
-              {/* This allows the chart to take full width on mobile and flex basis of 1 on lg screens */}
               <TimeChart />
             </div>
             <div className="mt-10 lg:flex-1 lg:mt-0 bg-white shadow-xl rounded-xl p-8 space-y-4">
