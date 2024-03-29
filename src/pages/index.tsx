@@ -85,16 +85,16 @@ const Home: NextPage = () => {
               <span className="block">AI Automated</span>
               <span className="block text-red-700">Candidate Screens</span>
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-lg text-gray-800 sm:text-xl md:mt-5 md:max-w-3xl">
-              Fully automated AI phone screening for your recruiting process.
-              Upload a job post, and receive an intelligent AI phone screen
-              agent to screen anyone who applies.
+            <p className="mt-3 max-w-md font-normal mx-auto text-xl text-gray-800 sm:text-xl md:mt-5 md:max-w-3xl">
+              Flip recruiting on its head- Instead of drowning in resumes that
+              never get read, let AI call, screen, and rank your candidates for
+              you.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row sm:justify-center lg:justify-start space-y-2 sm:space-y-0 sm:space-x-2">
               <div className="rounded-md shadow">
                 <a
                   href="#pilot-program"
-                  className="w-full h-20 flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-800 md:py-4 md:text-lg md:px-10"
+                  className="w-full h-20 flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-800 md:py-4 md:text-xl md:px-10"
                 >
                   Join Beta Program
                 </a>
@@ -103,7 +103,7 @@ const Home: NextPage = () => {
                 <a
                   href="#"
                   onClick={toggleModal}
-                  className="w-full h-20 text-bold flex items-center justify-center px-8 py-3 border border-gray-800 text-base font-medium rounded-md text-gray-800 hover:bg-gray-400 hover:text-gray-800 md:py-4 md:text-lg md:px-10"
+                  className="w-full h-20 text-bold flex items-center justify-center px-8 py-3 border-2 border-gray-800 text-base font-medium rounded-md text-gray-800 hover:bg-gray-400 hover:text-gray-800 md:py-4 md:text-xl md:px-10"
                 >
                   <span className="text-3xl">📼</span>&nbsp; Watch Demo
                 </a>
@@ -180,21 +180,21 @@ const Home: NextPage = () => {
             <div className="lg:flex-1">
               <TimeChart />
             </div>
-            <div className="mt-10 lg:flex-1 lg:mt-0 bg-white shadow-xl rounded-xl p-8 space-y-4">
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-800 sm:text-4xl">
+            <div className="mt-10 lg:flex-1 lg:mt-0 bg-transparent shadow-xl rounded-xl p-8 space-y-4">
+              <h2 className="text-3xl font-semibold tracking-tight text-yellow-200 sm:text-4xl">
                 Escape the Resume Dungeon
               </h2>
-              <p className="mt-3 text-lg leading-7 text-gray-800">
+              <p className="mt-3 text-lg leading-7 text-white">
                 At Dunder Mifflin, we used to have a room called the Resume
                 Dungeon, where resumes would pile up like Dwight&rsquo;s beet
                 harvest. But now, with PhoneScreen.AI, we&apos;ve turned it into
                 the cafe disco! Say goodbye to endless hours of sifting through
                 resumes and hello to more time for office pranks.
               </p>
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-800 sm:text-4xl">
+              <h2 className="text-3xl font-semibold tracking-tight text-yellow-200 sm:text-4xl">
                 Screen Like a Boss
               </h2>
-              <p className="mt-3 text-lg leading-7 text-gray-800">
+              <p className="mt-3 text-lg leading-7 text-white">
                 Remember when Michael accidentally screened out the perfect
                 candidate because their paper resume didn&apos;t mention
                 anything about paper!? With PhoneScreen.AI, we ensure that no
@@ -218,7 +218,7 @@ const Home: NextPage = () => {
           <div className="mt-8">
             <Link
               href="/apply/17"
-              className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-800"
+              className="w-full h-20 flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-800 md:py-4 md:text-xl md:px-10"
             >
               Start Your AI Phone Screen
             </Link>
