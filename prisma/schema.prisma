@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["subscriptions"]
 }
 
 datasource db {
@@ -33,9 +34,12 @@ model Job {
   requirements       Json
   responsibilities   Json
   interviewQuestions Json
+  isArchived         Boolean     @default(false)
   user               User        @relation(fields: [userId], references: [id])
   candidates         Candidate[]
   phoneScreens       PhoneScreen[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
 }
 
 enum CandidateStatus {
