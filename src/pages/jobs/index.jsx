@@ -31,37 +31,18 @@ export async function getServerSideProps(context) {
   const userId = user.id;
 
   let jobs = await prisma.job.findMany({
-    where: { userId },
-    select: {
-      id: true,
-      company: true,
-      jobTitle: true,
-      createdAt: true,
-      updatedAt: true,
-      candidates: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          status: true,
-          phoneScreen: {
-            select: {
-              id: true,
-              callLength: true,
-              qualificationScore: true,
-            },
-          },
-        },
-      },
-    },
     where: {
+      companyId: user.companyId,
       userId,
       isArchived: false,
     },
     select: {
       id: true,
-      company: true,
+      company: {
+        select: {
+          name: true,
+        },
+      },
       jobTitle: true,
       createdAt: true,
       updatedAt: true,
@@ -99,6 +80,8 @@ export async function getServerSideProps(context) {
         : null,
     })),
   }));
+
+  console.log('debug jobs', jobs)
 
   return {
     props: {

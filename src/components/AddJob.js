@@ -2,7 +2,7 @@
 import { useState } from "react";
 import JobDetails from "./JobDetails";
 
-const AddJob = () => {
+const AddJob = ({ user }) => {
   const [jobPost, setJobPost] = useState("");
   const [jobDetails, setJobDetails] = useState(null);
   const [isParsing, setIsParsing] = useState(false);
@@ -103,7 +103,11 @@ const AddJob = () => {
             </button>
           </form>
         ) : (
-          <JobDetails jobDetails={jobDetails} setJobDetails={setJobDetails} />
+          <JobDetails
+            jobDetails={jobDetails}
+            setJobDetails={setJobDetails}
+            user={user}
+          />
         )}
       </div>
       {isLoading && (

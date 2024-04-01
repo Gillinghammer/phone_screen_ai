@@ -6,12 +6,12 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const JobsPage = ({ jobs }) => {
+const JobsPage = ({ jobs, user }) => {
   return (
     <Layout>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h3 className="text-2xl font-semibold text-gray-900">Post a New Job</h3>
-        <AddJob />
+        <AddJob user={user} />
       </div>
     </Layout>
   );
@@ -33,6 +33,9 @@ export const getServerSideProps = async (context) => {
     where: {
       email: session.user.email,
     },
+    select: {
+      companyId: true,
+    }
   });
 
   const jobs = await prisma.job.findMany({
@@ -46,7 +49,7 @@ export const getServerSideProps = async (context) => {
   });
 
   return {
-    props: { jobs },
+    props: { jobs, user },
   };
 };
 

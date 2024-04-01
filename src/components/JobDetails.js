@@ -120,7 +120,7 @@ const ListEditor = ({
 );
 
 // Assuming `setJobDetails` and `jobDetails` states are defined in the parent component
-const JobDetailsForm = ({ jobDetails, setJobDetails }) => {
+const JobDetailsForm = ({ jobDetails, setJobDetails, user }) => {
   const router = useRouter();
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -150,7 +150,7 @@ const JobDetailsForm = ({ jobDetails, setJobDetails }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(jobDetails),
+        body: JSON.stringify({ ...jobDetails, companyId: user.companyId }),
       });
 
       if (response.ok) {

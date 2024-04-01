@@ -54,7 +54,7 @@ const JobPage = ({ job }) => {
         <div className="md:flex">
           <div className="md:w-1/2 p-5 border-r">
             <h1 className="text-2xl font-bold">
-              {job.jobTitle} at {job.company}
+              {job.jobTitle} at {job.company?.name}
             </h1>
             <div className="mb-5">
               <h2 className="font-semibold">Location</h2>
@@ -190,7 +190,11 @@ export const getServerSideProps = async (context) => {
       remoteFriendly: true,
       seniority: true,
       salary: true,
-      company: true,
+      company: {
+        select: {
+          name: true,
+        },
+      },
       requirements: true,
       interviewQuestions: true,
       responsibilities: true,

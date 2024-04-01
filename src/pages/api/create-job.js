@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
     // Ensure all required fields are included in the request body
     const {
-      company,
+      companyId,
       job_title,
       job_location,
       job_description,
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
       responsibilities,
       interview_questions,
     } = req.body;
-
+    console.log("add job", req.body);
     // Check if the session contains a user and that user has an ID
     if (!session.user || !token.id) {
       return res.status(403).json({ message: "Invalid user session." });
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       const job = await prisma.job.create({
         data: {
           userId: token.id,
-          company: company,
+          companyId: companyId,
           jobTitle: job_title,
           jobLocation: job_location,
           jobDescription: job_description,
