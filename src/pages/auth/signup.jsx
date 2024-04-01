@@ -6,6 +6,7 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function SignUp() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, name, company }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -73,6 +74,23 @@ export default function SignUp() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="John Doe"
+            />
+          </div>
+          <div className="mb-4">
+            {/* Company Name */}
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="company"
+            >
+              Company
+            </label>
+            <input
+              className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="company"
+              type="text"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              placeholder="Company Name"
             />
           </div>
           <div className="mb-4">
