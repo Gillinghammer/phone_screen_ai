@@ -47,7 +47,7 @@ export function LoginForm() {
       password,
       redirect: false,
     }).then((result) => {
-      if (result.error) {
+      if (result?.error) {
         alert(result.error);
       } else {
         router.push("/jobs");
