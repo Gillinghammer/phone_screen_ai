@@ -127,7 +127,7 @@ const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
   };
 
   const handleAddQuestion = () => {
-    if (parsedData.interview_questions.length < 10) {
+    if (parsedData && parsedData.interview_questions.length < 10) {
       setParsedData({
         ...parsedData,
         interview_questions: [...parsedData.interview_questions, ""],
