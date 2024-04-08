@@ -118,7 +118,11 @@ const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
         }
       }
     } catch (error) {
-      alert(error.message);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        console.error("An unknown error occurred:", error);
+      }
     }
   };
 
