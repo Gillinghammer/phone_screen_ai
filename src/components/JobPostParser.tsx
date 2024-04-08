@@ -76,31 +76,33 @@ const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
 
   const handleCreatePhoneScreen = async () => {
     try {
-      const formattedParsedData = {
-        companyId: companyId,
-        jobTitle: parsedData.job_title,
-        jobLocation: parsedData.job_location,
-        jobDescription: parsedData.job_description,
-        remoteFriendly: parsedData.remote_friendly,
-        seniority: parsedData.seniority,
-        salary: parsedData.salary,
-        requirements: parsedData.requirements,
-        responsibilities: parsedData.responsibilities,
-        interviewQuestions: parsedData.interview_questions,
-      };
+      if (parsedData) {
+        const formattedParsedData = {
+          companyId: companyId,
+          jobTitle: parsedData.job_title,
+          jobLocation: parsedData.job_location,
+          jobDescription: parsedData.job_description,
+          remoteFriendly: parsedData.remote_friendly,
+          seniority: parsedData.seniority,
+          salary: parsedData.salary,
+          requirements: parsedData.requirements,
+          responsibilities: parsedData.responsibilities,
+          interviewQuestions: parsedData.interview_questions,
+        };
 
-      const response = await fetch("/api/create-job", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formattedParsedData),
-      });
+        const response = await fetch("/api/create-job", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formattedParsedData),
+        });
 
-      if (response.ok) {
-        onClose();
-      } else {
-        throw new Error("Failed to create job");
+        if (response.ok) {
+          onClose();
+        } else {
+          throw new Error("Failed to create job");
+        }
       }
     } catch (error) {
       alert(error.message);
