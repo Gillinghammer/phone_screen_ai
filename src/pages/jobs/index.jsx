@@ -7,6 +7,15 @@ import { getSession } from "next-auth/react";
 import JobTable from "../../components/JobTable";
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import Link from "next/link";
 
 const prisma = new PrismaClient();
 
@@ -38,6 +47,7 @@ export async function getServerSideProps(context) {
     },
     select: {
       id: true,
+      jobLocation: true,
       company: {
         select: {
           name: true,
@@ -64,7 +74,6 @@ export async function getServerSideProps(context) {
       },
     },
   });
-  
 
   // Convert DateTime fields to strings
   jobs = jobs.map((job) => ({
@@ -80,18 +89,18 @@ export async function getServerSideProps(context) {
         : null,
     })),
   }));
-
-  console.log('debug jobs', jobs)
-
+  
+  console.log('debug jobs', jobs);
+  
   return {
     props: {
       jobs,
+      companyId: user.companyId
     },
   };
 }
 
-export default function JobsPage({ jobs }) {
-  console.log("debug jobs", jobs)
+export default function JobsPage({ jobs, companyId }) {
   const router = useRouter();
 
   const refreshData = () => {
@@ -105,17 +114,26 @@ export default function JobsPage({ jobs }) {
       </Head>
       <Layout>
         <div className="container mx-auto mt-10">
+        <Breadcrumb className="mb-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink>
+                <Link href="/dashboard">Dashboard</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink>
+                <Link href="/jobs">Jobs</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-4xl font-bold">Active Job Screens</h1>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={refreshData}
-            >
-              Refresh Data
-            </button>
           </div>
           <div className="overflow-x-auto">
-            <JobTable jobs={jobs} refetchJobs={refreshData} />
+            <JobTable jobs={jobs} refetchJobs={refreshData} companyId={companyId} />
           </div>
         </div>
       </Layout>

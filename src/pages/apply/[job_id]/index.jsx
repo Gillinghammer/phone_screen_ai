@@ -12,6 +12,7 @@ const JobPage = ({ job }) => {
     resumeUrl: "",
     jobId: job.id,
   });
+  console.log(job);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleInputChange = (e) => {
@@ -26,7 +27,7 @@ const JobPage = ({ job }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...applicantDetails, jobId: job.id }),
+        body: JSON.stringify({ ...applicantDetails, jobId: job.id, job }),
       });
 
       if (response.ok) {
@@ -49,8 +50,8 @@ const JobPage = ({ job }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-10">
-      <div className="container mx-auto bg-white rounded shadow-md overflow-hidden max-w-4xl">
+    <div className="bg-foreground text-gray-900 min-h-screen flex items-center justify-center p-10">
+      <div className="bg-gray-50 container mx-auto rounded shadow-md overflow-hidden max-w-4xl">
         <div className="md:flex">
           <div className="md:w-1/2 p-5 border-r">
             <h1 className="text-2xl font-bold">
@@ -71,7 +72,6 @@ const JobPage = ({ job }) => {
               <h2 className="font-semibold">Seniority</h2>
               <p className="text-sm">{job.seniority}</p>
             </div>
-            {/* Include more job details as needed */}
           </div>
           <div className="md:w-1/2 p-5">
             <form className="space-y-4">
@@ -89,7 +89,7 @@ const JobPage = ({ job }) => {
                   value={applicantDetails.name}
                   onChange={handleInputChange}
                   required
-                  className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
+                  className="bg-white mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
                   placeholder="Jane Doe"
                 />
               </div>
@@ -107,7 +107,7 @@ const JobPage = ({ job }) => {
                   value={applicantDetails.email}
                   onChange={handleInputChange}
                   required
-                  className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
+                  className="bg-white mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
                   placeholder="jane.doe@example.com"
                 />
               </div>
@@ -125,11 +125,11 @@ const JobPage = ({ job }) => {
                   value={applicantDetails.phone}
                   onChange={handleInputChange}
                   required
-                  className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
+                  className="bg-white mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
                   placeholder="+1234567890"
                 />
               </div>
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label
                   htmlFor="resumeUrl"
                   className="block text-sm font-medium text-gray-700"
@@ -142,10 +142,10 @@ const JobPage = ({ job }) => {
                   id="resumeUrl"
                   value={applicantDetails.resumeUrl}
                   onChange={handleInputChange}
-                  className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
+                  className="bg-white mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
                   placeholder="http://linkedin.com/in/jane-doe"
                 />
-              </div>
+              </div> */}
               <div className="text-right">
                 <button
                   type="button"
@@ -165,7 +165,7 @@ const JobPage = ({ job }) => {
         </div>
       </div>
       <ConfirmationModal
-        company={job.company}
+        company={job.company.name}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={() => {

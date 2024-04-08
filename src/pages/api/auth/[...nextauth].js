@@ -44,14 +44,10 @@ export default NextAuth({
       } else if (!token.id && token.sub) {
         token.id = token.sub;
       }
-      console.log("JWT callback - Token after:", token);
       return token;
     },
     async session({ session, token }) {
-      console.log("Session callback - Token:", token);
-      console.log("Session callback - Session before:", session);
       session.user = { ...session.user, id: token.id };
-      console.log("Session callback - Session after:", session);
       return session;
     },
   },

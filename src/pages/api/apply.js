@@ -27,6 +27,9 @@ export default async function handle(req, res) {
       where: {
         id: parseInt(jobId, 10),
       },
+      include: {
+        company: true,
+      },
     });
 
     if (!job) {
@@ -45,7 +48,7 @@ export default async function handle(req, res) {
           name,
           phone,
           jobId: jobId,
-          company: job.company,
+          company: job.company.name,
           candidateId: candidate.id,
           jobTitle: job.jobTitle,
           jobDescription: job.jobDescription,

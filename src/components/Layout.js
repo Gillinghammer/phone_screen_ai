@@ -2,6 +2,10 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
+import { cn } from "@/lib/utils";
+import ThemeToggle from "./ThemeToggle";
+import { EyeClosedIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
@@ -10,46 +14,52 @@ export default function Layout({ children }) {
   const isActive = (pathname) => router.pathname === pathname;
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-gray-800 text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <header className="border-b">
+        <div className="container flex h-16 items-center justify-between py-4">
           <h1 className="text-xl font-bold">PhoneScreen.AI</h1>
           <nav>
             <ul className="flex items-center space-x-4">
               {session && (
                 <>
                   <li>
+                    <ThemeToggle />
+                  </li>
+                  <li>
                     <Link href="/jobs">
                       <span
-                        className={`hover:underline ${
-                          isActive("/jobs") ? "text-blue-300" : "text-white"
-                        }`}
+                        className={cn(
+                          "hover:text-primary",
+                          isActive("/jobs") ? "text-primary" : "text-foreground"
+                        )}
                       >
-                        Active Jobs
+                        Jobs
                       </span>
                     </Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <Link href="/candidates">
                       <span
-                        className={`hover:underline ${
+                        className={cn(
+                          "hover:text-primary",
                           isActive("/candidates")
-                            ? "text-blue-300"
-                            : "text-white"
-                        }`}
+                            ? "text-primary"
+                            : "text-foreground"
+                        )}
                       >
                         Candidates
                       </span>
                     </Link>
-                  </li>
-
+                  </li> */}
                   <li>
-                    <button
+                    <Button
+                      variant={"link"}
+                      className="text-foreground hover:text-primary"
                       onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     >
+                      <EyeClosedIcon className="w-5 h-5 mr-2" />
                       Sign Out
-                    </button>
+                    </Button>
                   </li>
                 </>
               )}
@@ -57,9 +67,9 @@ export default function Layout({ children }) {
           </nav>
         </div>
       </header>
-      <main className="container mx-auto flex-1 p-4">{children}</main>
-      <footer className="bg-gray-800 text-white p-4">
-        <div className="container mx-auto">
+      <main className="container mx-auto flex-1 py-8">{children}</main>
+      <footer className="border-t">
+        <div className="container py-4">
           <p>&copy; {new Date().getFullYear()} PhoneScreen.AI</p>
         </div>
       </footer>

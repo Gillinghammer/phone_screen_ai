@@ -37,6 +37,11 @@ export async function getServerSideProps(context) {
     ...candidate,
     createdAt: candidate.createdAt.toISOString(),
     updatedAt: candidate.updatedAt.toISOString(),
+    jobPost: {
+      ...candidate.jobPost,
+      createdAt: candidate.jobPost.createdAt.toISOString(),
+      updatedAt: candidate.jobPost.updatedAt.toISOString(),
+    },
     phoneScreen: candidate.phoneScreen
       ? {
           ...candidate.phoneScreen,
@@ -51,7 +56,7 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
-      candidates,
+      candidates: JSON.parse(JSON.stringify(candidates)),
     },
   };
 }
@@ -77,6 +82,7 @@ export default function CandidatesPage({ candidates }) {
         (selectedStatus === "" || candidate.status === selectedStatus)
       );
     })
+    .filter((candidate) => candidate.phoneScreen)
     .sort((a, b) => {
       if (sortField) {
         const valueA = a.phoneScreen ? a.phoneScreen.qualificationScore : 0;

@@ -4,6 +4,42 @@ import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 import Layout from "../../components/Layout";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatDistanceToNow, parseISO } from "date-fns";
+import { EnvelopeClosedIcon, MobileIcon } from "@radix-ui/react-icons";
+import { Badge } from "@/components/ui/badge"
+
+const RECORDS_PER_PAGE = 6;
 
 const prisma = new PrismaClient();
 
@@ -22,6 +58,7 @@ export async function getServerSideProps(context) {
   const job = await prisma.job.findUnique({
     where: { id: parseInt(job_id) },
     include: {
+      company: true,
       candidates: {
         include: {
           phoneScreen: true,
@@ -29,10 +66,17 @@ export async function getServerSideProps(context) {
       },
     },
   });
-
+  console.log(job);
   // Transform data to be serializable and format callLength
   const serializedJob = {
     ...job,
+    createdAt: job.createdAt.toISOString(),
+    updatedAt: job.updatedAt.toISOString(),
+    company: {
+      ...job.company,
+      createdAt: job.company.createdAt.toISOString(),
+      updatedAt: job.company.updatedAt.toISOString(),
+    },
     candidates: job?.candidates.map((candidate) => ({
       ...candidate,
       createdAt: candidate.createdAt.toISOString(),
@@ -64,62 +108,334 @@ const formatCallDuration = (callLength) => {
 };
 
 export default function JobDetailPage({ job }) {
-  console.log(job);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCandidates, setSelectedCandidates] = useState([]);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedStatus, setSelectedStatus] = useState("any");
+  const { toast } = useToast();
+
+  const handleSearchTermChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const getSortValue = (candidate, column) => {
+    switch (column) {
+      case "screened":
+        return candidate.createdAt;
+      case "name":
+        return candidate.name;
+      case "duration":
+        const duration = candidate.phoneScreen?.callLength;
+        if (duration) {
+          const [minutes, seconds] = duration.split(":").map(Number);
+          return minutes * 60 + seconds;
+        }
+        return 0;
+      case "score":
+        return candidate.phoneScreen?.qualificationScore ?? 0;
+      case "status":
+        return candidate.status.toLowerCase();
+      default:
+        return null;
+    }
+  };
+  
+
+  const filteredCandidates = job.candidates
+  .filter((candidate) => {
+    const nameMatch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const emailMatch = candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const phoneMatch = candidate.phone.toLowerCase().includes(searchTerm.toLowerCase());
+    return nameMatch || emailMatch || phoneMatch;
+  })
+  .filter((candidate) => candidate.status.toLowerCase() !== "archived")
+  .filter((candidate) => candidate.status.toLowerCase() === selectedStatus || selectedStatus === "any")
+  .sort((a, b) => {
+    if (sortColumn) {
+      const valueA = getSortValue(a, sortColumn);
+      const valueB = getSortValue(b, sortColumn);
+
+      if (typeof valueA === "string" && typeof valueB === "string") {
+        return sortOrder === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+      } else {
+        return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+      }
+    }
+    return 0;
+  });
+
+
+
+  const totalPages = Math.ceil(filteredCandidates.length / RECORDS_PER_PAGE);
+  const paginatedCandidates = filteredCandidates.slice(
+    (currentPage - 1) * RECORDS_PER_PAGE,
+    currentPage * RECORDS_PER_PAGE
+  );
+
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortOrder("asc");
+    }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+
+  const handleSelectAllCandidates = (checked) => {
+    setSelectedCandidates(checked ? filteredCandidates.map((candidate) => candidate.id) : []);
+  };
+
+  const handleSelectCandidate = (candidateId) => {
+    const selectedIndex = selectedCandidates.indexOf(candidateId);
+    let newSelectedCandidates = [];
+
+    if (selectedIndex === -1) {
+      newSelectedCandidates = newSelectedCandidates.concat(selectedCandidates, candidateId);
+    } else if (selectedIndex === 0) {
+      newSelectedCandidates = newSelectedCandidates.concat(selectedCandidates.slice(1));
+    } else if (selectedIndex === selectedCandidates.length - 1) {
+      newSelectedCandidates = newSelectedCandidates.concat(selectedCandidates.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelectedCandidates = newSelectedCandidates.concat(
+        selectedCandidates.slice(0, selectedIndex),
+        selectedCandidates.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedCandidates(newSelectedCandidates);
+  };
+
+  const handleConfirmArchive = async () => {
+    try {
+      await Promise.all(
+        selectedCandidates.map(async (candidateId) => {
+          await fetch("/api/archiveCandidate", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ candidateId }),
+          });
+        })
+      );
+      console.log("Archive candidates:", selectedCandidates);
+      toast({
+        title: "Candidates archived",
+        description: `${selectedCandidates.length} candidate(s) have been archived.`,
+      });
+      setSelectedCandidates([]);
+      // Refresh the job data after archiving candidates
+      // You may need to implement a separate API route to fetch the updated job data
+      setIsConfirmationDialogOpen(false);
+    } catch (error) {
+      console.error("Error archiving candidates:", error);
+    }
+  };
+
   return (
     <>
       <Head>
         <title>
-          {job.jobTitle} - {job.company}
+          {job.jobTitle}
         </title>
       </Head>
       <Layout>
         <div className="container mx-auto mt-10">
+        <Breadcrumb className="mb-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink>
+                <Link href="/dashboard">Dashboard</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink>
+                <Link href="/jobs">Jobs</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{job.jobTitle}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
           <h1 className="text-4xl font-bold mb-6">
-            {job.company} - {job.jobTitle}
+            {job.jobTitle}
           </h1>
-          {/* Add a button to archive job */}
-          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded float-right">
-            Archive Job
-          </button>
-          <table className="min-w-full leading-normal">
-            <thead>
-              <tr className="text-left">
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>LinkedIn</th>
-                <th>Duration</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {job.candidates.map((candidate) => (
-                <tr key={candidate.id}>
-                  <td>
-                    <Link
-                      href={`/jobs/${job.id}/${candidate.id}`}
-                      className="text-indigo-500"
-                    >
-                      {candidate.name}
-                    </Link>
-                  </td>
-                  <td>{candidate.email}</td>
-                  <td>{candidate.phone}</td>
-                  <td>
-                    {candidate.linkedinUrl ? (
-                      <Link href={candidate.linkedinUrl}>visit</Link>
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                  <td>{candidate.phoneScreen?.callLength}</td>
-                  <td>
-                    {candidate.phoneScreen?.qualificationScore.toFixed(2) ?? 0}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+            <Dialog open={isConfirmationDialogOpen} onOpenChange={setIsConfirmationDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant={selectedCandidates.length === 0 ? "disabled" : "destructive"}
+                  disabled={selectedCandidates.length === 0}
+                  onClick={() => setIsConfirmationDialogOpen(true)}
+                >
+                  Archive selected
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Confirm Archive</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to archive the selected candidates?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="destructive" onClick={handleConfirmArchive}>
+                    Archive
+                  </Button>
+                  <Button variant="secondary" onClick={() => setIsConfirmationDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Button
+              variant={selectedCandidates.length === 0 ? "disabled" : "secondary"}
+              disabled={selectedCandidates.length === 0}
+              onClick={() => setIsConfirmationDialogOpen(true)}
+            >
+              Change status
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              {selectedCandidates.length} candidate(s) selected
+            </span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Input
+              type="text"
+                placeholder="Search candidates"
+                value={searchTerm}
+                onChange={handleSearchTermChange}
+                className="w-96"
+              />
+              <Select
+                value={selectedStatus}
+                onValueChange={(value) => setSelectedStatus(value)}
+                placeholder="Filter by status"
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="any">
+                      any
+                    </SelectItem>
+                    <SelectItem value="open">
+                      <Badge variant="outline">open</Badge>
+                    </SelectItem>
+                    <SelectItem value="rejected">
+                      <Badge variant="destructive">rejected</Badge>
+                    </SelectItem>
+                    <SelectItem value="accepted">
+                      <Badge>accepted</Badge>
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={selectedCandidates.length === filteredCandidates.length}
+                  onCheckedChange={handleSelectAllCandidates}
+                  aria-label="Select all"
+                />
+              </TableHead>
+              <TableHead onClick={() => handleSort("screened")}>
+                Screened {sortColumn === "screened" && (sortOrder === "asc" ? "▲" : "▼")}
+              </TableHead>
+              <TableHead onClick={() => handleSort("name")}>
+                Name {sortColumn === "name" && (sortOrder === "asc" ? "▲" : "▼")}
+              </TableHead>
+              <TableHead>Contact</TableHead>
+              <TableHead onClick={() => handleSort("duration")}>
+                Duration {sortColumn === "duration" && (sortOrder === "asc" ? "▲" : "▼")}
+              </TableHead>
+                            <TableHead onClick={() => handleSort("score")}>
+                Score {sortColumn === "score" && (sortOrder === "asc" ? "▲" : "▼")}
+              </TableHead>
+              <TableHead onClick={() => handleSort("status")}>
+                Status {sortColumn === "status" && (sortOrder === "asc" ? "▲" : "▼")}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+    {paginatedCandidates.map((candidate) => {
+    const createdAtDate = parseISO(candidate.createdAt);
+    const daysSinceCreated = formatDistanceToNow(createdAtDate, { addSuffix: true });
+    // unique badge color and variant needed for rejected, open, accepted status
+    const badgeVariant = candidate.status.toLowerCase() === "rejected" ? "destructive" : candidate.status.toLowerCase() === "open" ? "outline" : "";
+    return (
+      <TableRow key={candidate.id}>
+        <TableCell className="w-[50px]">
+          <Checkbox
+            checked={selectedCandidates.includes(candidate.id)}
+            onCheckedChange={() => handleSelectCandidate(candidate.id)}
+            aria-label="Select row"
+          />
+        </TableCell>
+        <TableCell className="text-xs">{daysSinceCreated}</TableCell>
+        <TableCell>
+          {candidate.phoneScreen ? (
+            <Link href={`/jobs/${job.id}/${candidate.id}`} className="underline">
+              {candidate.name}
+            </Link>
+          ) : (
+            <span>{candidate.name}</span>
+          )}
+        </TableCell>
+        <TableCell className="w-[280px]">
+          <div className="flex items-center space-x-2 mb-2">
+            <EnvelopeClosedIcon className="w-4 h-4 text-primary" />
+            <span >{candidate.email}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <MobileIcon className="w-4 h-4 text-primary" />
+            <span className="text-xs">{candidate.phone}</span>
+          </div>
+        </TableCell>
+        <TableCell>
+          {candidate.phoneScreen?.callLength ?? "in progress"}
+        </TableCell>
+        <TableCell>{candidate.phoneScreen?.qualificationScore.toFixed(2) ?? 0}</TableCell>
+        <TableCell>
+          <Badge variant={badgeVariant}>
+            {candidate.status.toLowerCase()}  
+          </Badge>
+        </TableCell>
+      </TableRow>
+    );
+  })}
+</TableBody>
+          </Table>
+          {totalPages > 1 && (
+      <div className="flex justify-center mt-4">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <Button
+            key={index}
+            variant={currentPage === index + 1 ? "" : "secondary"}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </Button>
+        ))}
+      </div>
+    )}
         </div>
       </Layout>
     </>

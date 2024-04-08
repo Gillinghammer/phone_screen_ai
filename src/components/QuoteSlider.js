@@ -51,7 +51,9 @@ const QuoteSlider = () => {
                   />
                 </div>
                 <div className="w-full md:w-1/2 mt-6 md:mt-0">
-                  <p className="text-2xl font-semibold mb-4">{quote.quote}</p>
+                  <p className="text-gray-900 text-2xl font-semibold mb-4">
+                    {quote.quote}
+                  </p>
                   <p className="text-gray-600 text-xl">- {quote.author}</p>
                 </div>
               </div>

@@ -76,7 +76,7 @@ const ConfirmationModal = ({ company, isOpen, onClose, onConfirm }) => {
         isOpen ? "block" : "hidden"
       }`}
     >
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-xl">
+      <div className="bg-white text-gray-900 rounded-lg shadow-xl p-6 w-full max-w-xl">
         <h2 className="text-xl font-bold mb-4">Please Confirm</h2>
         <div className="space-y-2">
           {checkboxes.map(({ name, label }) => (

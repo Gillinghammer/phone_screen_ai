@@ -98,7 +98,7 @@ const ProductScreenshots = () => {
               </div>
             </div>
             <div className="md:w-1/2 mt-6 md:mt-0 md:px-10">
-              <h3 className="text-3xl font-extrabold mb-4">
+              <h3 className="text-gray-900 text-3xl font-extrabold mb-4">
                 {screenshot.title}
               </h3>
               <div className="text-xl text-gray-600">

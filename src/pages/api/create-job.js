@@ -19,15 +19,15 @@ export default async function handler(req, res) {
     // Ensure all required fields are included in the request body
     const {
       companyId,
-      job_title,
-      job_location,
-      job_description,
-      remote_friendly,
+      jobTitle,
+      jobLocation,
+      jobDescription,
+      remoteFriendly,
       seniority,
       salary,
       requirements,
       responsibilities,
-      interview_questions,
+      interviewQuestions,
     } = req.body;
     console.log("add job", req.body);
     // Check if the session contains a user and that user has an ID
@@ -39,16 +39,16 @@ export default async function handler(req, res) {
       const job = await prisma.job.create({
         data: {
           userId: token.id,
-          companyId: companyId,
-          jobTitle: job_title,
-          jobLocation: job_location,
-          jobDescription: job_description,
-          remoteFriendly: remote_friendly,
+          companyId,
+          jobTitle,
+          jobLocation,
+          jobDescription,
+          remoteFriendly,
           seniority,
           salary,
           requirements: { set: requirements },
           responsibilities: { set: responsibilities },
-          interviewQuestions: { set: interview_questions },
+          interviewQuestions: { set: interviewQuestions },
         },
       });
       res.status(200).json(job);

@@ -1,53 +1,60 @@
 @tailwind base;
-@tailwind components;
-@tailwind utilities;
+  @tailwind components;
+  @tailwind utilities;
+  
+@layer base {
+  :root {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14.3% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+    --primary: 47.9 95.8% 53.1%;
+    --primary-foreground: 26 83.3% 14.1%;
+    --secondary: 60 4.8% 95.9%;
+    --secondary-foreground: 24 9.8% 10%;
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+    --accent: 60 4.8% 95.9%;
+    --accent-foreground: 24 9.8% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --ring: 20 14.3% 4.1%;
+    --radius: 0.3rem;
+  }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-:root {
-  --primary-color: 34, 197, 94; /* Tailwind's emerald-500 */
-  --secondary-color: 55, 65, 81; /* Tailwind's gray-800 */
-  --accent-color: 239, 68, 68; /* Tailwind's red-500 */
-  --background-color: 249, 250, 251; /* Tailwind's gray-50 */
-  --text-color: 31, 41, 55; /* Tailwind's gray-700 */
-}
-
-body {
-  font-family: 'Inter', serif;
-  background-color: rgb(var(--background-color));
-  color: rgb(var(--text-color));
-}
-
-
-button, .button {
-  background-color: rgb(var(--primary-color));
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem; /* Tailwind's rounded-md */
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover, .button:hover {
-  background-color: rgba(var(--primary-color), 0.8);
-}
-
-input, textarea, select {
-  border: 1px solid rgba(var(--secondary-color), 0.4);
-  border-radius: 0.375rem; /* Tailwind's rounded-md */
-  padding: 0.5rem;
-  font-size: 1rem;
-  width: 100%;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: 2px solid rgb(var(--primary-color));
-  border-color: transparent;
-}
-
-@layer utilities {
-  .text-accent {
-    color: rgb(var(--accent-color));
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 60 9.1% 97.8%;
+    --card: 20 14.3% 4.1%;
+    --card-foreground: 60 9.1% 97.8%;
+    --popover: 20 14.3% 4.1%;
+    --popover-foreground: 60 9.1% 97.8%;
+    --primary: 47.9 95.8% 53.1%;
+    --primary-foreground: 26 83.3% 14.1%;
+    --secondary: 12 6.5% 15.1%;
+    --secondary-foreground: 60 9.1% 97.8%;
+    --muted: 12 6.5% 15.1%;
+    --muted-foreground: 24 5.4% 63.9%;
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 60 9.1% 97.8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --border: 12 6.5% 15.1%;
+    --input: 12 6.5% 15.1%;
+    --ring: 35.5 91.7% 32.9%;
   }
 }
+  
+  @layer base {
+    * {
+      @apply border-border;
+    }
+    body {
+      @apply bg-background text-foreground;
+    }
+  }

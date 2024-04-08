@@ -4,6 +4,7 @@ import { getSession } from "next-auth/react";
 import Layout from "../../../components/Layout";
 import Head from "next/head";
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 
 const prisma = new PrismaClient();
 
@@ -12,8 +13,15 @@ export async function getServerSideProps(context) {
 
   const phoneScreen = await prisma.phoneScreen.findUnique({
     where: { candidateId: parseInt(candidate_id) },
-    include: { candidate: true, job: true },
+    include: { candidate: true, job: true },  
   });
+
+  const job = await prisma.job.findUnique({
+    where: { id: parseInt(job_id, 10) },
+    include: { company: true },
+  });
+
+  console.log('jobbb', job)
 
   if (!phoneScreen) {
     // Handle the case where there is no phone screen found
@@ -25,6 +33,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       phoneScreen: JSON.parse(JSON.stringify(phoneScreen)),
+      job: JSON.parse(JSON.stringify(job)),
     },
   };
 }
@@ -50,7 +59,7 @@ async function updateCandidateStatus(candidateId, newStatus) {
   }
 }
 
-export default function CandidateDetailPage({ phoneScreen }) {
+export default function CandidateDetailPage({ phoneScreen, job }) {
   // Deserialize analysis JSON
   const { questions, answers } = phoneScreen.analysis || {
     questions: [],
@@ -73,19 +82,18 @@ export default function CandidateDetailPage({ phoneScreen }) {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold">
-                {phoneScreen.job.company} - {phoneScreen.job.jobTitle}
+                {job.company.name} - {phoneScreen.job.jobTitle}
               </h1>
               <h2 className="text-2xl">{phoneScreen.candidate.name}</h2>
               <p>Email: {phoneScreen.candidate.email}</p>
               <p>Phone: {phoneScreen.candidate.phone}</p>
               <p>
-                LinkedIn:{" "}
-                {phoneScreen.candidate.linkedinUrl ? (
-                  <Link href={phoneScreen.candidate.linkedinUrl}>Profile</Link>
-                ) : (
-                  "N/A"
-                )}
+                Applied:{" "}
+                {formatDistanceToNow(new Date(phoneScreen.createdAt), {
+                  addSuffix: true,
+                })}
               </p>
+              
             </div>
             <div className="text-center">
               <div className="text-6xl font-bold">
