@@ -24,7 +24,7 @@ export function LoginForm() {
   const { toast } = useToast();
 
   useEffect(() => {
-    let interval;
+    let interval: NodeJS.Timeout | undefined;
     if (loading) {
       interval = setInterval(() => {
         setProgress((prevProgress) => (prevProgress + 20) % 100);
