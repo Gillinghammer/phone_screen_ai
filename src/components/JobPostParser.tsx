@@ -7,6 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { TrashIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 
+interface JobPostParserProps {
+  companyId: string;
+  onClose: () => void;
+}
+
 const sampleParsedData = {
   company: "Ashland Manufacturing Co.",
   job_title: "Administrative Assistant",
@@ -47,7 +52,7 @@ const sampleParsedData = {
   ],
 };
 
-const JobPostParser = ({ companyId, onClose }) => {
+const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
   const [jobPostText, setJobPostText] = useState("");
   const [parsedData, setParsedData] = useState(null);
   const [loading, setLoading] = useState(false);
