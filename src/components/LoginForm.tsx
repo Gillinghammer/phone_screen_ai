@@ -39,7 +39,7 @@ export function LoginForm() {
     router.push("/jobs");
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     signIn("credentials", {
