@@ -293,7 +293,7 @@ const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
                 <Label htmlFor={`interview-question-${index}`}>
                   Interview Question {index + 1}
                 </Label>
-                <Input
+                <Textarea
                   id={`interview-question-${index}`}
                   value={question}
                   rows={1}
@@ -317,17 +317,6 @@ const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
                 )}
               </div>
             ))}
-            {parsedData.interview_questions.length < 10 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleAddQuestion}
-                className="mt-2"
-              >
-                <PlusCircledIcon className="h-4 w-4" />
-                &nbsp;Add Question
-              </Button>
-            )}
           </div>
           <Button onClick={handleCreatePhoneScreen} disabled={submitting}>
             {submitting ? <Spinner size="sm" /> : "Create PhoneScreen"}
