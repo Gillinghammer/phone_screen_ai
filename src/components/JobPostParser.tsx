@@ -135,8 +135,8 @@ const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
     }
   };
 
-  const handleRemoveQuestion = (index) => {
-    if (parsedData.interview_questions.length > 3) {
+  const handleRemoveQuestion = (index: number) => {
+    if (parsedData && parsedData.interview_questions.length > 3) {
       const newQuestions = [...parsedData.interview_questions];
       newQuestions.splice(index, 1);
       setParsedData({
