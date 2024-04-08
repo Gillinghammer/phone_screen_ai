@@ -12,6 +12,19 @@ interface JobPostParserProps {
   onClose: () => void;
 }
 
+interface ParsedData {
+  company: string;
+  job_title: string;
+  job_location: string;
+  job_description: string;
+  remote_friendly: boolean;
+  seniority: string;
+  salary: string | null;
+  requirements: string[];
+  responsibilities: string[];
+  interview_questions: string[];
+}
+
 const sampleParsedData = {
   company: "Ashland Manufacturing Co.",
   job_title: "Administrative Assistant",
@@ -54,7 +67,7 @@ const sampleParsedData = {
 
 const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
   const [jobPostText, setJobPostText] = useState("");
-  const [parsedData, setParsedData] = useState(null);
+  const [parsedData, setParsedData] = useState<ParsedData | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
