@@ -31,7 +31,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -39,13 +38,13 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { EnvelopeClosedIcon, MobileIcon } from "@radix-ui/react-icons";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/router";
 
 const RECORDS_PER_PAGE = 6;
 
@@ -121,16 +120,22 @@ export default function JobDetailPage({ job }) {
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortColumn, setSortColumn] = useState(null);
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortColumn, setSortColumn] = useState("screened");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [selectedStatus, setSelectedStatus] = useState("any");
+  const [bulkChangeStatus, setBulkChangeStatus] = useState(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  console.log("debug job", job);
+  // console.log("debug job", job);
+
+  const refreshData = () => {
+    router.replace(router.asPath);
+  };
 
   const getSortValue = (candidate, column) => {
     switch (column) {
@@ -154,40 +159,56 @@ export default function JobDetailPage({ job }) {
     }
   };
 
-  const filteredCandidates = job.candidates
-    .filter((candidate) => {
-      const nameMatch = candidate.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const emailMatch = candidate.email
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const phoneMatch = candidate.phone
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      return nameMatch || emailMatch || phoneMatch;
-    })
-    .filter((candidate) => candidate.status.toLowerCase() !== "archived")
-    .filter(
-      (candidate) =>
-        candidate.status.toLowerCase() === selectedStatus ||
-        selectedStatus === "any"
-    )
-    .sort((a, b) => {
-      if (sortColumn) {
-        const valueA = getSortValue(a, sortColumn);
-        const valueB = getSortValue(b, sortColumn);
+  const getFilteredCandidates = (
+    candidates,
+    searchTerm,
+    selectedStatus,
+    sortColumn,
+    sortOrder
+  ) => {
+    return candidates
+      .filter((candidate) => {
+        const nameMatch = candidate.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const emailMatch = candidate.email
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const phoneMatch = candidate.phone
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        return nameMatch || emailMatch || phoneMatch;
+      })
+      .filter((candidate) => candidate.status.toLowerCase() !== "archived")
+      .filter(
+        (candidate) =>
+          candidate.status.toLowerCase() === selectedStatus ||
+          selectedStatus === "any"
+      )
+      .sort((a, b) => {
+        if (sortColumn) {
+          const valueA = getSortValue(a, sortColumn);
+          const valueB = getSortValue(b, sortColumn);
 
-        if (typeof valueA === "string" && typeof valueB === "string") {
-          return sortOrder === "asc"
-            ? valueA.localeCompare(valueB)
-            : valueB.localeCompare(valueA);
-        } else {
-          return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+          if (typeof valueA === "string" && typeof valueB === "string") {
+            return sortOrder === "asc"
+              ? valueA.localeCompare(valueB)
+              : valueB.localeCompare(valueA);
+          } else {
+            return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+          }
         }
-      }
-      return 0;
-    });
+        return 0;
+      });
+  };
+
+  const filteredCandidates = getFilteredCandidates(
+    job.candidates,
+    searchTerm,
+    selectedStatus,
+    sortColumn,
+    sortOrder
+  );
 
   const totalPages = Math.ceil(filteredCandidates.length / RECORDS_PER_PAGE);
   const paginatedCandidates = filteredCandidates.slice(
@@ -241,30 +262,25 @@ export default function JobDetailPage({ job }) {
     setSelectedCandidates(newSelectedCandidates);
   };
 
-  const handleConfirmArchive = async () => {
+  const handleConfirmChangeStatus = async (status) => {
     try {
-      await Promise.all(
-        selectedCandidates.map(async (candidateId) => {
-          await fetch("/api/archiveCandidate", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ candidateId }),
-          });
-        })
-      );
-      console.log("Archive candidates:", selectedCandidates);
+      await fetch("/api/changeCandidateStatus", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ candidateIds: selectedCandidates, status }),
+      });
       toast({
-        title: "Candidates archived",
-        description: `${selectedCandidates.length} candidate(s) have been archived.`,
+        title: "Candidate status updated",
+        description: `${selectedCandidates.length} candidate(s) status have been updated to ${status}.`,
       });
       setSelectedCandidates([]);
-      // Refresh the job data after archiving candidates
-      // You may need to implement a separate API route to fetch the updated job data
       setIsConfirmationDialogOpen(false);
+      setSelectedStatus("any");
+      refreshData();
     } catch (error) {
-      console.error("Error archiving candidates:", error);
+      console.error("Error updating candidate status:", error);
     }
   };
 
@@ -297,32 +313,69 @@ export default function JobDetailPage({ job }) {
                 open={isConfirmationDialogOpen}
                 onOpenChange={setIsConfirmationDialogOpen}
               >
-                <DialogTrigger asChild>
-                  <Button
-                    variant={
-                      selectedCandidates.length === 0
-                        ? "disabled"
-                        : "destructive"
+                <Select
+                  value={selectedStatus}
+                  onValueChange={(value) => {
+                    if (value) {
+                      setBulkChangeStatus(value);
+                      setIsConfirmationDialogOpen(true);
                     }
+                  }}
+                >
+                  <SelectTrigger
+                    className={`${
+                      selectedCandidates.length === 0 ? "opacity-50" : ""
+                    } w-[180px]`}
                     disabled={selectedCandidates.length === 0}
-                    onClick={() => setIsConfirmationDialogOpen(true)}
                   >
-                    Archive selected
-                  </Button>
-                </DialogTrigger>
+                    <SelectValue placeholder="Change Status">
+                      Change status
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ACCEPTED">Accept</SelectItem>
+                    <SelectItem value="REJECTED">Reject</SelectItem>
+                    <SelectItem value="OPEN">Open</SelectItem>
+                    <SelectItem value="ARCHIVED">Archive</SelectItem>
+                  </SelectContent>
+                </Select>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Confirm Archive</DialogTitle>
+                    <DialogTitle>Confirm Status Change</DialogTitle>
                     <DialogDescription>
-                      Are you sure you want to archive the selected candidates?
+                      {bulkChangeStatus === "ACCEPTED" && (
+                        <>
+                          Are you sure you want to <strong>accept</strong> the
+                          selected candidates?
+                        </>
+                      )}
+                      {bulkChangeStatus === "REJECTED" && (
+                        <>
+                          Are you sure you want to <strong>reject</strong> the
+                          selected candidates?
+                        </>
+                      )}
+                      {bulkChangeStatus === "OPEN" && (
+                        <>
+                          Are you sure you want to mark the selected candidates
+                          as <strong>open</strong>?
+                        </>
+                      )}
+                      {bulkChangeStatus === "ARCHIVED" && (
+                        <>
+                          Are you sure you want to <strong>archive</strong> the
+                          selected candidates?
+                        </>
+                      )}
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
                     <Button
-                      variant="destructive"
-                      onClick={handleConfirmArchive}
+                      onClick={() =>
+                        handleConfirmChangeStatus(bulkChangeStatus)
+                      }
                     >
-                      Archive
+                      Confirm
                     </Button>
                     <Button
                       variant="secondary"
@@ -333,15 +386,6 @@ export default function JobDetailPage({ job }) {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-              <Button
-                variant={
-                  selectedCandidates.length === 0 ? "disabled" : "secondary"
-                }
-                disabled={selectedCandidates.length === 0}
-                onClick={() => setIsConfirmationDialogOpen(true)}
-              >
-                Change status
-              </Button>
               <span className="text-sm text-muted-foreground">
                 {selectedCandidates.length} candidate(s) selected
               </span>
@@ -364,7 +408,7 @@ export default function JobDetailPage({ job }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="any">any</SelectItem>
+                    <SelectItem value="any">all</SelectItem>
                     <SelectItem value="open">
                       <Badge variant="outline">open</Badge>
                     </SelectItem>
