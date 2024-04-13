@@ -31,7 +31,12 @@ const JobPage = ({ job }) => {
       });
 
       if (response.ok) {
-        track('Candidate application', { ...applicantDetails, jobId: job.id, jobTitle: job.jobTitle, company: job.company});
+        track("Candidate application", {
+          ...applicantDetails,
+          jobId: job.id,
+          jobTitle: job.jobTitle,
+          company: job.company,
+        });
         setApplicantDetails({
           name: "",
           email: "",

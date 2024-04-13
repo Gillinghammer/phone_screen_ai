@@ -5,23 +5,22 @@ import React from "react";
 import Layout from "../../components/Layout";
 import { getSession } from "next-auth/react";
 import JobTable from "../../components/JobTable";
-import { format } from 'date-fns';
-import { useRouter } from 'next/router';
+import { format } from "date-fns";
+import { useRouter } from "next/router";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
 import Link from "next/link";
 
 const prisma = new PrismaClient();
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);
-  console.log("debug session", session)
+  console.log("debug session", session);
   if (!session || !session.user?.email) {
     return {
       redirect: {
@@ -78,8 +77,8 @@ export async function getServerSideProps(context) {
   // Convert DateTime fields to strings
   jobs = jobs.map((job) => ({
     ...job,
-    createdAt: format(job.createdAt, 'yyyy-MM-dd HH:mm:ss'),
-    updatedAt: format(job.updatedAt, 'yyyy-MM-dd HH:mm:ss'),
+    createdAt: format(job.createdAt, "yyyy-MM-dd HH:mm:ss"),
+    updatedAt: format(job.updatedAt, "yyyy-MM-dd HH:mm:ss"),
     candidates: job.candidates.map((candidate) => ({
       ...candidate,
       phoneScreen: candidate.phoneScreen
@@ -89,13 +88,13 @@ export async function getServerSideProps(context) {
         : null,
     })),
   }));
-  
-  console.log('debug jobs', jobs);
-  
+
+  console.log("debug jobs", jobs);
+
   return {
     props: {
       jobs,
-      companyId: user.companyId
+      companyId: user.companyId,
     },
   };
 }
@@ -105,7 +104,9 @@ export default function JobsPage({ jobs, companyId }) {
 
   const refreshData = () => {
     router.replace(router.asPath);
-}
+  };
+
+  console.log("debug jobs", jobs);
 
   return (
     <>
@@ -114,26 +115,26 @@ export default function JobsPage({ jobs, companyId }) {
       </Head>
       <Layout>
         <div className="container mx-auto mt-10">
-        <Breadcrumb className="mb-4">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink>
-                <Link href="/dashboard">Dashboard</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink>
-                <Link href="/jobs">Jobs</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+          <Breadcrumb className="mb-4">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/jobs">Jobs</BreadcrumbLink>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-4xl font-bold">Active Job Screens</h1>
           </div>
           <div className="overflow-x-auto">
-            <JobTable jobs={jobs} refetchJobs={refreshData} companyId={companyId} />
+            <JobTable
+              jobs={jobs}
+              refetchJobs={refreshData}
+              companyId={companyId}
+            />
           </div>
         </div>
       </Layout>

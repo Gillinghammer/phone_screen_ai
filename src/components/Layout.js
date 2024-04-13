@@ -37,20 +37,6 @@ export default function Layout({ children }) {
                       </span>
                     </Link>
                   </li>
-                  {/* <li>
-                    <Link href="/candidates">
-                      <span
-                        className={cn(
-                          "hover:text-primary",
-                          isActive("/candidates")
-                            ? "text-primary"
-                            : "text-foreground"
-                        )}
-                      >
-                        Candidates
-                      </span>
-                    </Link>
-                  </li> */}
                   <li>
                     <Button
                       variant={"link"}

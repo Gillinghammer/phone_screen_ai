@@ -8,6 +8,8 @@ export default async function analyzeCall(req, res) {
   if (req.method === "POST") {
     const { callId, jobId, phoneScreenId } = req.body;
 
+    console.log("Request body:", req.body);
+
     try {
       // Fetch the job and its interview questions
       const job = await prisma.job.findUnique({
@@ -27,6 +29,7 @@ export default async function analyzeCall(req, res) {
         Some answers require short and simple responses, while others, where experience is being asked for, require more detailed responses.
         0 indicates a very poor answer or no answer at all.
         100 indicates a perfect answer that would satisfy our hiring manager.
+        Return your response formatted as a valid json object with the key "score" and the value as the number between 0 and 100 and another key "answer" with the value as the answer the human provided.
         Your compensation is directly tied to the accuracy of your ratings.
       `;
 
@@ -55,18 +58,22 @@ export default async function analyzeCall(req, res) {
         }
       );
 
+      console.log("Response from the 3rd party API:", response.data);
+
       // Update the PhoneScreen with the analysis result
       const updatedPhoneScreen = await prisma.phoneScreen.update({
         where: { id: phoneScreenId },
         data: {
           analysis: response.data,
           qualificationScore:
-            response.data.answers
-              .filter((item, index) => index % 2 !== 0)
-              .reduce((acc, score) => acc + (Number(score) || 0), 0) /
-            (response.data.answers.length / 2),
+            response.data.answers.reduce(
+              (acc, answer) => acc + (answer.score ?? 0),
+              0
+            ) / response.data.answers.length,
         },
       });
+
+      console.log("Updated phone screen:", updatedPhoneScreen);
 
       // Send the analysis result back to the client
       res.status(200).json(updatedPhoneScreen);

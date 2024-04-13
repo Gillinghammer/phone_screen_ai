@@ -24,7 +24,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
 import {
   Dialog,
   DialogContent,
@@ -34,10 +34,18 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { EnvelopeClosedIcon, MobileIcon } from "@radix-ui/react-icons";
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 
 const RECORDS_PER_PAGE = 6;
 
@@ -110,7 +118,8 @@ const formatCallDuration = (callLength) => {
 export default function JobDetailPage({ job }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCandidates, setSelectedCandidates] = useState([]);
-  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
+    useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -120,6 +129,8 @@ export default function JobDetailPage({ job }) {
   const handleSearchTermChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
+  console.log("debug job", job);
 
   const getSortValue = (candidate, column) => {
     switch (column) {
@@ -142,32 +153,41 @@ export default function JobDetailPage({ job }) {
         return null;
     }
   };
-  
 
   const filteredCandidates = job.candidates
-  .filter((candidate) => {
-    const nameMatch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const emailMatch = candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const phoneMatch = candidate.phone.toLowerCase().includes(searchTerm.toLowerCase());
-    return nameMatch || emailMatch || phoneMatch;
-  })
-  .filter((candidate) => candidate.status.toLowerCase() !== "archived")
-  .filter((candidate) => candidate.status.toLowerCase() === selectedStatus || selectedStatus === "any")
-  .sort((a, b) => {
-    if (sortColumn) {
-      const valueA = getSortValue(a, sortColumn);
-      const valueB = getSortValue(b, sortColumn);
+    .filter((candidate) => {
+      const nameMatch = candidate.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const emailMatch = candidate.email
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const phoneMatch = candidate.phone
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      return nameMatch || emailMatch || phoneMatch;
+    })
+    .filter((candidate) => candidate.status.toLowerCase() !== "archived")
+    .filter(
+      (candidate) =>
+        candidate.status.toLowerCase() === selectedStatus ||
+        selectedStatus === "any"
+    )
+    .sort((a, b) => {
+      if (sortColumn) {
+        const valueA = getSortValue(a, sortColumn);
+        const valueB = getSortValue(b, sortColumn);
 
-      if (typeof valueA === "string" && typeof valueB === "string") {
-        return sortOrder === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
-      } else {
-        return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+        if (typeof valueA === "string" && typeof valueB === "string") {
+          return sortOrder === "asc"
+            ? valueA.localeCompare(valueB)
+            : valueB.localeCompare(valueA);
+        } else {
+          return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+        }
       }
-    }
-    return 0;
-  });
-
-
+      return 0;
+    });
 
   const totalPages = Math.ceil(filteredCandidates.length / RECORDS_PER_PAGE);
   const paginatedCandidates = filteredCandidates.slice(
@@ -188,9 +208,10 @@ export default function JobDetailPage({ job }) {
     setCurrentPage(pageNumber);
   };
 
-
   const handleSelectAllCandidates = (checked) => {
-    setSelectedCandidates(checked ? filteredCandidates.map((candidate) => candidate.id) : []);
+    setSelectedCandidates(
+      checked ? filteredCandidates.map((candidate) => candidate.id) : []
+    );
   };
 
   const handleSelectCandidate = (candidateId) => {
@@ -198,11 +219,18 @@ export default function JobDetailPage({ job }) {
     let newSelectedCandidates = [];
 
     if (selectedIndex === -1) {
-      newSelectedCandidates = newSelectedCandidates.concat(selectedCandidates, candidateId);
+      newSelectedCandidates = newSelectedCandidates.concat(
+        selectedCandidates,
+        candidateId
+      );
     } else if (selectedIndex === 0) {
-      newSelectedCandidates = newSelectedCandidates.concat(selectedCandidates.slice(1));
+      newSelectedCandidates = newSelectedCandidates.concat(
+        selectedCandidates.slice(1)
+      );
     } else if (selectedIndex === selectedCandidates.length - 1) {
-      newSelectedCandidates = newSelectedCandidates.concat(selectedCandidates.slice(0, -1));
+      newSelectedCandidates = newSelectedCandidates.concat(
+        selectedCandidates.slice(0, -1)
+      );
     } else if (selectedIndex > 0) {
       newSelectedCandidates = newSelectedCandidates.concat(
         selectedCandidates.slice(0, selectedIndex),
@@ -243,77 +271,84 @@ export default function JobDetailPage({ job }) {
   return (
     <>
       <Head>
-        <title>
-          {job.jobTitle}
-        </title>
+        <title>{job.jobTitle}</title>
       </Head>
       <Layout>
         <div className="container mx-auto mt-10">
-        <Breadcrumb className="mb-4">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink>
-                <Link href="/dashboard">Dashboard</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink>
-                <Link href="/jobs">Jobs</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{job.jobTitle}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-          <h1 className="text-4xl font-bold mb-6">
-            {job.jobTitle}
-          </h1>
+          <Breadcrumb className="mb-4">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/jobs">Jobs</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{job.jobTitle}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <h1 className="text-4xl font-bold mb-6">{job.jobTitle}</h1>
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center space-x-4">
-            <Dialog open={isConfirmationDialogOpen} onOpenChange={setIsConfirmationDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant={selectedCandidates.length === 0 ? "disabled" : "destructive"}
-                  disabled={selectedCandidates.length === 0}
-                  onClick={() => setIsConfirmationDialogOpen(true)}
-                >
-                  Archive selected
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Confirm Archive</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to archive the selected candidates?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="destructive" onClick={handleConfirmArchive}>
-                    Archive
+              <Dialog
+                open={isConfirmationDialogOpen}
+                onOpenChange={setIsConfirmationDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant={
+                      selectedCandidates.length === 0
+                        ? "disabled"
+                        : "destructive"
+                    }
+                    disabled={selectedCandidates.length === 0}
+                    onClick={() => setIsConfirmationDialogOpen(true)}
+                  >
+                    Archive selected
                   </Button>
-                  <Button variant="secondary" onClick={() => setIsConfirmationDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            <Button
-              variant={selectedCandidates.length === 0 ? "disabled" : "secondary"}
-              disabled={selectedCandidates.length === 0}
-              onClick={() => setIsConfirmationDialogOpen(true)}
-            >
-              Change status
-            </Button>
-            <span className="text-sm text-muted-foreground">
-              {selectedCandidates.length} candidate(s) selected
-            </span>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Confirm Archive</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to archive the selected candidates?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      variant="destructive"
+                      onClick={handleConfirmArchive}
+                    >
+                      Archive
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setIsConfirmationDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant={
+                  selectedCandidates.length === 0 ? "disabled" : "secondary"
+                }
+                disabled={selectedCandidates.length === 0}
+                onClick={() => setIsConfirmationDialogOpen(true)}
+              >
+                Change status
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {selectedCandidates.length} candidate(s) selected
+              </span>
             </div>
             <div className="flex items-center space-x-4">
               <Input
-              type="text"
+                type="text"
                 placeholder="Search candidates"
                 value={searchTerm}
                 onChange={handleSearchTermChange}
@@ -329,9 +364,7 @@ export default function JobDetailPage({ job }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="any">
-                      any
-                    </SelectItem>
+                    <SelectItem value="any">any</SelectItem>
                     <SelectItem value="open">
                       <Badge variant="outline">open</Badge>
                     </SelectItem>
@@ -347,95 +380,121 @@ export default function JobDetailPage({ job }) {
             </div>
           </div>
           <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={selectedCandidates.length === filteredCandidates.length}
-                  onCheckedChange={handleSelectAllCandidates}
-                  aria-label="Select all"
-                />
-              </TableHead>
-              <TableHead onClick={() => handleSort("screened")}>
-                Screened {sortColumn === "screened" && (sortOrder === "asc" ? "▲" : "▼")}
-              </TableHead>
-              <TableHead onClick={() => handleSort("name")}>
-                Name {sortColumn === "name" && (sortOrder === "asc" ? "▲" : "▼")}
-              </TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead onClick={() => handleSort("duration")}>
-                Duration {sortColumn === "duration" && (sortOrder === "asc" ? "▲" : "▼")}
-              </TableHead>
-                            <TableHead onClick={() => handleSort("score")}>
-                Score {sortColumn === "score" && (sortOrder === "asc" ? "▲" : "▼")}
-              </TableHead>
-              <TableHead onClick={() => handleSort("status")}>
-                Status {sortColumn === "status" && (sortOrder === "asc" ? "▲" : "▼")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-    {paginatedCandidates.map((candidate) => {
-    const createdAtDate = parseISO(candidate.createdAt);
-    const daysSinceCreated = formatDistanceToNow(createdAtDate, { addSuffix: true });
-    // unique badge color and variant needed for rejected, open, accepted status
-    const badgeVariant = candidate.status.toLowerCase() === "rejected" ? "destructive" : candidate.status.toLowerCase() === "open" ? "outline" : "";
-    return (
-      <TableRow key={candidate.id}>
-        <TableCell className="w-[50px]">
-          <Checkbox
-            checked={selectedCandidates.includes(candidate.id)}
-            onCheckedChange={() => handleSelectCandidate(candidate.id)}
-            aria-label="Select row"
-          />
-        </TableCell>
-        <TableCell className="text-xs">{daysSinceCreated}</TableCell>
-        <TableCell>
-          {candidate.phoneScreen ? (
-            <Link href={`/jobs/${job.id}/${candidate.id}`} className="underline">
-              {candidate.name}
-            </Link>
-          ) : (
-            <span>{candidate.name}</span>
-          )}
-        </TableCell>
-        <TableCell className="w-[280px]">
-          <div className="flex items-center space-x-2 mb-2">
-            <EnvelopeClosedIcon className="w-4 h-4 text-primary" />
-            <span >{candidate.email}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <MobileIcon className="w-4 h-4 text-primary" />
-            <span className="text-xs">{candidate.phone}</span>
-          </div>
-        </TableCell>
-        <TableCell>
-          {candidate.phoneScreen?.callLength ?? "in progress"}
-        </TableCell>
-        <TableCell>{candidate.phoneScreen?.qualificationScore.toFixed(2) ?? 0}</TableCell>
-        <TableCell>
-          <Badge variant={badgeVariant}>
-            {candidate.status.toLowerCase()}  
-          </Badge>
-        </TableCell>
-      </TableRow>
-    );
-  })}
-</TableBody>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={
+                      selectedCandidates.length === filteredCandidates.length
+                    }
+                    onCheckedChange={handleSelectAllCandidates}
+                    aria-label="Select all"
+                  />
+                </TableHead>
+                <TableHead onClick={() => handleSort("screened")}>
+                  Screened{" "}
+                  {sortColumn === "screened" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
+                </TableHead>
+                <TableHead onClick={() => handleSort("name")}>
+                  Name{" "}
+                  {sortColumn === "name" && (sortOrder === "asc" ? "▲" : "▼")}
+                </TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead onClick={() => handleSort("duration")}>
+                  Duration{" "}
+                  {sortColumn === "duration" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
+                </TableHead>
+                <TableHead onClick={() => handleSort("score")}>
+                  Score{" "}
+                  {sortColumn === "score" && (sortOrder === "asc" ? "▲" : "▼")}
+                </TableHead>
+                <TableHead onClick={() => handleSort("status")}>
+                  Status{" "}
+                  {sortColumn === "status" && (sortOrder === "asc" ? "▲" : "▼")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedCandidates.map((candidate) => {
+                const createdAtDate = parseISO(candidate.createdAt);
+                const daysSinceCreated = formatDistanceToNow(createdAtDate, {
+                  addSuffix: true,
+                });
+                // unique badge color and variant needed for rejected, open, accepted status
+                const badgeVariant =
+                  candidate.status.toLowerCase() === "rejected"
+                    ? "destructive"
+                    : candidate.status.toLowerCase() === "open"
+                    ? "outline"
+                    : "";
+                return (
+                  <TableRow key={candidate.id}>
+                    <TableCell className="w-[50px]">
+                      <Checkbox
+                        checked={selectedCandidates.includes(candidate.id)}
+                        onCheckedChange={() =>
+                          handleSelectCandidate(candidate.id)
+                        }
+                        aria-label="Select row"
+                      />
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      {daysSinceCreated}
+                    </TableCell>
+                    <TableCell>
+                      {candidate.phoneScreen ? (
+                        <Link
+                          href={`/jobs/${job.id}/${candidate.id}`}
+                          className="underline"
+                        >
+                          {candidate.name}
+                        </Link>
+                      ) : (
+                        <span>{candidate.name}</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="w-[280px]">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <EnvelopeClosedIcon className="w-4 h-4 text-gray-500" />
+                        <span>{candidate.email}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <MobileIcon className="w-4 h-4 text-gray-500" />
+                        <span className="text-xs">{candidate.phone}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {candidate.phoneScreen?.callLength ?? "in progress"}
+                    </TableCell>
+                    <TableCell>
+                      {candidate.phoneScreen?.qualificationScore.toFixed(2) ??
+                        0}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={badgeVariant}>
+                        {candidate.status.toLowerCase()}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
           </Table>
           {totalPages > 1 && (
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <Button
-            key={index}
-            variant={currentPage === index + 1 ? "" : "secondary"}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </Button>
-        ))}
-      </div>
-    )}
+            <div className="flex justify-center mt-4">
+              {Array.from({ length: totalPages }, (_, index) => (
+                <Button
+                  key={index}
+                  variant={currentPage === index + 1 ? "" : "secondary"}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
       </Layout>
     </>

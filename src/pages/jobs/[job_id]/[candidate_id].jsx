@@ -3,8 +3,23 @@ import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import Layout from "../../../components/Layout";
 import Head from "next/head";
-import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const prisma = new PrismaClient();
 
@@ -13,15 +28,13 @@ export async function getServerSideProps(context) {
 
   const phoneScreen = await prisma.phoneScreen.findUnique({
     where: { candidateId: parseInt(candidate_id) },
-    include: { candidate: true, job: true },  
+    include: { candidate: true, job: true },
   });
 
   const job = await prisma.job.findUnique({
     where: { id: parseInt(job_id, 10) },
     include: { company: true },
   });
-
-  console.log('jobbb', job)
 
   if (!phoneScreen) {
     // Handle the case where there is no phone screen found
@@ -60,17 +73,12 @@ async function updateCandidateStatus(candidateId, newStatus) {
 }
 
 export default function CandidateDetailPage({ phoneScreen, job }) {
+  console.log("Phone Screen:", phoneScreen);
   // Deserialize analysis JSON
   const { questions, answers } = phoneScreen.analysis || {
     questions: [],
     answers: [],
   };
-
-  // Split answers into chunks of 2 (answer text and score)
-  const answerChunks = [];
-  for (let i = 0; i < answers.length; i += 2) {
-    answerChunks.push({ text: answers[i], score: answers[i + 1] });
-  }
 
   return (
     <>
@@ -78,86 +86,149 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
         <title>Candidate Detail - {phoneScreen.candidate.name}</title>
       </Head>
       <Layout>
-        <div className="container mx-auto my-10 p-6 border rounded shadow">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">
-                {job.company.name} - {phoneScreen.job.jobTitle}
-              </h1>
-              <h2 className="text-2xl">{phoneScreen.candidate.name}</h2>
-              <p>Email: {phoneScreen.candidate.email}</p>
-              <p>Phone: {phoneScreen.candidate.phone}</p>
-              <p>
-                Applied:{" "}
-                {formatDistanceToNow(new Date(phoneScreen.createdAt), {
-                  addSuffix: true,
-                })}
-              </p>
-              
-            </div>
-            <div className="text-center">
-              <div className="text-6xl font-bold">
-                {phoneScreen.qualificationScore.toFixed(2) ?? 0}
+        <Breadcrumb className="mb-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/jobs">Jobs</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/jobs/${phoneScreen.job.id}`}>
+                {phoneScreen.job.jobTitle}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{phoneScreen.candidate.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="container mx-auto my-10">
+          <Card className="p-6">
+            <div className="lg:flex lg:justify-between lg:items-center mb-6">
+              <div className="mb-6 lg:mb-0">
+                <h1 className="text-2xl md:text-3xl font-bold mb-4">
+                  {job.company.name} - {phoneScreen.job.jobTitle}
+                </h1>
+                <div className="flex flex-col md:flex-row md:items-center md:space-x-6 mb-4">
+                  <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-0">
+                    {phoneScreen.candidate.name}
+                  </h2>
+                  <div className="text-base md:text-lg">
+                    <p>Email: {phoneScreen.candidate.email}</p>
+                    <p>Phone: {phoneScreen.candidate.phone}</p>
+                  </div>
+                </div>
+                <p className="text-gray-500">
+                  Applied:{" "}
+                  {formatDistanceToNow(new Date(phoneScreen.createdAt), {
+                    addSuffix: true,
+                  })}
+                </p>
               </div>
-              <div className="text-xl">score</div>
-            </div>
-          </div>
-          {phoneScreen.recordingUrl && (
-            <div className="mb-6">
-              <h3 className="text-xl font-bold mb-2">Listen to Phone Screen</h3>
-              <audio controls src={phoneScreen.recordingUrl}>
-                Your browser does not support the audio element.
-              </audio>
-              <p>Call Duration: {formatCallDuration(phoneScreen.callLength)}</p>
-            </div>
-          )}
-          <div className="mb-6">
-            <button
-              onClick={() =>
-                updateCandidateStatus(phoneScreen.candidateId, "ACCEPTED")
-              }
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
-            >
-              Accept
-            </button>
-            <button
-              onClick={() =>
-                updateCandidateStatus(phoneScreen.candidateId, "REJECTED")
-              }
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2"
-            >
-              Reject
-            </button>
-            <button
-              onClick={() =>
-                updateCandidateStatus(phoneScreen.candidateId, "ARCHIVED")
-              }
-              className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Archive
-            </button>
-          </div>
-          <div className="mb-6">
-            <h3 className="text-xl font-bold">Listen to Phone Screen</h3>
-            <p>Call Duration: {formatCallDuration(phoneScreen.callLength)}</p>
-            {/* Assume there's an audio player component */}
-          </div>
-          <div>
-            {questions.map((question, index) => (
-              <div key={index} className="mb-6">
-                <h4 className="text-lg font-bold">Question {index + 1}</h4>
-                <p className="text-lg">{question[0]}</p>
-                <div className="bg-blue-100 p-4 my-2">
-                  <p className="text-lg">
-                    {answerChunks[index]?.text || "No answer provided"}
-                  </p>
-                  <p className="text-lg">
-                    Score: {answerChunks[index]?.score || "N/A"}
-                  </p>
+              <div className="text-center">
+                <div className="text-4xl md:text-6xl font-bold">
+                  {phoneScreen.qualificationScore.toFixed(2) ?? 0}
+                </div>
+                <div className="text-lg md:text-xl">score</div>
+                <div className="mt-4 flex flex-col sm:flex-row sm:justify-center">
+                  <Button
+                    onClick={() =>
+                      updateCandidateStatus(phoneScreen.candidateId, "ACCEPTED")
+                    }
+                    variant=""
+                    className="mb-2 sm:mb-0 sm:mr-2"
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      updateCandidateStatus(phoneScreen.candidateId, "REJECTED")
+                    }
+                    variant="destructive"
+                    className="mb-2 sm:mb-0 sm:mr-2"
+                  >
+                    Reject
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      updateCandidateStatus(phoneScreen.candidateId, "ARCHIVED")
+                    }
+                    variant="outline"
+                  >
+                    Archive
+                  </Button>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+            {phoneScreen.recordingUrl && (
+              <Card className="mb-6 p-4 shadow">
+                <h3 className="text-xl font-bold mb-4">
+                  Listen to Phone Screen
+                </h3>
+                <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+                  <audio
+                    controls
+                    src={phoneScreen.recordingUrl}
+                    className="w-full mb-2 md:mb-0"
+                  >
+                    Your browser does not support the audio element.
+                  </audio>
+                  <div>
+                    <p className="text-sm text-gray-500">Call Duration:</p>
+                    <p className="text-lg">
+                      {formatCallDuration(phoneScreen.callLength)}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            )}
+            <div className="">
+              {questions.map((question, index) => (
+                <div key={index} className="mb-6">
+                  <div className="flex flex-col md:flex-row md:items-center">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="flex-1 mb-4 md:mb-0 md:mr-4"
+                    >
+                      <AccordionItem value={`item-${index}`}>
+                        <AccordionTrigger className="text-left">
+                          <div className="flex flex-col items-start">
+                            <div className="text-sm mb-1">
+                              Question {index + 1}
+                            </div>
+                            <p className="text-base md:text-lg mb-1">
+                              {question[0]}
+                            </p>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <Card className="bg-gray-50 p-4 my-2">
+                            <p className="text-base md:text-lg">
+                              {answers[index].answer || "N/A"}
+                            </p>
+                          </Card>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                    <div className="self-center md:ml-4">
+                      <div className="rounded-full w-16 h-16 flex flex-col items-center justify-center">
+                        <span className="text-2xl md:text-3xl font-bold">
+                          {answers[index].score || "N/A"}
+                        </span>
+                        <span className="text-xs text-gray-500">score</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
       </Layout>
     </>

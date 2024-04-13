@@ -4,7 +4,6 @@ import { formatDistanceToNow, parseISO } from "date-fns";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
