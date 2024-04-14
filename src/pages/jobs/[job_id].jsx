@@ -562,8 +562,8 @@ export default function JobDetailPage({ job }) {
                         No candidates have applied
                       </h2>
                       <p className="text-lg text-muted-foreground mb-6">
-                        Share your screen link with the candidates you'd like to
-                        screen for this job
+                        Share your screen link with the candidates you would
+                        like to screen for this job.
                       </p>
                       <Button
                         variant="outline"
