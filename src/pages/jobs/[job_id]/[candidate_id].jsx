@@ -1,4 +1,5 @@
 // pages/jobs/[job_id]/[candidate_id].tsx
+import { useState } from "react";
 import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import Layout from "../../../components/Layout";
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/accordion";
 import { useRouter } from "next/router";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
 
 const prisma = new PrismaClient();
 
@@ -77,6 +79,8 @@ async function updateCandidateStatus(candidateId, newStatus, refreshData) {
 
 export default function CandidateDetailPage({ phoneScreen, job }) {
   console.log("Phone Screen:", phoneScreen);
+  const { toast } = useToast();
+  const [isReScoring, setIsReScoring] = useState(false);
 
   const router = useRouter();
 
@@ -88,6 +92,38 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
     questions: [],
     answers: [],
   };
+
+  async function handleReScore() {
+    setIsReScoring(true);
+    toast({
+      title: "Recalculating score",
+      description: "This will take a few moments to update",
+    });
+    try {
+      const response = await fetch(`/api/analyze-call`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          callId: phoneScreen.callId,
+          jobId: phoneScreen.jobId,
+          phoneScreenId: phoneScreen.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to re-score phone screen");
+      }
+
+      const updatedPhoneScreen = await response.json();
+      console.log("Phone screen re-scored:", updatedPhoneScreen);
+      refreshData();
+    } catch (error) {
+      console.error("Error re-scoring phone screen:", error);
+    }
+    setIsReScoring(false);
+  }
 
   return (
     <>
@@ -120,13 +156,15 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
           <Card className="p-6">
             <div className="lg:flex lg:justify-between lg:items-center mb-6">
               <div className="mb-6 lg:mb-0">
-                <div className="mb-4">
-                  <h1 className="text-2xl md:text-3xl font-bold">
-                    {phoneScreen.job.jobTitle}
-                  </h1>
-                  <p className="text-lg ">{job.company.name}</p>
+                <div className="mb-4 flex justify-between items-center">
+                  <div>
+                    <h1 className="text-2xl md:text-3xl font-bold">
+                      {phoneScreen.job.jobTitle}
+                    </h1>
+                    <p className="text-lg">{job.company.name}</p>
+                  </div>
                 </div>
-                <div className="rounded-lg shadow py-6">
+                <div className="rounded-lg py-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold">
                       {phoneScreen.candidate.name}
@@ -165,6 +203,13 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                 </div>
               </div>
               <div className="text-center">
+                <Button
+                  onClick={handleReScore}
+                  variant="ghost"
+                  disabled={isReScoring}
+                >
+                  {isReScoring ? "Recalculating..." : "Recalculate Score"}
+                </Button>
                 <div className="text-4xl md:text-6xl font-bold">
                   {phoneScreen.qualificationScore.toFixed(2) ?? 0}
                 </div>
@@ -256,7 +301,7 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                         <AccordionContent>
                           <Card className="bg-gray-50 p-4 my-2">
                             <p className="text-base md:text-lg">
-                              {answers[index].answer || "N/A"}
+                              {answers[index]?.answer || "N/A"}
                             </p>
                           </Card>
                         </AccordionContent>
@@ -265,7 +310,7 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                     <div className="self-center md:ml-4">
                       <div className="rounded-full w-16 h-16 flex flex-col items-center justify-center">
                         <span className="text-2xl md:text-3xl font-bold">
-                          {answers[index].score || "N/A"}
+                          {answers[index]?.score || 0}
                         </span>
                         <span className="text-xs text-gray-500">score</span>
                       </div>

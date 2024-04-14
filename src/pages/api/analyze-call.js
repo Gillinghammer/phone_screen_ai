@@ -23,15 +23,44 @@ export default async function analyzeCall(req, res) {
 
       // const scorePrompt =
       //   "Based on the human's response to this question rate their qualification on a 0 to 100 point scale. 0 indicates no answer or examples provided that demonstrate any experience or awareness of the question. 100 demonstrates a detailed, nuanced response with direct personal examples that perfectly answer the question. 50 indicates an acknowledgement and awareness of what is being asked but vaguely specified experience.";
+      // const scorePrompt = `
+      //   Based on the human's response to this question rate their qualification on a 0 to 100 point scale.
+      //   Imagine you are the hiring manager and you need to determine if the human is qualified for the role based on the answers they provide to the questions.
+      //   Some answers require short and simple responses, while others, where experience is being asked for, require more detailed responses.
+      //   0 indicates a very poor answer or no answer at all.
+      //   100 indicates a perfect answer, demonstrating direct experience that would satisfy our hiring manager and should be a difficult score to acheive.
+      //   Return your response formatted as a valid json object with the key "score" and the value as the number between 0 and 100 and another key "answer" with the value as the answer the human provided.
+      //   Your compensation is directly tied to the accuracy of your ratings.
+      // `;
+
       const scorePrompt = `
-        Based on the human's response to this question rate their qualification on a 0 to 100 point scale. 
-        Imagine you are the hiring manager and you need to determine if the human is qualified for the role based on the answers they provide to the questions.
-        Some answers require short and simple responses, while others, where experience is being asked for, require more detailed responses.
-        0 indicates a very poor answer or no answer at all.
-        100 indicates a perfect answer that would satisfy our hiring manager.
-        Return your response formatted as a valid json object with the key "score" and the value as the number between 0 and 100 and another key "answer" with the value as the answer the human provided.
-        Your compensation is directly tied to the accuracy of your ratings.
-      `;
+        Task: Evaluate the candidate's response to each interview question and provide a qualification score.
+
+        Instructions:
+        1. Carefully read the candidate's answer to the given question.
+        2. Consider the role requirements and the level of detail and relevance in the candidate's response.
+        3. Assign a score between 0 and 100 based on the following criteria:
+          - 0: Complete non-answer even if the answer is poorly given.
+          - 1-30: Candidate attempted to answer, but provided a poor answer that lacks detail, relevance, or fails to demonstrate necessary qualifications. Seems like they are gussing, or trying to pretend they know what they are talking about.
+          - 31-60: Satisfactory answer that addresses the question but lacks depth or specific examples.
+          - 61-90: Strong answer that directly addresses the question, provides relevant examples, and demonstrates required qualifications.
+          - 91-100: Exceptional answer that not only meets but exceeds expectations, demonstrating strong expertise and experience directly related to the role.
+        4. Format your response as a valid JSON object with the following keys:
+          - "score": The numeric score between 0 and 100.
+          - "answer": The candidate's original answer to the question.
+
+        Example response format, VERY IMPORTANT!!!
+        {
+          "score": 75,
+          "answer": "The candidate's answer goes here..."
+        }
+
+        Important Notes:
+        - Short, simple questions require concise answers, while questions asking about experience should be evaluated based on the level of detail and relevance provided.
+        - Aim to provide accurate scores as if you were the hiring manager assessing the candidate's qualifications. Your compensation is directly tied to the accuracy of your ratings.
+        - If the candidate's answer is missing or cannot be evaluated, assign a score of 0 and explain that the candidate failed to provide an answer to the question.
+        - Ensure your repsonse is only the provided json object { "score": int, "answer": string }
+        `;
 
       // Prepare the questions array for the 3rd party API request
       const questions = job.interviewQuestions?.set?.map((question) => [

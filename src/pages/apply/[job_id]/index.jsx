@@ -1,10 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PrismaClient } from "@prisma/client";
-import ConfirmationModal from "../../../components/ConfirmationModal";
 import { track } from "@vercel/analytics";
+import { Card } from "@/components/ui/card";
+import Head from "next/head";
+import { useTheme } from "next-themes";
+
+import {
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 const prisma = new PrismaClient();
 
 const JobPage = ({ job }) => {
+  const { setTheme } = useTheme();
   const [applicantDetails, setApplicantDetails] = useState({
     name: "",
     email: "",
@@ -12,173 +27,227 @@ const JobPage = ({ job }) => {
     resumeUrl: "",
     jobId: job.id,
   });
-  console.log(job);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [videoPlayed, setVideoPlayed] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setTheme("light");
+  }, [setTheme]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setApplicantDetails({ ...applicantDetails, [name]: value });
   };
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch("/api/apply", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...applicantDetails, jobId: job.id, job }),
-      });
+  const isFormValid = () => {
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const phoneRegex = /^\+?\d{10,14}$/;
 
-      if (response.ok) {
-        track("Candidate application", {
-          ...applicantDetails,
-          jobId: job.id,
-          jobTitle: job.jobTitle,
-          company: job.company,
+    if (!applicantDetails.name || !nameRegex.test(applicantDetails.name)) {
+      return false;
+    }
+
+    if (!applicantDetails.email) {
+      return false;
+    }
+
+    if (!applicantDetails.phone || !phoneRegex.test(applicantDetails.phone)) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (isFormValid()) {
+      try {
+        setIsDialogOpen(false);
+        const response = await fetch("/api/apply", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...applicantDetails, jobId: job.id, job }),
         });
-        setApplicantDetails({
-          name: "",
-          email: "",
-          phone: "",
-          resumeUrl: "",
-          jobId: job.id,
+
+        if (response.ok) {
+          track("Candidate application", {
+            ...applicantDetails,
+            jobId: job.id,
+            jobTitle: job.jobTitle,
+            company: job.company,
+          });
+          setApplicantDetails({
+            name: "",
+            email: "",
+            phone: "",
+            resumeUrl: "",
+            jobId: job.id,
+          });
+          toast({
+            title: "Ok, we're preparing to give you a call",
+            description: "Get ready, your AI phone screen will begin shortly.",
+          });
+        } else {
+          toast({
+            title: "Failed to submit application",
+            description: "An error occurred while submitting your application.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("An error occurred while submitting the form:", error);
+        toast({
+          title: "Error",
+          description: "An error occurred while submitting your application.",
+          variant: "destructive",
         });
-        alert("Application submitted successfully!");
-      } else {
-        alert("Failed to submit application.");
       }
-    } catch (error) {
-      console.error("An error occurred while submitting the form:", error);
-      alert("An error occurred while submitting the application.");
     }
   };
 
   return (
-    <div className="bg-foreground text-gray-900 min-h-screen flex items-center justify-center p-10">
-      <div className="bg-gray-50 container mx-auto rounded shadow-md overflow-hidden max-w-4xl">
-        <div className="md:flex">
-          <div className="md:w-1/2 p-5 border-r">
-            <h1 className="text-2xl font-bold">
-              {job.jobTitle} at {job.company?.name}
-            </h1>
-            <div className="mb-5">
-              <h2 className="font-semibold">Location</h2>
-              <p className="text-gray-600">
-                {job.jobLocation}{" "}
-                {job.remoteFriendly ? "(Remote friendly)" : ""}
-              </p>
-            </div>
-            <div className="mb-5">
-              <h2 className="font-semibold">Job Description</h2>
-              <p className="text-sm">{job.jobDescription}</p>
-            </div>
-            <div className="mb-5">
-              <h2 className="font-semibold">Seniority</h2>
-              <p className="text-sm">{job.seniority}</p>
-            </div>
+    <>
+      <Head>
+        <meta name="robots" content="noindex" />
+      </Head>
+      <div className="bg-white text-gray-900 min-h-screen flex items-center justify-center p-4">
+        <Card className="text-gray-900 rounded p-0 md:p-4 shadow-md overflow-hidden max-w-4xl">
+          <div className="md:flex md:flex-row flex-col-reverse">
+            <CardContent className="p-6 sm:p-2 md:w-1/2">
+              <form className="space-y-4">
+                <div className="mb-4">
+                  <Label htmlFor="name" className="text-gray-900">
+                    Full name
+                  </Label>
+                  <Input
+                    type="text"
+                    name="name"
+                    id="name"
+                    value={applicantDetails.name}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Jane Doe"
+                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label htmlFor="email" className="text-gray-900">
+                    Email address
+                  </Label>
+                  <Input
+                    type="email"
+                    name="email"
+                    id="email"
+                    value={applicantDetails.email}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="jane.doe@example.com"
+                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label htmlFor="phone" className="text-gray-900">
+                    Phone number
+                  </Label>
+                  <Input
+                    type="tel"
+                    name="phone"
+                    id="phone"
+                    value={applicantDetails.phone}
+                    onChange={handleInputChange}
+                    required
+                    pattern="^\+?\d{10,14}$"
+                    title="Please enter a valid phone number (10-14 digits, may include a leading '+')"
+                    placeholder="+1234567890"
+                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+                <div className="text-right">
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        disabled={!isFormValid()}
+                        className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                          isFormValid()
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : "bg-gray-400 cursor-not-allowed"
+                        } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      >
+                        Apply for this job
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-white text-gray-900 sm:max-w-md sm:mx-auto sm:w-auto sm:h-auto w-full h-full">
+                      <div className="flex flex-col gap-4">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Prepare for your call
+                        </h3>
+                        <p className="text-gray-900">
+                          This phone screen will be conducted by an AI. Please
+                          watch this short video so that you have the best
+                          possible experience.
+                        </p>
+                        <div className="aspect-w-16 aspect-h-9">
+                          <video
+                            src="/instructions.mp4"
+                            controls
+                            className="w-full h-full object-cover"
+                            onPlay={() => setVideoPlayed(true)}
+                          ></video>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            type="button"
+                            className="text-gray-900"
+                            onClick={() => setIsDialogOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            disabled={!videoPlayed}
+                            type="button"
+                            onClick={handleSubmit}
+                          >
+                            Ready for my phone screen
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </form>
+            </CardContent>
+            <CardContent className="p-6 sm:p-2 md:w-1/2">
+              <CardTitle className="text-2xl font-bold text-gray-900 mb-4">
+                {job.jobTitle} at {job.company?.name}
+              </CardTitle>
+              <div className="mb-4">
+                <h2 className="font-semibold text-gray-900">Location</h2>
+                <CardDescription className="text-gray-900">
+                  {job.jobLocation}{" "}
+                  {job.remoteFriendly ? "(Remote friendly)" : ""}
+                </CardDescription>
+              </div>
+              <div className="mb-4">
+                <h2 className="font-semibold text-gray-900">Job Description</h2>
+                <CardDescription className="text-gray-900">
+                  {job.jobDescription}
+                </CardDescription>
+              </div>
+              <div className="mb-4">
+                <h2 className="font-semibold text-gray-900">Seniority</h2>
+                <CardDescription className="text-gray-900 text-sm">
+                  {job.seniority}
+                </CardDescription>
+              </div>
+            </CardContent>
           </div>
-          <div className="md:w-1/2 p-5">
-            <form className="space-y-4">
-              <div className="mb-4">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Full name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  value={applicantDetails.name}
-                  onChange={handleInputChange}
-                  required
-                  className="bg-white mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
-                  placeholder="Jane Doe"
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email address
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  value={applicantDetails.email}
-                  onChange={handleInputChange}
-                  required
-                  className="bg-white mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
-                  placeholder="jane.doe@example.com"
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Phone number
-                </label>
-                <input
-                  type="text"
-                  name="phone"
-                  id="phone"
-                  value={applicantDetails.phone}
-                  onChange={handleInputChange}
-                  required
-                  className="bg-white mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
-                  placeholder="+1234567890"
-                />
-              </div>
-              {/* <div className="mb-4">
-                <label
-                  htmlFor="resumeUrl"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  LinkedIn URL (optional)
-                </label>
-                <input
-                  type="url"
-                  name="resumeUrl"
-                  id="resumeUrl"
-                  value={applicantDetails.resumeUrl}
-                  onChange={handleInputChange}
-                  className="bg-white mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
-                  placeholder="http://linkedin.com/in/jane-doe"
-                />
-              </div> */}
-              <div className="text-right">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(true)}
-                  disabled={
-                    applicantDetails.name === "" ||
-                    applicantDetails.email === "" ||
-                    applicantDetails.phone === ""
-                  }
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Apply for this job
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        </Card>
       </div>
-      <ConfirmationModal
-        company={job.company.name}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={() => {
-          setIsModalOpen(false);
-          handleSubmit(); // Call your form submission function here
-        }}
-      />
-    </div>
+    </>
   );
 };
 

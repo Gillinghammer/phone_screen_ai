@@ -54,7 +54,11 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import { EnvelopeClosedIcon, MobileIcon } from "@radix-ui/react-icons";
+import {
+  EnvelopeClosedIcon,
+  MobileIcon,
+  Cross1Icon,
+} from "@radix-ui/react-icons";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/router";
 
@@ -598,10 +602,21 @@ export default function JobDetailPage({ job }) {
         <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <DrawerContent className="max-h-[80vh] px-12">
             <DrawerHeader>
-              <DrawerTitle>Edit Job</DrawerTitle>
-              <DrawerClose onClick={() => setIsDrawerOpen(false)} />
+              <div className="flex items-center justify-between w-full">
+                <DrawerTitle>
+                  Edit the details and screening questions for this job
+                </DrawerTitle>
+                <DrawerClose>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsDrawerOpen(false)}
+                  >
+                    <Cross1Icon className="w-6 h-6" />
+                  </Button>
+                </DrawerClose>
+              </div>
             </DrawerHeader>
-            <div className="overflow-y-auto">
+            <div className="overflow-y-auto px-4">
               <JobDetails
                 jobData={{
                   job_id: job.id,

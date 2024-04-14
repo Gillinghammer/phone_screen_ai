@@ -6,7 +6,6 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 
 const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
-  console.log("jobData", jobData);
   const [jobDetails, setJobDetails] = useState(jobData);
   const [formErrors, setFormErrors] = useState({});
 
@@ -129,7 +128,7 @@ const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-4">
+      <div className="space-y-8">
         <div className="grid grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label htmlFor="job_title">Job Title</Label>
@@ -182,11 +181,11 @@ const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
           />
         </div>
         <div>
-          <h3 className="text-lg font-medium mb-2">Interview Questions</h3>
+          <h3 className="text-lg font-medium mb-2">Screening Questions</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Review these AI generated interview questions based on your supplied
-            job post. Our AI agent will ask each of these questions to every
-            candidate and score their response.
+            Review these AI generated questions based on your supplied job post.
+            Our AI agent will ask each of these questions to every candidate and
+            score their response.
           </p>
           {jobDetails.interview_questions.map((question, index) => (
             <div key={index} className="flex items-center space-x-2 mb-2">

@@ -340,15 +340,19 @@ const JobTable = ({ jobs, refetchJobs, companyId }) => {
           </TableHeader>
           <TableBody>
             {paginatedJobs.map((job) => {
-              const totalScore = job.candidates.reduce((acc, candidate) => {
-                return (
-                  acc + Number(candidate.phoneScreen?.qualificationScore || 0)
-                );
-              }, 0);
-
               const nonArchivedCandidates = job.candidates.filter(
                 (candidate) => candidate.status !== "ARCHIVED"
               );
+
+              const totalScore = nonArchivedCandidates.reduce(
+                (acc, candidate) => {
+                  return (
+                    acc + Number(candidate.phoneScreen?.qualificationScore || 0)
+                  );
+                },
+                0
+              );
+
               const avgScore =
                 nonArchivedCandidates.length > 0
                   ? totalScore / nonArchivedCandidates.length

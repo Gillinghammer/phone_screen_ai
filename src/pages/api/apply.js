@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { sendEmail } from "../../lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -61,6 +62,13 @@ export default async function handle(req, res) {
         }),
       }
     );
+
+    // Send email to candidate (alias) function sendEmail({ to, subject, text, html }: SendEmailParams):
+    // await sendEmail({
+    //   to: email,
+    //   subject: "Your application has been received",
+    //   text: `Hi ${name},\n\nThank you for applying to the position of ${job.jobTitle} at ${job.company.name}. We have received your application and will be in touch shortly.\n\nBest,\n${job.company.name}`,
+    // });
 
     if (!callResponse.ok) {
       throw new Error("Failed to make call");

@@ -13,6 +13,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -60,7 +61,7 @@ export function LoginForm() {
   };
 
   return (
-    <Card>
+    <Card className="w-full max-w-md p-8 space-y-4 m-auto">
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
@@ -91,10 +92,21 @@ export function LoginForm() {
             />
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col items-center gap-4">
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Signing in..." : "Sign in"}
           </Button>
+          <div className="text-sm">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/signup" className="underline">
+              Sign up
+            </Link>
+          </div>
+          <div className="text-sm">
+            <Link href="/auth/forgot-password" className="underline">
+              Forgot your password?
+            </Link>
+          </div>
         </CardFooter>
       </form>
     </Card>
