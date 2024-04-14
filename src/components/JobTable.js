@@ -98,17 +98,13 @@ const JobTable = ({ jobs, refetchJobs, companyId }) => {
 
   const handleConfirmArchive = async () => {
     try {
-      await Promise.all(
-        selectedJobs.map(async (jobId) => {
-          await fetch("/api/archiveJob", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ jobId }),
-          });
-        })
-      );
+      await fetch("/api/archiveJob", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ jobIds: selectedJobs }),
+      });
       console.log("Archive jobs:", selectedJobs);
       toast({
         title: "Jobs archived",

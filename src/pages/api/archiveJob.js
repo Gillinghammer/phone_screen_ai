@@ -4,27 +4,31 @@ import prisma from "../../../lib/prisma";
 
 export default async function handler(req, res) {
   if (req.method === "PUT") {
-    const { jobId } = req.body;
-    console.log("Archiving job:", jobId);
+    const { jobIds } = req.body;
+    console.log("Archiving jobs:", jobIds);
 
-    if (!jobId) {
-      return res.status(400).json({ message: "Job ID is required" });
+    if (!jobIds || !Array.isArray(jobIds) || jobIds.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Job IDs are required and must be an array" });
     }
 
     try {
-      const result = await prisma.job.update({
-        where: { id: jobId },
+      const result = await prisma.job.updateMany({
+        where: { id: { in: jobIds } },
         data: { isArchived: true },
       });
-      if (result) {
-        console.log("Job archived:", result);
-        return res.status(200).json({ message: "Job archived successfully" });
+      if (result.count > 0) {
+        console.log("Jobs archived:", result);
+        return res
+          .status(200)
+          .json({ message: `${result.count} job(s) archived successfully` });
       } else {
-        console.error("Job not found");
-        return res.status(404).json({ message: "Job not found" });
+        console.error("No jobs found");
+        return res.status(404).json({ message: "No jobs found" });
       }
     } catch (error) {
-      console.error("Error archiving job:", error);
+      console.error("Error archiving jobs:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   } else {

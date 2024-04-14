@@ -4,6 +4,7 @@ import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 import Layout from "../../components/Layout";
+import JobDetails from "../../components/JobDetails";
 import {
   Table,
   TableBody,
@@ -17,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
+import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -41,6 +43,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { EnvelopeClosedIcon, MobileIcon } from "@radix-ui/react-icons";
 import { Badge } from "@/components/ui/badge";
@@ -115,6 +127,7 @@ const formatCallDuration = (callLength) => {
 };
 
 export default function JobDetailPage({ job }) {
+  console.log("debug job", job);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
@@ -124,6 +137,7 @@ export default function JobDetailPage({ job }) {
   const [sortOrder, setSortOrder] = useState("desc");
   const [selectedStatus, setSelectedStatus] = useState("any");
   const [bulkChangeStatus, setBulkChangeStatus] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -306,7 +320,22 @@ export default function JobDetailPage({ job }) {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <h1 className="text-4xl font-bold mb-6">{job.jobTitle}</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-4xl font-bold">{job.jobTitle}</h1>
+            <div className="flex space-x-4">
+              <Button size="md" variant={"outline"} className="px-4">
+                <div className="flex items-center">
+                  <ExternalLinkIcon className="w-4 h-4 mr-2" />
+                  <Link href={`/apply/${job.id}`} target="_blank">
+                    Screen link
+                  </Link>
+                </div>
+              </Button>
+              <Button variant="outline" onClick={() => setIsDrawerOpen(true)}>
+                Edit this job
+              </Button>
+            </div>
+          </div>
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Dialog
@@ -540,6 +569,35 @@ export default function JobDetailPage({ job }) {
             </div>
           )}
         </div>
+        <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
+          <DrawerContent className="max-h-[80vh] px-12">
+            <DrawerHeader>
+              <DrawerTitle>Edit Job</DrawerTitle>
+              <DrawerClose onClick={() => setIsDrawerOpen(false)} />
+            </DrawerHeader>
+            <div className="overflow-y-auto">
+              <JobDetails
+                jobData={{
+                  job_id: job.id,
+                  company: job.company.name,
+                  job_title: job.jobTitle,
+                  job_location: job.jobLocation,
+                  job_description: job.jobDescription,
+                  remote_friendly: job.remoteFriendly,
+                  seniority: job.seniority,
+                  salary: job.salary,
+                  requirements: job.qualifications?.set,
+                  responsibilities: job.responsibilities?.set,
+                  interview_questions: job.interviewQuestions.set,
+                }}
+                setJobDetails={null}
+                user={null}
+                drawer={setIsDrawerOpen}
+                refreshData={refreshData}
+              />
+            </div>
+          </DrawerContent>
+        </Drawer>
       </Layout>
     </>
   );

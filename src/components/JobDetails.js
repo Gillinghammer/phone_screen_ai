@@ -1,225 +1,233 @@
-import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 
-const InputRow = ({ children }) => (
-  <div className="flex mb-4 space-x-4">{children}</div>
-);
+const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
+  console.log("jobData", jobData);
+  const [jobDetails, setJobDetails] = useState(jobData);
+  const [formErrors, setFormErrors] = useState({});
 
-const InputField = ({
-  label,
-  name,
-  value,
-  handleChange,
-  type = "text",
-  width = "full",
-}) => (
-  <div className={`w-${width}`}>
-    <label htmlFor={name} className="block text-sm text-gray-700 my-2">
-      {label}
-    </label>
-    <input
-      type={type}
-      name={name}
-      placeholder={label}
-      value={value}
-      onChange={handleChange}
-      className="w-full p-2 border border-gray-300 rounded-md text-xs"
-    />
-  </div>
-);
-
-const TextAreaField = ({ label, name, value, handleChange, rows = 3 }) => (
-  <div className="mb-4">
-    <label htmlFor={name} className="block text-sm text-gray-700 my-2">
-      {label}
-    </label>
-    <textarea
-      name={name}
-      placeholder={label}
-      value={value}
-      onChange={handleChange}
-      rows={rows}
-      className="w-full p-2 border border-gray-300 rounded-md text-xs"
-    />
-  </div>
-);
-
-const CheckboxField = ({ label, name, checked, handleChange }) => (
-  <div className="mb-4 flex items-center">
-    <label htmlFor={name} className="flex items-center cursor-pointer">
-      <div className="relative">
-        <input
-          type="checkbox"
-          id={name}
-          name={name}
-          checked={checked}
-          onChange={handleChange}
-          className="sr-only" // Hide the default checkbox
-        />
-        <div
-          className={`block bg-gray-200 w-14 h-8 rounded-full ${
-            checked ? "bg-green-400" : "bg-gray-200"
-          }`}
-        ></div>
-        <div
-          className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${
-            checked ? "translate-x-full" : ""
-          }`}
-        ></div>
-      </div>
-      <span className="ml-3 text-sm text-gray-700">
-        {checked ? "Remote Job" : "Not Remote"}
-      </span>
-    </label>
-  </div>
-);
-
-const ListEditor = ({
-  label,
-  items,
-  handleAdd,
-  handleRemove,
-  handleChange,
-}) => (
-  <div className="mb-4">
-    <h3 className="text-sm font-semibold text-gray-900 mb-2">{label}</h3>
-    <p className="pb-4 text-sm">
-      Review these AI generated interview questions based on your supplied job
-      post. Our AI agent will ask each of these questions to every candidate and
-      score their response.{" "}
-    </p>
-    {items.map((item, index) => (
-      <div key={index} className="flex items-center mb-2">
-        <input
-          type="text"
-          name={`${label.toLowerCase().replace(/\s/g, "_")}_${index}`}
-          value={item}
-          onChange={(e) => handleChange(e, index)}
-          className="w-full p-2 border border-gray-300 rounded-md text-xs"
-        />
-        <button
-          onClick={() => handleRemove(index)}
-          type="button"
-          className="ml-2 p-2 bg-red-500 text-white rounded-md"
-        >
-          <ArchiveBoxIcon className="h-4 w-4" />
-        </button>
-      </div>
-    ))}
-    {items.length < 10 && (
-      <button
-        onClick={handleAdd}
-        type="button"
-        // outline secondary button, on hover, bg-gray-100
-        className="p-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-300"
-      >
-        Add Question
-      </button>
-    )}
-  </div>
-);
-
-// Assuming `setJobDetails` and `jobDetails` states are defined in the parent component
-const JobDetailsForm = ({ jobDetails, setJobDetails, user }) => {
-  const router = useRouter();
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setJobDetails({ ...jobDetails, [name]: value });
+    setJobDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+    setFormErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
-  const handleCheckboxChange = (e) => {
-    setJobDetails({ ...jobDetails, [e.target.name]: e.target.checked });
+  const handleCheckboxChange = (checked) => {
+    setJobDetails((prevDetails) => ({
+      ...prevDetails,
+      remote_friendly: checked,
+    }));
   };
 
-  const handleAddQuestion = () => {
-    setJobDetails({
-      ...jobDetails,
-      interview_questions: [...jobDetails.interview_questions, ""],
+  const handleInterviewQuestionChange = (e, index) => {
+    const { value } = e.target;
+    setJobDetails((prevDetails) => {
+      const updatedQuestions = [...prevDetails.interview_questions];
+      updatedQuestions[index] = value;
+      return {
+        ...prevDetails,
+        interview_questions: updatedQuestions,
+      };
     });
   };
 
-  const handleRemove = (index, field) => {
-    const newList = jobDetails[field].filter((_, i) => i !== index);
-    setJobDetails({ ...jobDetails, [field]: newList });
+  const handleAddQuestion = () => {
+    if (jobDetails.interview_questions.length < 10) {
+      setJobDetails((prevDetails) => ({
+        ...prevDetails,
+        interview_questions: [...prevDetails.interview_questions, ""],
+      }));
+    }
   };
 
-  const createJob = async () => {
-    try {
-      const response = await fetch("/api/create-job", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...jobDetails, companyId: user.companyId }),
-      });
+  const handleRemoveQuestion = (index) => {
+    setJobDetails((prevDetails) => {
+      const updatedQuestions = [...prevDetails.interview_questions];
+      updatedQuestions.splice(index, 1);
+      return {
+        ...prevDetails,
+        interview_questions: updatedQuestions,
+      };
+    });
+  };
 
-      if (response.ok) {
-        router.push("/jobs");
-      } else {
-        throw new Error("Failed to create job");
+  const validateForm = () => {
+    let errors = {};
+    let isValid = true;
+
+    if (!jobDetails.company.trim()) {
+      errors.company = "Company name is required";
+      isValid = false;
+    }
+
+    if (!jobDetails.job_title.trim()) {
+      errors.job_title = "Job title is required";
+      isValid = false;
+    }
+
+    if (!jobDetails.job_location.trim()) {
+      errors.job_location = "Job location is required";
+      isValid = false;
+    }
+
+    const validQuestions = jobDetails.interview_questions.filter(
+      (question) => question.trim() !== ""
+    );
+    if (validQuestions.length !== jobDetails.interview_questions.length) {
+      setJobDetails((prevDetails) => ({
+        ...prevDetails,
+        interview_questions: validQuestions,
+      }));
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      const updatedJobDetails = {
+        ...jobDetails,
+        interview_questions: jobDetails.interview_questions.filter(
+          (question) => question.trim() !== ""
+        ),
+      };
+
+      try {
+        const response = await fetch("/api/update-job", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedJobDetails),
+        });
+
+        if (response.ok) {
+          // Job updated successfully
+          console.log("Job updated successfully");
+          // Perform any necessary actions after successful update
+          refreshData();
+          drawer(false); // Close the drawer
+        } else {
+          // Handle error
+          console.error("Failed to update job");
+        }
+      } catch (error) {
+        console.error("Error updating job:", error);
       }
-    } catch (error) {
-      alert(error.message);
     }
   };
 
   return (
-    <div className="flex">
-      <div className="w-full space-y-6">
-        <div>
-          <InputRow>
-            <InputField
-              label="Company Name"
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="company">Company Name</Label>
+            <Input
+              id="company"
               name="company"
               value={jobDetails.company}
-              handleChange={handleInputChange}
-              width="1/2"
+              onChange={handleInputChange}
+              className={formErrors.company ? "error" : ""}
             />
-            <InputField
-              label="Job Title"
+            {formErrors.company && (
+              <p className="text-red-500 text-sm">{formErrors.company}</p>
+            )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="job_title">Job Title</Label>
+            <Input
+              id="job_title"
               name="job_title"
               value={jobDetails.job_title}
-              handleChange={handleInputChange}
-              width="1/2"
+              onChange={handleInputChange}
+              className={formErrors.job_title ? "error" : ""}
             />
-          </InputRow>
-          <InputField
-            label="Job Location"
+            {formErrors.job_title && (
+              <p className="text-red-500 text-sm">{formErrors.job_title}</p>
+            )}
+          </div>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="job_location">Job Location</Label>
+          <Input
+            id="job_location"
             name="job_location"
             value={jobDetails.job_location}
-            handleChange={handleInputChange}
+            onChange={handleInputChange}
+            className={formErrors.job_location ? "error" : ""}
           />
-          <TextAreaField
-            label="Job Description"
+          {formErrors.job_location && (
+            <p className="text-red-500 text-sm">{formErrors.job_location}</p>
+          )}
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="job_description">Job Description</Label>
+          <Textarea
+            id="job_description"
             name="job_description"
-            rows={10}
+            rows={8}
             value={jobDetails.job_description}
-            handleChange={handleInputChange}
-          />
-          <CheckboxField
-            label="Remote Friendly"
-            name="remote_friendly"
-            checked={jobDetails.remote_friendly}
-            handleChange={handleCheckboxChange}
-          />
-          <ListEditor
-            label="Interview Questions"
-            items={jobDetails.interview_questions}
-            handleAdd={handleAddQuestion}
-            handleRemove={(index) => handleRemove(index, "interview_questions")}
-            handleChange={handleInputChange}
+            onChange={handleInputChange}
           />
         </div>
-        <div className="text-right">
-          <button
-            onClick={createJob}
-            className="mt-4 p-2 bg-green-500 text-white font-bold py-2 px-4 rounded"
-          >
-            Create Job Listing
-          </button>
+        <Switch
+          label="Remote Friendly"
+          name="remote_friendly"
+          checked={jobDetails.remote_friendly}
+          onCheckedChange={handleCheckboxChange}
+        />
+        <div>
+          <h3 className="text-lg font-medium mb-2">Interview Questions</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Review these AI generated interview questions based on your supplied
+            job post. Our AI agent will ask each of these questions to every
+            candidate and score their response.
+          </p>
+          {jobDetails.interview_questions.map((question, index) => (
+            <div key={index} className="flex items-center space-x-2 mb-2">
+              <div className="grid gap-2 flex-1">
+                <Input
+                  id={`interview_question_${index}`}
+                  name={`interview_question_${index}`}
+                  value={question}
+                  onChange={(e) => handleInterviewQuestionChange(e, index)}
+                />
+              </div>
+              <Button
+                variant="destructive"
+                type="button"
+                size="sm"
+                onClick={() => handleRemoveQuestion(index)}
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
+          {jobDetails.interview_questions.length < 10 && (
+            <Button type="button" variant="outline" onClick={handleAddQuestion}>
+              Add Question
+            </Button>
+          )}
+        </div>
+        <div className="flex justify-start space-x-2 py-4">
+          <Button type="submit">Update Job</Button>
+          <Button type="button" variant="outline" onClick={() => drawer(false)}>
+            Cancel
+          </Button>
         </div>
       </div>
-    </div>
+    </form>
   );
 };
 
