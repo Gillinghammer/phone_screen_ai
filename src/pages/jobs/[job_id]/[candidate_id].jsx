@@ -20,6 +20,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useRouter } from "next/router";
+import { Badge } from "@/components/ui/badge";
 
 const prisma = new PrismaClient();
 
@@ -51,7 +53,7 @@ export async function getServerSideProps(context) {
   };
 }
 
-async function updateCandidateStatus(candidateId, newStatus) {
+async function updateCandidateStatus(candidateId, newStatus, refreshData) {
   try {
     const response = await fetch(`/api/candidates/${candidateId}`, {
       method: "PUT",
@@ -67,6 +69,7 @@ async function updateCandidateStatus(candidateId, newStatus) {
 
     const updatedCandidate = await response.json();
     console.log("Candidate updated:", updatedCandidate);
+    refreshData();
   } catch (error) {
     console.error("Error updating candidate status:", error);
   }
@@ -74,6 +77,12 @@ async function updateCandidateStatus(candidateId, newStatus) {
 
 export default function CandidateDetailPage({ phoneScreen, job }) {
   console.log("Phone Screen:", phoneScreen);
+
+  const router = useRouter();
+
+  const refreshData = () => {
+    router.replace(router.asPath);
+  };
   // Deserialize analysis JSON
   const { questions, answers } = phoneScreen.analysis || {
     questions: [],
@@ -111,24 +120,49 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
           <Card className="p-6">
             <div className="lg:flex lg:justify-between lg:items-center mb-6">
               <div className="mb-6 lg:mb-0">
-                <h1 className="text-2xl md:text-3xl font-bold mb-4">
-                  {job.company.name} - {phoneScreen.job.jobTitle}
-                </h1>
-                <div className="flex flex-col md:flex-row md:items-center md:space-x-6 mb-4">
-                  <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-0">
-                    {phoneScreen.candidate.name}
-                  </h2>
-                  <div className="text-base md:text-lg">
-                    <p>Email: {phoneScreen.candidate.email}</p>
-                    <p>Phone: {phoneScreen.candidate.phone}</p>
+                <div className="mb-4">
+                  <h1 className="text-2xl md:text-3xl font-bold">
+                    {phoneScreen.job.jobTitle}
+                  </h1>
+                  <p className="text-lg ">{job.company.name}</p>
+                </div>
+                <div className="rounded-lg shadow py-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold">
+                      {phoneScreen.candidate.name}
+                    </h2>
+                    <Badge
+                      variant={
+                        phoneScreen.candidate.status === "REJECTED"
+                          ? "destructive"
+                          : phoneScreen.candidate.status === "OPEN" ||
+                            phoneScreen.candidate.status === "ARCHIVED"
+                          ? "outline"
+                          : "default"
+                      }
+                    >
+                      {phoneScreen.candidate.status}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="">Email</p>
+                      <p className="">{phoneScreen.candidate.email}</p>
+                    </div>
+                    <div>
+                      <p className="">Phone</p>
+                      <p className="">{phoneScreen.candidate.phone}</p>
+                    </div>
+                    <div>
+                      <p className="">Applied</p>
+                      <p className="">
+                        {formatDistanceToNow(new Date(phoneScreen.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <p className="text-gray-500">
-                  Applied:{" "}
-                  {formatDistanceToNow(new Date(phoneScreen.createdAt), {
-                    addSuffix: true,
-                  })}
-                </p>
               </div>
               <div className="text-center">
                 <div className="text-4xl md:text-6xl font-bold">
@@ -138,7 +172,11 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                 <div className="mt-4 flex flex-col sm:flex-row sm:justify-center">
                   <Button
                     onClick={() =>
-                      updateCandidateStatus(phoneScreen.candidateId, "ACCEPTED")
+                      updateCandidateStatus(
+                        phoneScreen.candidateId,
+                        "ACCEPTED",
+                        refreshData
+                      )
                     }
                     variant=""
                     className="mb-2 sm:mb-0 sm:mr-2"
@@ -147,7 +185,11 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                   </Button>
                   <Button
                     onClick={() =>
-                      updateCandidateStatus(phoneScreen.candidateId, "REJECTED")
+                      updateCandidateStatus(
+                        phoneScreen.candidateId,
+                        "REJECTED",
+                        refreshData
+                      )
                     }
                     variant="destructive"
                     className="mb-2 sm:mb-0 sm:mr-2"
@@ -156,7 +198,11 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                   </Button>
                   <Button
                     onClick={() =>
-                      updateCandidateStatus(phoneScreen.candidateId, "ARCHIVED")
+                      updateCandidateStatus(
+                        phoneScreen.candidateId,
+                        "ARCHIVED",
+                        refreshData
+                      )
                     }
                     variant="outline"
                   >

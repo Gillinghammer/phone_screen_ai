@@ -43,7 +43,7 @@ const extractJobTitle = async (details) => {
 };
 
 const extractJobDescription = async (details) => {
-  const prompt = `Extract the job description from the following job posting:\n\n${details}`;
+  const prompt = `Extract the job description from the following job posting, keep it short and sweet, no excess details:\n\n${details}`;
   return askGPT(prompt);
 };
 
@@ -60,7 +60,7 @@ const extractSalary = async (details) => {
 };
 
 const extractJobLocation = async (details) => {
-  const prompt = `Extract the job location as city and 2 letter state abreviation (Miami, FL) from the following job posting:\n\n${details}`;
+  const prompt = `Extract the job location as city and 2 letter state abreviation like Miami, FL or Milwaukee, WI from the following job posting:\n\n${details}`;
   return askGPT(prompt);
 };
 

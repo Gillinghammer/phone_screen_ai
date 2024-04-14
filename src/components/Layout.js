@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
-import { EyeClosedIcon } from "@radix-ui/react-icons";
+import { PersonIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
 export default function Layout({ children }) {
@@ -37,15 +37,22 @@ export default function Layout({ children }) {
                       </span>
                     </Link>
                   </li>
+
                   <li>
                     <Button
                       variant={"link"}
                       className="text-foreground hover:text-primary"
                       onClick={() => signOut({ callbackUrl: "/auth/signin" })}
                     >
-                      <EyeClosedIcon className="w-5 h-5 mr-2" />
                       Sign Out
                     </Button>
+                  </li>
+                  <li>
+                    <Link href="/profile">
+                      <span className="hover:text-primary">
+                        <PersonIcon className="w-4 h-4" />
+                      </span>
+                    </Link>
                   </li>
                 </>
               )}

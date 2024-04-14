@@ -132,19 +132,6 @@ const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="company">Company Name</Label>
-            <Input
-              id="company"
-              name="company"
-              value={jobDetails.company}
-              onChange={handleInputChange}
-              className={formErrors.company ? "error" : ""}
-            />
-            {formErrors.company && (
-              <p className="text-red-500 text-sm">{formErrors.company}</p>
-            )}
-          </div>
-          <div className="grid gap-2">
             <Label htmlFor="job_title">Job Title</Label>
             <Input
               id="job_title"
@@ -157,19 +144,19 @@ const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
               <p className="text-red-500 text-sm">{formErrors.job_title}</p>
             )}
           </div>
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="job_location">Job Location</Label>
-          <Input
-            id="job_location"
-            name="job_location"
-            value={jobDetails.job_location}
-            onChange={handleInputChange}
-            className={formErrors.job_location ? "error" : ""}
-          />
-          {formErrors.job_location && (
-            <p className="text-red-500 text-sm">{formErrors.job_location}</p>
-          )}
+          <div className="grid gap-2">
+            <Label htmlFor="job_location">Job Location</Label>
+            <Input
+              id="job_location"
+              name="job_location"
+              value={jobDetails.job_location}
+              onChange={handleInputChange}
+              className={formErrors.job_location ? "error" : ""}
+            />
+            {formErrors.job_location && (
+              <p className="text-red-500 text-sm">{formErrors.job_location}</p>
+            )}
+          </div>
         </div>
         <div className="grid gap-2">
           <Label htmlFor="job_description">Job Description</Label>
@@ -181,12 +168,19 @@ const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
             onChange={handleInputChange}
           />
         </div>
-        <Switch
-          label="Remote Friendly"
-          name="remote_friendly"
-          checked={jobDetails.remote_friendly}
-          onCheckedChange={handleCheckboxChange}
-        />
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="remote_friendly">
+            {jobDetails.remote_friendly
+              ? "This job is remote friendly"
+              : "This job is not remote friendly"}
+          </Label>
+          <Switch
+            id="remote_friendly"
+            name="remote_friendly"
+            checked={jobDetails.remote_friendly}
+            onCheckedChange={handleCheckboxChange}
+          />
+        </div>
         <div>
           <h3 className="text-lg font-medium mb-2">Interview Questions</h3>
           <p className="text-sm text-muted-foreground mb-4">

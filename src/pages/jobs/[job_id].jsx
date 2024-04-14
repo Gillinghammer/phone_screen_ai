@@ -58,7 +58,7 @@ import { EnvelopeClosedIcon, MobileIcon } from "@radix-ui/react-icons";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/router";
 
-const RECORDS_PER_PAGE = 6;
+const RECORDS_PER_PAGE = 20;
 
 const prisma = new PrismaClient();
 
@@ -490,69 +490,95 @@ export default function JobDetailPage({ job }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedCandidates.map((candidate) => {
-                const createdAtDate = parseISO(candidate.createdAt);
-                const daysSinceCreated = formatDistanceToNow(createdAtDate, {
-                  addSuffix: true,
-                });
-                // unique badge color and variant needed for rejected, open, accepted status
-                const badgeVariant =
-                  candidate.status.toLowerCase() === "rejected"
-                    ? "destructive"
-                    : candidate.status.toLowerCase() === "open"
-                    ? "outline"
-                    : "";
-                return (
-                  <TableRow key={candidate.id}>
-                    <TableCell className="w-[50px]">
-                      <Checkbox
-                        checked={selectedCandidates.includes(candidate.id)}
-                        onCheckedChange={() =>
-                          handleSelectCandidate(candidate.id)
-                        }
-                        aria-label="Select row"
-                      />
-                    </TableCell>
-                    <TableCell className="text-xs">
-                      {daysSinceCreated}
-                    </TableCell>
-                    <TableCell>
-                      {candidate.phoneScreen ? (
-                        <Link
-                          href={`/jobs/${job.id}/${candidate.id}`}
-                          className="underline"
-                        >
-                          {candidate.name}
+              {paginatedCandidates.length > 0 ? (
+                paginatedCandidates.map((candidate) => {
+                  const createdAtDate = parseISO(candidate.createdAt);
+                  const daysSinceCreated = formatDistanceToNow(createdAtDate, {
+                    addSuffix: true,
+                  });
+                  // unique badge color and variant needed for rejected, open, accepted status
+                  const badgeVariant =
+                    candidate.status.toLowerCase() === "rejected"
+                      ? "destructive"
+                      : candidate.status.toLowerCase() === "open"
+                      ? "outline"
+                      : "";
+                  return (
+                    <TableRow key={candidate.id}>
+                      <TableCell className="w-[50px]">
+                        <Checkbox
+                          checked={selectedCandidates.includes(candidate.id)}
+                          onCheckedChange={() =>
+                            handleSelectCandidate(candidate.id)
+                          }
+                          aria-label="Select row"
+                        />
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {daysSinceCreated}
+                      </TableCell>
+                      <TableCell>
+                        {candidate.phoneScreen ? (
+                          <Link
+                            href={`/jobs/${job.id}/${candidate.id}`}
+                            className="underline"
+                          >
+                            {candidate.name}
+                          </Link>
+                        ) : (
+                          <span>{candidate.name}</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="w-[280px]">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <EnvelopeClosedIcon className="w-4 h-4 text-gray-500" />
+                          <span>{candidate.email}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <MobileIcon className="w-4 h-4 text-gray-500" />
+                          <span className="text-xs">{candidate.phone}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {candidate.phoneScreen?.callLength ?? "in progress"}
+                      </TableCell>
+                      <TableCell>
+                        {candidate.phoneScreen?.qualificationScore.toFixed(2) ??
+                          0}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={badgeVariant}>
+                          {candidate.status.toLowerCase()}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-12">
+                    <div className="flex flex-col items-center">
+                      <h2 className="text-2xl font-semibold mb-4">
+                        No candidates have applied
+                      </h2>
+                      <p className="text-lg text-muted-foreground mb-6">
+                        Share your screen link with the candidates you'd like to
+                        screen for this job
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-fit px-6"
+                      >
+                        <ExternalLinkIcon className="w-4 h-4 mr-2" />
+                        <Link href={`/apply/${job.id}`} target="_blank">
+                          Screen link
                         </Link>
-                      ) : (
-                        <span>{candidate.name}</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="w-[280px]">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <EnvelopeClosedIcon className="w-4 h-4 text-gray-500" />
-                        <span>{candidate.email}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <MobileIcon className="w-4 h-4 text-gray-500" />
-                        <span className="text-xs">{candidate.phone}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {candidate.phoneScreen?.callLength ?? "in progress"}
-                    </TableCell>
-                    <TableCell>
-                      {candidate.phoneScreen?.qualificationScore.toFixed(2) ??
-                        0}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={badgeVariant}>
-                        {candidate.status.toLowerCase()}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
           {totalPages > 1 && (

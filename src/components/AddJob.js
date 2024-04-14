@@ -1,40 +1,24 @@
 // components/AddJob.tsx
 import { useState } from "react";
-import JobDetails from "./JobDetails";
 
 const AddJob = ({ user }) => {
   const [jobPost, setJobPost] = useState("");
-  const [jobDetails, setJobDetails] = useState(null);
-  const [isParsing, setIsParsing] = useState(false);
-  const [isParsed, setIsParsed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
-
   const handleJobPostChange = (e) => {
     setJobPost(e.target.value);
   };
+
+  console.log("debug add job");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setLoadingMessage("Our AI is processing your job post...");
 
-    // Simulate the API call with a timeout
-    setTimeout(() => {
-      setLoadingMessage(
-        "Now we're generating interview questions used to qualify candidates"
-      );
-      setTimeout(() => {
-        setIsLoading(false);
-        alert(
-          "Processing complete! You can now review and edit the job details and interview questions."
-        );
-      }, 5000);
-    }, 5000);
-
     try {
-      // Replace the endpoint with your actual API endpoint
-      const response = await fetch("/api/parse-job", {
+      // Call the parse-job endpoint
+      const parseResponse = await fetch("/api/parse-job", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,17 +26,64 @@ const AddJob = ({ user }) => {
         body: JSON.stringify({ details: jobPost }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setJobDetails(data);
-        setIsParsed(true);
-      } else {
+      if (!parseResponse.ok) {
         throw new Error("Failed to parse job post");
       }
+
+      const parsedJob = await parseResponse.json();
+
+      // Extract the necessary fields from the parsed job
+      const {
+        companyId,
+        jobTitle,
+        jobLocation,
+        jobDescription,
+        remoteFriendly,
+        seniority,
+        salary,
+        requirements,
+        responsibilities,
+        interviewQuestions,
+      } = parsedJob;
+
+      // Call the create-job endpoint
+      const createResponse = await fetch("/api/create-job", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          companyId,
+          jobTitle,
+          jobLocation,
+          jobDescription,
+          remoteFriendly,
+          seniority,
+          salary,
+          requirements,
+          responsibilities,
+          interviewQuestions,
+        }),
+      });
+
+      if (!createResponse.ok) {
+        throw new Error("Failed to create job");
+      }
+
+      // Simulate the processing time with timeouts
+      setTimeout(() => {
+        setLoadingMessage(
+          "Now we're generating interview questions used to qualify candidates"
+        );
+        setTimeout(() => {
+          setIsLoading(false);
+          alert(
+            "Processing complete! You can now review and edit the job details and interview questions."
+          );
+        }, 5000);
+      }, 5000);
     } catch (error) {
       alert(error.message);
-    } finally {
-      setIsParsing(false);
     }
   };
 
@@ -86,29 +117,21 @@ const AddJob = ({ user }) => {
       </aside>
 
       <div className="w-2/3 p-2">
-        {!jobDetails ? (
-          <form onSubmit={handleSubmit}>
-            <textarea
-              className="w-full h-96 p-4 border border-gray-300 rounded-lg text-xs"
-              placeholder="Paste the job listing here..."
-              value={jobPost}
-              onChange={handleJobPostChange}
-            />
-            <button
-              type="submit"
-              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              disabled={isLoading || !jobPost}
-            >
-              {isLoading ? "Processing..." : "Generate Job Listing"}
-            </button>
-          </form>
-        ) : (
-          <JobDetails
-            jobDetails={jobDetails}
-            setJobDetails={setJobDetails}
-            user={user}
+        <form onSubmit={handleSubmit}>
+          <textarea
+            className="w-full h-96 p-4 border border-gray-300 rounded-lg text-xs"
+            placeholder="Paste the job listing here..."
+            value={jobPost}
+            onChange={handleJobPostChange}
           />
-        )}
+          <button
+            type="submit"
+            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            disabled={isLoading || !jobPost}
+          >
+            {isLoading ? "Processing..." : "Generate Job Listing"}
+          </button>
+        </form>
       </div>
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center">

@@ -10,7 +10,7 @@ const ThemeToggle = () => {
   };
 
   return (
-    <button onClick={toggleTheme}>
+    <button onClick={toggleTheme} className="pt-2">
       {theme === "dark" ? <SunIcon /> : <MoonIcon />}
     </button>
   );

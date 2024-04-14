@@ -40,11 +40,6 @@ export default async function handler(req, res) {
           id: job_id,
         },
         data: {
-          company: {
-            update: {
-              name: company, // Assuming `company` is the updated company name
-            },
-          },
           jobTitle: job_title,
           jobLocation: job_location,
           jobDescription: job_description,

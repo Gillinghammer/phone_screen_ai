@@ -40,7 +40,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-const RECORDS_PER_PAGE = 4;
+const RECORDS_PER_PAGE = 20;
 
 const JobTable = ({ jobs, refetchJobs, companyId }) => {
   const [selectedJobs, setSelectedJobs] = useState([]);
@@ -281,7 +281,6 @@ const JobTable = ({ jobs, refetchJobs, companyId }) => {
       </div>
       <div className="rounded-md border">
         <Table>
-          {/* <TableCaption>A list of your recent jobs.</TableCaption> */}
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">
@@ -347,9 +346,12 @@ const JobTable = ({ jobs, refetchJobs, companyId }) => {
                 );
               }, 0);
 
+              const nonArchivedCandidates = job.candidates.filter(
+                (candidate) => candidate.status !== "ARCHIVED"
+              );
               const avgScore =
-                job.candidates.length > 0
-                  ? totalScore / job.candidates.length
+                nonArchivedCandidates.length > 0
+                  ? totalScore / nonArchivedCandidates.length
                   : NaN;
 
               const displayAvgScore = isNaN(avgScore)
@@ -386,7 +388,11 @@ const JobTable = ({ jobs, refetchJobs, companyId }) => {
                     </Button>
                   </TableCell>
                   <TableCell className="text-center">
-                    {job.candidates.length}
+                    {
+                      job.candidates.filter(
+                        (candidate) => candidate.status !== "ARCHIVED"
+                      ).length
+                    }
                   </TableCell>
                   <TableCell className="text-center">
                     {displayAvgScore}
