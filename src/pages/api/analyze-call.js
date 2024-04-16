@@ -48,12 +48,11 @@ export default async function analyzeCall(req, res) {
         4. Format your response as a valid JSON object with the following keys:
           - "score": The numeric score between 0 and 100.
           - "answer": The candidate's original answer to the question.
-
-        RESPONSE FORMAT:
-        {
-          "score": 75,
-          "answer": "The candidate's answer goes here..."
-        }
+          - RESPONSE FORMAT
+          {
+            "score": 75,
+            "answer": "The candidate's answer goes here..."
+          }
 
         Important Notes:
         - Short, simple questions require concise answers, while questions asking about experience should be evaluated based on the level of detail and relevance provided.
@@ -70,7 +69,7 @@ export default async function analyzeCall(req, res) {
 
       // Prepare the payload for the 3rd party API request
       const payload = {
-        goal: "Determine if the human is qualified for the role based on the answers they provide to the agents questions.",
+        goal: "Determine if the human is qualified for the role based on the answers they provide to the agents questions. respond with a valid JSON object following the format { 'answer': 'The candidate's answer goes here...', 'score': 75 }",
         questions,
       };
 
@@ -87,7 +86,7 @@ export default async function analyzeCall(req, res) {
         }
       );
 
-      console.log("Response from the 3rd party API:", response.data);
+      console.log("Response from the 3rd party API:", response.data.answers);
 
       // Update the PhoneScreen with the analysis result
       const updatedPhoneScreen = await prisma.phoneScreen.update({
@@ -96,7 +95,7 @@ export default async function analyzeCall(req, res) {
           analysis: response.data,
           qualificationScore:
             response.data.answers.reduce(
-              (acc, answer) => acc + (answer.score ?? 0),
+              (acc, answer) => acc + (answer?.score ?? 0),
               0
             ) / response.data.answers.length,
         },
