@@ -8,10 +8,6 @@
     "pages/api/analyze-call.js": {
       "memory": 3008,
       "maxDuration": 300
-    },
-    "/api/analyze-call.js": {
-      "memory": 3008,
-      "maxDuration": 300
     }
   }
 }
