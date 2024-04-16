@@ -4,7 +4,9 @@ import { track } from "@vercel/analytics";
 import { Card } from "@/components/ui/card";
 import Head from "next/head";
 import { useTheme } from "next-themes";
-
+import { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
 import {
   CardHeader,
   CardTitle,
@@ -53,7 +55,10 @@ const JobPage = ({ job }) => {
       return false;
     }
 
-    if (!applicantDetails.phone || !phoneRegex.test(applicantDetails.phone)) {
+    if (
+      !applicantDetails.phone ||
+      !isValidPhoneNumber(applicantDetails.phone)
+    ) {
       return false;
     }
 
@@ -152,18 +157,20 @@ const JobPage = ({ job }) => {
                   <Label htmlFor="phone" className="text-gray-900">
                     Phone number
                   </Label>
-                  <Input
-                    type="tel"
-                    name="phone"
-                    id="phone"
-                    value={applicantDetails.phone}
-                    onChange={handleInputChange}
-                    required
-                    pattern="^\+?\d{10,14}$"
-                    title="Please enter a valid phone number (10-14 digits, may include a leading '+')"
-                    placeholder="+1234567890"
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  />
+                  <div className="border border-gray-300 rounded-md">
+                    <PhoneInput
+                      international
+                      defaultCountry="US"
+                      value={applicantDetails.phone}
+                      onChange={(value) =>
+                        setApplicantDetails({
+                          ...applicantDetails,
+                          phone: value,
+                        })
+                      }
+                      className="focus:ring-blue-500 focus:border-blue-500 text-gray-900 w-full rounded-md"
+                    />
+                  </div>
                 </div>
                 <div className="text-right">
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

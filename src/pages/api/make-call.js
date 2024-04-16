@@ -89,7 +89,7 @@ export default async function handler(req, res) {
       voice_settings: {
         speed: 1,
       },
-      interruption_threshold: 1500,
+      interruption_threshold: 1200,
       temperature: 0.2,
       voicemail_action: "hangup",
       start_time: null,
