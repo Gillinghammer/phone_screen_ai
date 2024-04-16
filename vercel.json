@@ -1,11 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "functions": {
-    "pages/api/parse-job.js": {
-      "memory": 3008,
-      "maxDuration": 300
-    },
-    "pages/api/analyze-call.js": {
+    "pages/api/*.js": {
       "memory": 3008,
       "maxDuration": 300
     }
