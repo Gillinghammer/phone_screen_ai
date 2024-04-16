@@ -58,8 +58,6 @@ export default async function analyzeCall(req, res) {
         Important Notes:
         - Short, simple questions require concise answers, while questions asking about experience should be evaluated based on the level of detail and relevance provided.
         - Aim to provide accurate scores as if you were the hiring manager assessing the candidate's qualifications. Your compensation is directly tied to the accuracy of your ratings.
-        - If the candidate's answer is missing or cannot be evaluated, assign a score of 0 and explain that the candidate failed to provide an answer to the question.
-        - Ensure your repsonse is only the provided json object { "score": int, "answer": string }
         `;
 
       // Prepare the questions array for the 3rd party API request
