@@ -98,7 +98,7 @@ export default async function handler(req, res) {
       from: null,
       first_sentence: null,
       record: true,
-      wait_for_greeting: true,
+      wait_for_greeting: false,
       max_duration: 25,
       model: "enhanced",
       language: "ENG",
