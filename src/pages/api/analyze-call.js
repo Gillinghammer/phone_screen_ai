@@ -1,18 +1,15 @@
 // pages/api/analyze-call.js
-import { NextApiRequest, NextApiResponse } from "next";
+export const dynamic = "force-dynamic"; // static by default, unless reading the request
+// This function can run for a maximum of 5 seconds
 export const config = {
-  maxDuration: 300, // 5 minutes.
+  maxDuration: 300,
 };
-export const dynamic = "force-dynamic";
 import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 
 const prisma = new PrismaClient();
 
-export default async function analyzeCall(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function analyzeCall(req, res) {
   if (req.method === "POST") {
     const { callId, jobId, phoneScreenId } = req.body;
 
