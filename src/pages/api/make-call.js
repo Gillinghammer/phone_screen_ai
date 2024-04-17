@@ -74,6 +74,7 @@ export default async function handler(req, res) {
 
     const data = {
       phone_number: phone,
+      from: "+16469339096",
       task: task,
       voice: "e1289219-0ea2-4f22-a994-c542c2a48a0f",
       request_data: {
@@ -89,18 +90,17 @@ export default async function handler(req, res) {
       voice_settings: {
         speed: 1,
       },
-      interruption_threshold: 1200,
+      interruption_threshold: 500,
       temperature: 0.2,
       voicemail_action: "hangup",
       start_time: null,
       transfer_phone_number: null,
       answered_by_enabled: false,
-      from: null,
       first_sentence: null,
       record: true,
       wait_for_greeting: false,
       max_duration: 25,
-      model: "enhanced",
+      model: "gpt4",
       language: "ENG",
       webhook: `${process.env.WEBHOOK_URL}/api/webhook/${jobId}/${candidateId}`,
     };
