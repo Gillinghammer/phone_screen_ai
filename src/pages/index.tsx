@@ -174,7 +174,7 @@ const Home: NextPage = () => {
         </div>
       )}
       <QuoteSlider />
-      <section className="bg-gray-900 overflow-hidden md:py-20 lg:py-16">
+      {/* <section className="bg-gray-900 overflow-hidden md:py-20 lg:py-16">
         <div className="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
           <div className="lg:flex lg:items-center lg:space-x-10">
             <div className="lg:flex-1">
@@ -204,7 +204,7 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
       <ProductScreenshots />
       <section className="py-16 bg-yellow-200 overflow-hidden  border-t-4 border-gray-300">
         <div className="relative max-w-xl mx-auto text-center px-4 sm:px-6 lg:px-8">
