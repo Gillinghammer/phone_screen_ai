@@ -167,7 +167,7 @@ const Home: NextPage = () => {
             style={{ maxWidth: "600px" }} // Set maximum width to 600px
           >
             <video controls autoPlay className="w-full">
-              <source src="/demo.mp4" type="video/mp4" />
+              <source src="/phone-screen-demo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
