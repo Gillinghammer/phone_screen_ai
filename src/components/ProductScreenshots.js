@@ -23,7 +23,7 @@ const ProductScreenshots = () => {
           </p>
         </>
       ),
-      image: "/interview-questions.png",
+      media: "/editjob.mp4",
     },
     {
       title: "Share Application Links",
@@ -48,7 +48,7 @@ const ProductScreenshots = () => {
           </p>
         </>
       ),
-      image: "/apply-page.png",
+      media: "/apply.mp4",
     },
     {
       title: "Analyze Candidate Performance",
@@ -69,7 +69,7 @@ const ProductScreenshots = () => {
           </p>
         </>
       ),
-      image: "/score.png",
+      media: "/score.mp4",
     },
   ];
 
@@ -88,13 +88,15 @@ const ProductScreenshots = () => {
           >
             <div className="md:w-1/2">
               <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <Image
-                  src={screenshot.image}
-                  alt={screenshot.title}
-                  width={1200}
-                  height={800}
+                <video
                   className="w-full h-auto"
-                />
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                >
+                  <source src={screenshot.media} type="video/mp4" />
+                </video>
               </div>
             </div>
             <div className="md:w-1/2 mt-6 md:mt-0 md:px-10">
