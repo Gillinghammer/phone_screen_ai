@@ -167,7 +167,7 @@ const Home: NextPage = () => {
             style={{ maxWidth: "600px" }} // Set maximum width to 600px
           >
             <video controls autoPlay className="w-full">
-              <source src="/phone-screen-demo.mp4" type="video/mp4" />
+              <source src="/smalldemo.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -205,7 +205,7 @@ const Home: NextPage = () => {
           </div>
         </div>
       </section>
-      {/* <ProductScreenshots /> */}
+      <ProductScreenshots />
       <section className="py-16 bg-yellow-200 overflow-hidden  border-t-4 border-gray-300">
         <div className="relative max-w-xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-800 sm:text-4xl">
