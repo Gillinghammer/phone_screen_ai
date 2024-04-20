@@ -209,9 +209,9 @@ const Home: NextPage = () => {
       <section className="py-16 bg-yellow-200 overflow-hidden  border-t-4 border-gray-300">
         <div className="relative max-w-xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-800 sm:text-4xl">
-            Think you have what it takes to sell paper at Dunder Mifflin?
+            Try it out!
           </h2>
-          <p className="mt-4 text-lg leading-7 text-gray-800">
+          <p className="mt-4 text-xl leading-7 text-gray-800">
             Enter your phone number on our demo page and our AI Agent will give
             you a call to screen you for a job at Dunder&nbsp;Miffilin.
           </p>
