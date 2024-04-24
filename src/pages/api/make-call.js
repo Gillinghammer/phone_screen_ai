@@ -81,6 +81,7 @@ export default async function handler(req, res) {
         job_title: jobTitle,
         job_location: jobTitle,
         company: company,
+        candidateName: name,
         job_description: jobDescription,
         job_requirements: jobRequirements.set.join(", "),
         job_responsibilities: jobResponsibilities.set.join(", "),

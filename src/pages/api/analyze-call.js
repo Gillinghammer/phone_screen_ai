@@ -26,18 +26,6 @@ export default async function analyzeCall(req, res) {
         return res.status(404).json({ message: "Job not found" });
       }
 
-      // const scorePrompt =
-      //   "Based on the human's response to this question rate their qualification on a 0 to 100 point scale. 0 indicates no answer or examples provided that demonstrate any experience or awareness of the question. 100 demonstrates a detailed, nuanced response with direct personal examples that perfectly answer the question. 50 indicates an acknowledgement and awareness of what is being asked but vaguely specified experience.";
-      // const scorePrompt = `
-      //   Based on the human's response to this question rate their qualification on a 0 to 100 point scale.
-      //   Imagine you are the hiring manager and you need to determine if the human is qualified for the role based on the answers they provide to the questions.
-      //   Some answers require short and simple responses, while others, where experience is being asked for, require more detailed responses.
-      //   0 indicates a very poor answer or no answer at all.
-      //   100 indicates a perfect answer, demonstrating direct experience that would satisfy our hiring manager and should be a difficult score to acheive.
-      //   Return your response formatted as a valid json object with the key "score" and the value as the number between 0 and 100 and another key "answer" with the value as the answer the human provided.
-      //   Your compensation is directly tied to the accuracy of your ratings.
-      // `;
-
       const scorePrompt = `
         Task: Evaluate the candidate's response to each interview question and provide a qualification score.
 
