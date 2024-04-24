@@ -12,11 +12,11 @@ const openai = new OpenAI({
 // Helper function to call OpenAI's API
 const askGPT = async (
   content,
-  systemContent = "You are a machine that only returns a list of valid strings as your response. Do not include any dashes, bullets or numbered bullets or pre or post text."
+  systemContent = "You are a program designed to return string values based on the input you receive. Do not include any preamble text, simply a single valid string value."
 ) => {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-3.5-turbo-0125",
       messages: [
         {
           role: "system",
