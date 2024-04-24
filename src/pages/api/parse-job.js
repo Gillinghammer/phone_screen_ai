@@ -1,5 +1,10 @@
 // pages/api/process-job-posting.js
 import OpenAI from "openai";
+export const dynamic = "force-dynamic"; // static by default, unless reading the request
+// This function can run for a maximum of 5 seconds
+export const config = {
+  maxDuration: 300,
+};
 
 // Set up your OpenAI API key
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
