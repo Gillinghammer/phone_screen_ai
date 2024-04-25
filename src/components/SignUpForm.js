@@ -84,10 +84,10 @@ export function SignUpForm() {
           // Create the user and associate with the company
           // Track the user signup event
           track("User signup", {
-            email: data.email,
-            name: data.name,
-            company: data.company,
-            domain: data.domain,
+            email: res.email,
+            name: res.name,
+            company: res.company,
+            domain: res.domain,
           });
           router.push("/auth/signin");
         } else {
