@@ -13,6 +13,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { track } from "@vercel/analytics";
 
 const validateEmail = (email) => {
   const re =
@@ -80,6 +81,14 @@ export function SignUpForm() {
         });
         const data = await res.json();
         if (res.ok) {
+          // Create the user and associate with the company
+          // Track the user signup event
+          track("User signup", {
+            email: data.email,
+            name: data.name,
+            company: data.company,
+            domain: data.domain,
+          });
           router.push("/auth/signin");
         } else {
           // Handle other errors (e.g., email already taken)
