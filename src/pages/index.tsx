@@ -70,7 +70,7 @@ const Home: NextPage = () => {
         />
         <meta
           property="twitter:image"
-          content="https://yourwebsite.com/images/twitter-og-image.jpg"
+          content="https://phonescreen.ai/og2.png"
         />
       </Head>
       <div className="relative bg-yellow-200 overflow-hidden">
