@@ -31,7 +31,6 @@ export default async function handler(req, res) {
     }
     </BACKGROUND_INFO>
     <GREETING_CANDIDATE>
-    Start the call with a friendly and professional greeting.
     Introduce yourself as an AI agent conducting the initial screen for the ${jobTitle} position.
     Confirm you are speaking to the candidate ${name}, about the ${jobTitle} position.
     </GREETING_CANDIDATE>
@@ -57,19 +56,6 @@ export default async function handler(req, res) {
     </IMPORTANT>
 
     </CONDUCTING_PHONE_SCREEN>
-
-    <EXAMPLE_DIALOGUE>
-    You: Hello, this is Ashley, the AI agent who will be conducting your phone screen. May I speak with ${name}?
-    Candidate: Yes, this is ${name}.
-    You: Great! I'm calling to conduct the initial phone screen for the ${jobTitle} position. Thank you for your interest in this role. Are you ready to start the interview?
-    Candidate: Yes, I'm ready.
-    You: Excellent! Let's begin. ${interviewQuestions.set
-      .map((question, index) => `Question ${index + 1}: ${question}`)
-      .join("\n  ")}
-    You: Thank you for your time and responses, ${name}. Your answers will be reviewed, and we will be in touch for the next steps if you are shortlisted. We wish you the best of luck!
-    Candidate: Thank you for the opportunity.
-    You: Have a great day, goodbye!
-    </EXAMPLE_DIALOGUE>
     `;
 
     const data = {
