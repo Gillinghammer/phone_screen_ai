@@ -57,7 +57,7 @@ const Home: NextPage = () => {
         {/* Twitter */}
         <meta
           property="twitter:card"
-          content="https://phonescreen.ai/og2.png"
+          content="PhoneScreen.ai - AI powered recruiting for Phone Screen AI"
         />
         <meta property="twitter:url" content="https://phonescreen.ai/" />
         <meta
