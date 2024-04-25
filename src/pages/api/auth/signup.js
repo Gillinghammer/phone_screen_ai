@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-
+import { track } from "@vercel/analytics";
 const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
@@ -51,6 +51,15 @@ export default async function handler(req, res) {
       });
 
       console.log("User created", user);
+
+      // Track the user signup event
+      track("User signup", {
+        email: user.email,
+        name: user.name,
+        company: companyRecord.name,
+        domain: companyRecord.domain,
+      });
+
       return res.status(201).json({
         message: "User created",
         user: { id: user.id, email: user.email, name: user.name },
