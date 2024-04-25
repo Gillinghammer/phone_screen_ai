@@ -55,7 +55,10 @@ const Home: NextPage = () => {
         <meta property="og:image" content="https://phonescreen.ai/og2.png" />
 
         {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
+        <meta
+          property="twitter:card"
+          content="https://phonescreen.ai/og2.png"
+        />
         <meta property="twitter:url" content="https://phonescreen.ai/" />
         <meta
           property="twitter:title"
