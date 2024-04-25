@@ -32,9 +32,9 @@ const ProductScreenshots = () => {
           <p className="mb-6 text-gray-800">
             Every job post you create comes with a{" "}
             <strong>unqiue application link</strong>.{" "}
-            <Link href="/apply/17" target="_blank" className="text-blue-600">
+            {/* <Link href="/apply/17" target="_blank" className="text-blue-600">
               Like this one &gt;
-            </Link>
+            </Link> */}
           </p>
           <p className="mb-6 text-gray-800">
             We recommend putting this{" "}
