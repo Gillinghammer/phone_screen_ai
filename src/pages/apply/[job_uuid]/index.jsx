@@ -259,10 +259,10 @@ const JobPage = ({ job }) => {
 };
 
 export const getServerSideProps = async (context) => {
-  const { job_id } = context.params;
+  const { job_uuid } = context.params;
 
   const job = await prisma.job.findUnique({
-    where: { id: parseInt(job_id) },
+    where: { uuid: job_uuid },
     select: {
       id: true,
       jobTitle: true,
@@ -284,7 +284,10 @@ export const getServerSideProps = async (context) => {
 
   if (!job) {
     return {
-      notFound: true,
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
     };
   }
 

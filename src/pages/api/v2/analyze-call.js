@@ -58,7 +58,12 @@ export default async function analyzeCall(req, res) {
             content: `
             
             You will be given a conversation transcript that takes place between a candidate (speaker:"user") and an interviewer (speaker:"assistant"). 
-            You task is to isolate the questions asked by the interviewer and the answers given by the candidate. You can ignore any formalities, small chat, or other irrelevant conversation.
+            You task is to isolate the questions asked by the interviewer and the answers given by the candidate. 
+            You can ignore any formalities, small chat, or other irrelevant conversation.
+
+            <interview_questions>
+            ${questions.map((q) => `<question>${q}</question>`).join("\n")}
+            </interview_questions>
 
             <conversation_transcript>
             ${alignedTranscript
@@ -72,15 +77,20 @@ export default async function analyzeCall(req, res) {
               .join("\n")}
             </conversation_transcript>
 
-            You will return a valid JSON object with the interview questions and the candidate's answers in the following format:
+            Generate an array of the questions asked by the interviewer. 
+            Each question should be paired with the candidate's exact answer. 
+            Please do not record any of the questions asked by the candidate about the role, stick to the interview questions. 
+            If a question was asked twice only include it once in your response.
+            
+            Use the following format:
             [
                 {
-                    "question": "The interviewer's question goes here...",
-                    "answer": "The candidate's answer goes here..."
+                    "question": "The interviewer's question goes here...", // ONLY QUESTIONS ASKED BY THE INTERVIEWER
+                    "answer": "The candidate's answer goes here..." // ONLY ANSWERS GIVEN BY THE CANDIDATE
                 },
                 {
-                    "question": "Another question from the interviewer...",
-                    "answer": "The candidate's answer to the second question..."
+                    "question": "Another question from the interviewer...", // ONLY QUESTIONS ASKED BY THE INTERVIEWER
+                    "answer": "The candidate's answer to the second question..."  // ONLY ANSWERS GIVEN BY THE CANDIDATE
                 },
                 ...
             ]

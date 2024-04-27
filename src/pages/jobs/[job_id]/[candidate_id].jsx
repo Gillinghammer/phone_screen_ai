@@ -29,6 +29,7 @@ const prisma = new PrismaClient();
 
 export async function getServerSideProps(context) {
   const { job_id, candidate_id } = context.params;
+  const session = await getSession(context);
 
   const phoneScreen = await prisma.phoneScreen.findUnique({
     where: { candidateId: parseInt(candidate_id) },
@@ -40,10 +41,32 @@ export async function getServerSideProps(context) {
     include: { company: true },
   });
 
-  if (!phoneScreen) {
-    // Handle the case where there is no phone screen found
+  if (!phoneScreen || !job) {
     return {
       notFound: true,
+    };
+  }
+
+  if (session && session.user && session.user.id) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { company: true },
+    });
+
+    if (user.company.id !== job.company.id) {
+      return {
+        redirect: {
+          destination: "/auth/signin",
+          permanent: false,
+        },
+      };
+    }
+  } else {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
     };
   }
 
@@ -281,7 +304,7 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                     Your browser does not support the audio element.
                   </audio>
                   <div>
-                    <p className="text-sm text-gray-500">Call Duration:</p>
+                    <p className="text-sm text-gray-500">Duration:</p>
                     <p className="text-lg">
                       {formatCallDuration(phoneScreen.callLength)}
                     </p>

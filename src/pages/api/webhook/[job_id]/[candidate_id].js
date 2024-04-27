@@ -101,7 +101,7 @@ export default async function webhook(req, res) {
 
       // Call the analyze-call API route with the necessary details
       const analyzeResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/analyze-call`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v2/analyze-call`,
         {
           jobId: job_id,
           callId: call_id,

@@ -77,6 +77,7 @@ export async function getServerSideProps(context) {
       },
     };
   }
+
   const { job_id } = context.params;
   const job = await prisma.job.findUnique({
     where: { id: parseInt(job_id) },
@@ -89,7 +90,18 @@ export async function getServerSideProps(context) {
       },
     },
   });
-  console.log(job);
+
+  // Check if the user belongs to the company that created the job
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  if (!user || user.companyId !== job.companyId) {
+    return {
+      notFound: true,
+    };
+  }
+
   // Transform data to be serializable and format callLength
   const serializedJob = {
     ...job,
