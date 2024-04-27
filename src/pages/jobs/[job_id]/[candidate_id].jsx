@@ -88,10 +88,21 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
     router.replace(router.asPath);
   };
   // Deserialize analysis JSON
-  const { questions, answers } = phoneScreen.analysis || {
-    questions: [],
-    answers: [],
-  };
+
+  let questions = [];
+  let answers = [];
+  if (phoneScreen.analysisV2?.length > 0) {
+    phoneScreen.analysisV2.forEach((qa) => {
+      questions.push([qa.question, ""]);
+      answers.push({ answer: qa.answer, score: qa.score || 0 });
+    });
+  } else {
+    questions = phoneScreen.analysis.questions;
+    answers = phoneScreen.analysis.answers;
+  }
+
+  console.log("Questions:", questions);
+  console.log("Answers:", answers);
 
   async function handleReScore() {
     setIsReScoring(true);
@@ -100,7 +111,7 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
       description: "This will take a few moments to update",
     });
     try {
-      const response = await fetch(`/api/analyze-call`, {
+      const response = await fetch(`/api/v2/analyze-call`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

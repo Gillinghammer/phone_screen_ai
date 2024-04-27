@@ -1,0 +1,33 @@
+{
+  "status": "success",
+  "answers": [
+    {
+      "score": 30,
+      "answer": "I haven't been a welder per se, but I've worked a lot of handyman jobs, and I had to weld couple times. On some of those jobs. So, yeah, I had a little bit of experience, probably, like, 18 total hours welding."
+    },
+    {
+      "score": 80,
+      "answer": "Yeah. I'm pretty technical. I'm good with blueprinting, through schematic. Understanding diagrams, things like that. I took a few CAD classes in high school, actually developing schematics So, yeah, pretty comfortable."
+    },
+    {
+      "score": 20,
+      "answer": "Not really. I mean, I guess I've, like, welded a couple, like, of the frame of the car to the the body once, welded it in a few places. But yeah. Don't have, like, a ton of experience."
+    }
+  ],
+  "message": "Successfully analyzed call",
+  "questions": [
+    [
+      "What experience do you have as a Welder?",
+      "\n Based on the human's response to this question rate their qualification on a 0 to 100 point scale. \n Imagine you are the hiring manager and you need to determine if the human is qualified for the role based on the answers they provide to the questions.\n Some answers require short and simple responses, while others, where experience is being asked for, require more detailed responses.\n 0 indicates a very poor answer or no answer at all.\n 100 indicates a perfect answer that would satisfy our hiring manager.\n Return your response formatted as a valid json object with the key \"score\" and the value as the number between 0 and 100 and another key \"answer\" with the value as the answer the human provided.\n Your compensation is directly tied to the accuracy of your ratings.\n "
+    ],
+    [
+      "How comfortable are you with reading schematics?",
+      "\n Based on the human's response to this question rate their qualification on a 0 to 100 point scale. \n Imagine you are the hiring manager and you need to determine if the human is qualified for the role based on the answers they provide to the questions.\n Some answers require short and simple responses, while others, where experience is being asked for, require more detailed responses.\n 0 indicates a very poor answer or no answer at all.\n 100 indicates a perfect answer that would satisfy our hiring manager.\n Return your response formatted as a valid json object with the key \"score\" and the value as the number between 0 and 100 and another key \"answer\" with the value as the answer the human provided.\n Your compensation is directly tied to the accuracy of your ratings.\n "
+    ],
+    [
+      "Can you provide examples of your welding skills?",
+      "\n Based on the human's response to this question rate their qualification on a 0 to 100 point scale. \n Imagine you are the hiring manager and you need to determine if the human is qualified for the role based on the answers they provide to the questions.\n Some answers require short and simple responses, while others, where experience is being asked for, require more detailed responses.\n 0 indicates a very poor answer or no answer at all.\n 100 indicates a perfect answer that would satisfy our hiring manager.\n Return your response formatted as a valid json object with the key \"score\" and the value as the number between 0 and 100 and another key \"answer\" with the value as the answer the human provided.\n Your compensation is directly tied to the accuracy of your ratings.\n "
+    ]
+  ],
+  "credits_used": 0.01894
+}

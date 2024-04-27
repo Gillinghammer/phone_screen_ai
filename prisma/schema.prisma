@@ -98,6 +98,7 @@ model PhoneScreen {
   variables              Json?
   wait                   Boolean?
   analysis               Json?
+  analysisV2            Json?
   qualificationScore     Float?
   candidate              Candidate @relation(fields: [candidateId], references: [id])
   job                    Job       @relation(fields: [jobId], references: [id])
