@@ -4,6 +4,7 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     const {
       name,
+      email,
       phone,
       jobTitle,
       jobDescription,
@@ -47,15 +48,19 @@ export default async function handler(req, res) {
       9. End the call on a positive note.
       </CALL_FLOW>
 
+      <PREPARED_INTERVIEW_QUESTIONS>
+      ${interviewQuestions.set
+        .map((question, index) => `${index + 1}. ${question}`)
+        .join("\n")}
+      </PREPARED_QUESTIONS>
+
       <EXAMPLE_DIALOGUE>
       You: Hello, is this ${name}?
       Candidate: Yes, this is ${name}.
       You: Hi ${name}, this is Ashley, an AI agent from ${company}. I'm calling to conduct an initial phone screen for the ${jobTitle} position. Is now still a good time to talk?
       Candidate: Yes, now is a great time.
       You: Great! This call should take about 10 minutes. I'll be asking you a series of questions related to your experience and qualifications for the role. Feel free to ask any questions you may have at the end. Let's get started!
-      ${interviewQuestions.set
-        .map((question, index) => `   Question ${index + 1}: ${question}`)
-        .join("\n")}
+      You: (Ask the <PREPARED_INTERVIEW_QUESTIONS>)
       You: That covers all the questions I had prepared. Before we wrap up, do you have any questions for me about the role or the company?
       Candidate: (Asks questions)
       You: (Answer questions based on provided information)
@@ -72,7 +77,7 @@ export default async function handler(req, res) {
       - If faced with technical difficulties, apologize and attempt to resolve them promptly.
       </IMPORTANT_NOTES>
     `;
-
+    console.log("debug", task);
     const data = {
       phone_number: phone,
       from: "+16469339096",
@@ -83,6 +88,7 @@ export default async function handler(req, res) {
         job_location: jobTitle,
         company: company,
         candidateName: name,
+        candidateEmail: email,
         job_description: jobDescription,
         job_requirements: jobRequirements.set.join(", "),
         job_responsibilities: jobResponsibilities.set.join(", "),
@@ -92,8 +98,8 @@ export default async function handler(req, res) {
       voice_settings: {
         speed: 1,
       },
-      interruption_threshold: 500,
-      temperature: 0.1,
+      interruption_threshold: 800,
+      temperature: 0,
       voicemail_action: "hangup",
       start_time: null,
       transfer_phone_number: null,

@@ -53,6 +53,7 @@ export default async function handler(req, res) {
       });
       res.status(200).json(job);
     } catch (error) {
+      console.error("Error creating job:", error);
       res.status(500).json({
         message: "Something went wrong when creating the job.",
         error: error.message,

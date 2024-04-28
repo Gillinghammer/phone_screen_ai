@@ -257,7 +257,7 @@ const JobPage = ({ job }) => {
 export const getServerSideProps = async (context) => {
   const { job_uuid } = context.params;
 
-  const job = await prisma.job.findUnique({
+  const job = await prisma.job.findFirst({
     where: { uuid: job_uuid },
     select: {
       id: true,

@@ -32,7 +32,7 @@ model User {
 
 model Job {
   id                 Int           @id @default(autoincrement())
-  uuid               String        @unique
+  uuid               String        @default(uuid())
   interviewQuestions Json
   jobDescription     String
   jobLocation        String

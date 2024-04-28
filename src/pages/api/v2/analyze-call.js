@@ -48,7 +48,7 @@ export default async function analyzeCall(req, res) {
       const alignedTranscript = response.data.transcripts;
 
       const msg = await anthropic.messages.create({
-        model: "claude-3-haiku-20240307", //"claude-3-opus-20240229",
+        model: "claude-3-sonnet-20240229", // "claude-3-opus-20240229", //"claude-3-haiku-20240307"
         max_tokens: 4096,
         temperature: 0,
         system: "You're a helpful assistant.",
@@ -81,6 +81,7 @@ export default async function analyzeCall(req, res) {
             Each question should be paired with the candidate's exact answer. 
             Please do not record any of the questions asked by the candidate about the role, stick to the interview questions. 
             If a question was asked twice only include it once in your response.
+            If you cannot find the candidate's answer to a question, just leave the answer an empty string ""
             
             Use the following format:
             [
@@ -110,7 +111,7 @@ export default async function analyzeCall(req, res) {
       const scorePromises = questionsAndAnswers.map(async (qa) => {
         const { question, answer } = qa;
         const score = await anthropic.messages.create({
-          model: "claude-3-haiku-20240307", //"claude-3-opus-20240229",
+          model: "claude-3-haiku-20240307", // "claude-3-opus-20240229"
           max_tokens: 4096,
           temperature: 0,
           system: `You're a professional recruiter. 
@@ -122,23 +123,27 @@ export default async function analyzeCall(req, res) {
             {
               role: "user",
               content: `
+                Consider the following interview question, and determine if it is a simply yes or no binary question or if it is asking for the candidate to provide specific examples of their experience. Simply stating they have a number of years of experience with a technology or skill is not enough to score highly on this question.
                 <interview_question>
                 ${question}
                 </interview_question>
+
+                <is_binary_question></is_binary_question> // true or false
                 
-                Based on the interview question come up with 2 perfect answers, 2 average answers, and 2 bad answers. Keep in mind some questions will be binary in nature and some will be open-ended. If it is binary simply provide a 100 or 0 for these.
-                <perfect_answer_1></perfect_answer_1>
-                <perfect_answer_2></perfect_answer_2>
-                <average_answer_1></average_answer_1>
-                <average_answer_2></average_answer_2>
-                <bad_answer_1></bad_answer_1>
-                <bad_answer_2></bad_answer_2>
+                To help determine the most accurate score possible, take a moment to think through what the perfect, avaerage, and bad answers to this question might look like. 
+                We want to make sure a candidate cannot just make up an answer to a question and get a high score, so please make sure to consider the context of the question and the role.
+
+                <example_perfect_answer></example_perfect_answer> // score 90-100
+                <example_average_answer></example_average_answer> // score 50-70
+                <example_bad_answer></example_bad_answer> // score 0-20
+
+                With these in mind, consider the candidate's answer and score it accordingly.
     
                 <candidate_answer>
                 ${answer}
                 </candidate_answer>
-    
-                Now, score the candidate's answer on a scale of 0 to 100, where 0 is the worst possible answer and 100 is the best possible answer.
+
+                Now provide the score for the candidate's answer:
             `,
             },
             {
