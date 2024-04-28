@@ -65,7 +65,8 @@ export default async function handler(req, res) {
 
       <IMPORTANT_NOTES>
       - Maintain a friendly, professional, and confident tone throughout the call.
-      - Ask all the predefined interview questions, using follow-ups as needed for clarity or detail.
+      - Stick to the interview questions provided above, avoid asking anything outside of these questions. 
+      - For any vague answers try to ask the candidate to provide specific examples.
       - Avoid indicating to the candidate how well they performed.
       - Do not guarantee a timeline for next steps or promise that they will be contacted if shortlisted.
       - If faced with technical difficulties, apologize and attempt to resolve them promptly.
@@ -92,7 +93,7 @@ export default async function handler(req, res) {
         speed: 1,
       },
       interruption_threshold: 500,
-      temperature: 0,
+      temperature: 0.1,
       voicemail_action: "hangup",
       start_time: null,
       transfer_phone_number: null,

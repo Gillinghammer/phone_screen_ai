@@ -63,20 +63,56 @@ export default async function handle(req, res) {
       }
     );
 
-    // Send email to candidate (alias) function sendEmail({ to, subject, text, html }: SendEmailParams):
-    // await sendEmail({
-    //   to: email,
-    //   subject: "Your application has been received",
-    //   text: `Hi ${name},\n\nThank you for applying to the position of ${job.jobTitle} at ${job.company.name}. We have received your application and will be in touch shortly.\n\nBest,\n${job.company.name}`,
-    // });
-
     if (!callResponse.ok) {
       throw new Error("Failed to make call");
     }
 
+    // Send email to candidate (alias) function sendEmail({ to, subject, text, html }: SendEmailParams):
+    await sendEmail({
+      to: email,
+      subject: "📞Thank you for completing the phone screen",
+      html: `<!DOCTYPE html>
+              <html lang="en">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              </head>
+              <body>
+                <p>Hi ${name},</p>
+                <p>We apologize there was an error conducting your phone screen for ${job.jobTitle}. Please wait for a few minutes and try again.</p>
+                
+                <p>If the issue persists, please reach out to your point of contact for support.</p>
+                
+                <p>Best regards,<br>
+                PhoneScreen.AI Team</p>
+              </body>
+              </html>`,
+    });
+
     return res.status(200).json(candidate);
   } catch (error) {
     console.error("An error occurred:", error);
+    // Send email to candidate (alias) function sendEmail({ to, subject, text, html }: SendEmailParams):
+    await sendEmail({
+      to: email,
+      subject: "📞Oops we ran into an error with your phone screen",
+      html: `<!DOCTYPE html>
+              <html lang="en">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              </head>
+              <body>
+                <p>Hi ${name},</p>
+                <p>We apologize there was an error conducting your phone screen for ${job.jobTitle}. Please wait for a few minutes and try again.</p>
+                
+                <p>If the issue persists, please reach out to your point of contact for support.</p>
+                
+                <p>Best regards,<br>
+                PhoneScreen.AI Team</p>
+              </body>
+              </html>`,
+    });
     return res
       .status(500)
       .json({ message: "Internal server error", error: error.message });

@@ -120,8 +120,8 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
       answers.push({ answer: qa.answer, score: qa.score || 0 });
     });
   } else {
-    questions = phoneScreen.analysis.questions;
-    answers = phoneScreen.analysis.answers;
+    questions = phoneScreen.analysis?.questions;
+    answers = phoneScreen.analysis?.answers;
   }
 
   console.log("Questions:", questions);
@@ -313,45 +313,46 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
               </Card>
             )}
             <div className="">
-              {questions.map((question, index) => (
-                <div key={index} className="mb-6">
-                  <div className="flex flex-col md:flex-row md:items-center">
-                    <Accordion
-                      type="single"
-                      collapsible
-                      className="flex-1 mb-4 md:mb-0 md:mr-4"
-                    >
-                      <AccordionItem value={`item-${index}`}>
-                        <AccordionTrigger className="text-left">
-                          <div className="flex flex-col items-start">
-                            <div className="text-sm mb-1">
-                              Question {index + 1}
+              {questions &&
+                questions.map((question, index) => (
+                  <div key={index} className="mb-6">
+                    <div className="flex flex-col md:flex-row md:items-center">
+                      <Accordion
+                        type="single"
+                        collapsible
+                        className="flex-1 mb-4 md:mb-0 md:mr-4"
+                      >
+                        <AccordionItem value={`item-${index}`}>
+                          <AccordionTrigger className="text-left">
+                            <div className="flex flex-col items-start">
+                              <div className="text-sm mb-1">
+                                Question {index + 1}
+                              </div>
+                              <p className="text-base md:text-lg mb-1">
+                                {question[0]}
+                              </p>
                             </div>
-                            <p className="text-base md:text-lg mb-1">
-                              {question[0]}
-                            </p>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <Card className="bg-gray-50 p-4 my-2">
-                            <p className="text-base md:text-lg">
-                              {answers[index]?.answer || "N/A"}
-                            </p>
-                          </Card>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                    <div className="self-center md:ml-4">
-                      <div className="rounded-full w-16 h-16 flex flex-col items-center justify-center">
-                        <span className="text-2xl md:text-3xl font-bold">
-                          {answers[index]?.score || 0}
-                        </span>
-                        <span className="text-xs text-gray-500">score</span>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <Card className="bg-gray-50 p-4 my-2">
+                              <p className="text-base md:text-lg">
+                                {answers[index]?.answer || "N/A"}
+                              </p>
+                            </Card>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                      <div className="self-center md:ml-4">
+                        <div className="rounded-full w-16 h-16 flex flex-col items-center justify-center">
+                          <span className="text-2xl md:text-3xl font-bold">
+                            {answers[index]?.score || 0}
+                          </span>
+                          <span className="text-xs text-gray-500">score</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </Card>
         </div>
