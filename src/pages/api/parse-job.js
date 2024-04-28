@@ -102,7 +102,7 @@ const extractResponsibilities = async (details) => {
 const generateInterviewQuestions = async (details) => {
   const rule =
     "Your response should consist of a list of strings, each on a separate line. Do not include any bullets or numbered bullets. DO NOT include any intoductory pre-text or follow up text in your response. DO NOT include numbered bullets";
-  const prompt = `Write 10 fully formed interview questions (use full sentences that end in question marks as if you were asking these on the phone to the candidate) for the initial phone screen based on the following job posting:\n\n${details}`;
+  const prompt = `Write 7 fully formed interview questions (use full sentences that end in question marks as if you were asking these on the phone to the candidate) for the initial phone screen based on the following job posting:\n\n${details}`;
   const response = await askGPT(prompt, rule);
   const questions = response
     .split("\n")

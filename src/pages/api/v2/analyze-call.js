@@ -81,7 +81,7 @@ export default async function analyzeCall(req, res) {
             Each question should be paired with the candidate's exact answer. 
             Please do not record any of the questions asked by the candidate about the role, stick to the interview questions. 
             If a question was asked twice only include it once in your response.
-            If you cannot find the candidate's answer to a question, just leave the answer an empty string ""
+            If you cannot find the candidate's answer to a question, just leave the answer "candidate failed to provide an answer"
             
             Use the following format:
             [

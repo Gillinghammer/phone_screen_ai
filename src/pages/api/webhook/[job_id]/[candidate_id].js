@@ -121,9 +121,9 @@ export default async function webhook(req, res) {
               </head>
               <body>
                 <p>Hi ${variables.candidateName},</p>
-                <p>Thank you for taking the time to complete the phone screen for the ${variables.job_title} position. We appreciate your interest in the role and the effort you put into the screening process.</p>
+                <p>Thank you for taking the time to complete the phone screen for the ${variables.job_title} position.</p>
                 
-                <p>Our team will review your responses and get back to you with the next steps in the hiring process. If you have any questions or concerns in the meantime, please feel free to reach out to your point of contact.</p>
+                <p>We've shared your responses with the hiring team. If you're shortlisted for the role the team will be in touch with next steps.</p>
                 
                 <p>Best regards,<br>
                 PhoneScreen.AI Team</p>
