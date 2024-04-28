@@ -32,7 +32,11 @@ const ProductScreenshots = () => {
           <p className="mb-6 text-gray-800">
             Every job post you create comes with a{" "}
             <strong>unqiue application link</strong>.{" "}
-            <Link href="/apply/3" target="_blank" className="text-blue-600">
+            <Link
+              href="/apply/76fa4f80-7250-428b-bcbd-86c9d91d5d00"
+              target="_blank"
+              className="text-blue-600"
+            >
               Like this one &gt;
             </Link>
           </p>

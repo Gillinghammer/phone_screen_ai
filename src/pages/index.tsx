@@ -220,7 +220,7 @@ const Home: NextPage = () => {
           </p>
           <div className="mt-8">
             <Link
-              href="/apply/3"
+              href="/apply/76fa4f80-7250-428b-bcbd-86c9d91d5d00"
               className="w-full h-20 flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-800 md:py-4 md:text-xl md:px-10"
             >
               Start Your AI Phone Screen

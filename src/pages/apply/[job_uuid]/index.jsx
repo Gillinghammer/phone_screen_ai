@@ -69,6 +69,9 @@ const JobPage = ({ job }) => {
     if (isFormValid()) {
       try {
         setIsDialogOpen(false);
+
+        console.log("Submitting application:", applicantDetails);
+        console.log("Job details:", job);
         const response = await fetch("/api/apply", {
           method: "POST",
           headers: {
@@ -118,137 +121,130 @@ const JobPage = ({ job }) => {
       <Head>
         <meta name="robots" content="noindex" />
       </Head>
-      <div className="bg-white text-gray-900 min-h-screen flex items-center justify-center p-4">
-        <Card className="text-gray-900 rounded p-0 md:p-4 shadow-md overflow-hidden max-w-4xl">
-          <div className="md:flex md:flex-row flex-col-reverse">
-            <CardContent className="p-6 sm:p-2 md:w-1/2">
-              <form className="space-y-4">
-                <div className="mb-4">
-                  <Label htmlFor="name" className="text-gray-900">
-                    Full name
-                  </Label>
-                  <Input
-                    type="text"
-                    name="name"
-                    id="name"
-                    value={applicantDetails.name}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="Jane Doe"
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  />
-                </div>
-                <div className="mb-4">
-                  <Label htmlFor="email" className="text-gray-900">
-                    Email address
-                  </Label>
-                  <Input
-                    type="email"
-                    name="email"
-                    id="email"
-                    value={applicantDetails.email}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="jane.doe@example.com"
-                    className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  />
-                </div>
-                <div className="mb-4">
-                  <Label htmlFor="phone" className="text-gray-900">
-                    Phone number
-                  </Label>
-                  <div className="border border-gray-300 rounded-md">
-                    <PhoneInput
-                      international
-                      defaultCountry="US"
-                      value={applicantDetails.phone}
-                      onChange={(value) =>
-                        setApplicantDetails({
-                          ...applicantDetails,
-                          phone: value,
-                        })
-                      }
-                      className="focus:ring-blue-500 focus:border-blue-500 text-gray-900 w-full rounded-md"
+      <div className="bg-[url('/apply-bg.jpg')] bg-cover text-gray-900 min-h-screen flex items-center justify-center p-4">
+        <Card className="text-gray-900 rounded-2xl p-0 shadow-2xl overflow-hidden max-w-lg border-0">
+          <div className="p-0 md:flex md:flex-row flex-col-reverse">
+            <CardContent className="p-0 border-0">
+              <div className="p-6">
+                <CardTitle className="text-gray-900 text-lg font-normal pb-4">
+                  Complete the form to begin the phone screen for
+                  <br />
+                  <span className="font-bold">{job.jobTitle}</span>
+                </CardTitle>
+                <form className="space-y-4">
+                  <div className="mb-4">
+                    <Label htmlFor="name" className="text-gray-900 text-lg">
+                      Full Name
+                    </Label>
+                    <Input
+                      type="text"
+                      name="name"
+                      id="name"
+                      value={applicantDetails.name}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="Jack Smith"
+                      className="text-lg py-4 border-gray-300 focus:ring-green-500 focus:border-green-500 text-gray-900"
                     />
                   </div>
-                </div>
-                <div className="text-right">
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        disabled={!isFormValid()}
-                        className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
-                          isFormValid()
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : "bg-gray-400 cursor-not-allowed"
-                        } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                      >
-                        Apply for this job
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="bg-white text-gray-900 sm:max-w-md sm:mx-auto sm:w-auto sm:h-auto w-full h-full">
-                      <div className="flex flex-col gap-4">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Prepare for your call
-                        </h3>
-                        <p className="text-gray-900">
-                          This phone screen will be conducted by an AI. Please
-                          watch this short video so that you have the best
-                          possible experience.
-                        </p>
-                        <div className="aspect-w-16 aspect-h-9">
-                          <video
-                            src="/instructions.mp4"
-                            controls
-                            className="w-full h-full object-cover"
-                            onPlay={() => setVideoPlayed(true)}
-                          ></video>
+                  <div className="mb-4">
+                    <Label htmlFor="email" className="text-gray-900 text-lg">
+                      Email Address
+                    </Label>
+                    <Input
+                      type="email"
+                      name="email"
+                      id="email"
+                      value={applicantDetails.email}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="jack.smith@gmail.com"
+                      className="text-lg py-4 border-gray-300 focus:ring-green-500 focus:border-green-500 text-gray-900"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <Label htmlFor="phone" className="text-gray-900 text-lg">
+                      Phone Number
+                    </Label>
+                    <div className="border border-gray-300 rounded-md">
+                      <PhoneInput
+                        international
+                        defaultCountry="US"
+                        value={applicantDetails.phone}
+                        onChange={(value) =>
+                          setApplicantDetails({
+                            ...applicantDetails,
+                            phone: value,
+                          })
+                        }
+                        className="text-gray-900 w-full rounded-md custom-phone-input"
+                      />
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          disabled={!isFormValid()}
+                          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                            isFormValid()
+                              ? "bg-gray-600 hover:bg-gray-700"
+                              : "bg-gray-400 cursor-not-allowed"
+                          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500`}
+                        >
+                          Begin phone screen
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="bg-white text-gray-900 sm:max-w-md sm:mx-auto sm:w-auto sm:h-auto w-full h-full">
+                        <div className="flex flex-col gap-4">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            Prepare for your call
+                          </h3>
+                          <p className="text-gray-900">
+                            This phone screen will be conducted by an AI. Please
+                            watch this short video so that you have the best
+                            possible experience.
+                          </p>
+                          <div className="aspect-w-16 aspect-h-9">
+                            <video
+                              src="/instructions.mp4"
+                              controls
+                              className="w-full h-full object-cover"
+                              onPlay={() => setVideoPlayed(true)}
+                            ></video>
+                          </div>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              type="button"
+                              className="text-gray-900"
+                              onClick={() => setIsDialogOpen(false)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              disabled={!videoPlayed}
+                              type="button"
+                              onClick={handleSubmit}
+                            >
+                              Ready for my phone screen
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            type="button"
-                            className="text-gray-900"
-                            onClick={() => setIsDialogOpen(false)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            disabled={!videoPlayed}
-                            type="button"
-                            onClick={handleSubmit}
-                          >
-                            Ready for my phone screen
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </form>
-            </CardContent>
-            <CardContent className="p-6 sm:p-2 md:w-1/2">
-              <CardTitle className="text-2xl font-bold text-gray-900 mb-4">
-                {job.jobTitle} at {job.company?.name}
-              </CardTitle>
-              <div className="mb-4">
-                <h2 className="font-semibold text-gray-900">Location</h2>
-                <CardDescription className="text-gray-900">
-                  {job.jobLocation}{" "}
-                  {job.remoteFriendly ? "(Remote friendly)" : ""}
-                </CardDescription>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </form>
               </div>
-              <div className="mb-4">
-                <h2 className="font-semibold text-gray-900">Job Description</h2>
-                <CardDescription className="text-gray-900">
-                  {job.jobDescription}
-                </CardDescription>
-              </div>
-              <div className="mb-4">
-                <h2 className="font-semibold text-gray-900">Seniority</h2>
-                <CardDescription className="text-gray-900 text-sm">
-                  {job.seniority}
-                </CardDescription>
+              <div className="p-6 bg-gray-900 text-white italic text-sm">
+                AI candidate screening technology is powered by{" "}
+                <a
+                  target="_blank"
+                  href="https://phonescreen.ai/"
+                  className="font-bold"
+                >
+                  PhoneScreen.AI
+                </a>
               </div>
             </CardContent>
           </div>

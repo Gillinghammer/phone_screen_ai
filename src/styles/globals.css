@@ -51,6 +51,17 @@
   }
 }
 
+.custom-phone-input {
+  padding-left: 10px;
+  margin: 6px 0;
+}
+
+.custom-phone-input .PhoneInputCountryIcon {
+  left: 12px;
+  /* top: 50%; */
+  /* transform: translateY(-50%); */
+}
+
   
   @layer base {
     * {

@@ -342,7 +342,7 @@ export default function JobDetailPage({ job }) {
               <Button size="md" variant={"outline"} className="px-4">
                 <div className="flex items-center">
                   <ExternalLinkIcon className="w-4 h-4 mr-2" />
-                  <Link href={`/apply/${job.id}`} target="_blank">
+                  <Link href={`/apply/${job.uuid}`} target="_blank">
                     Screen link
                   </Link>
                 </div>
@@ -556,7 +556,7 @@ export default function JobDetailPage({ job }) {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {candidate.phoneScreen?.callLength ?? "in progress"}
+                        {candidate.phoneScreen?.callLength ?? "-----"}
                       </TableCell>
                       <TableCell>
                         {candidate.phoneScreen?.qualificationScore.toFixed(2) ??

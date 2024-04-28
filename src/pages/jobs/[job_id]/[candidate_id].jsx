@@ -186,7 +186,7 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="container mx-auto my-10">
+        <div className="mx-auto my-10">
           <Card className="p-6">
             <div className="lg:flex lg:justify-between lg:items-center mb-6">
               <div className="mb-6 lg:mb-0">
