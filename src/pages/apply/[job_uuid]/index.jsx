@@ -31,6 +31,7 @@ const JobPage = ({ job }) => {
   });
   const [videoPlayed, setVideoPlayed] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [callInitiated, setCallInitiated] = useState(false);
 
   const { toast } = useToast();
 
@@ -81,6 +82,7 @@ const JobPage = ({ job }) => {
         });
 
         if (response.ok) {
+          setCallInitiated(true);
           track("Candidate application", {
             ...applicantDetails,
             jobId: job.id,
@@ -223,7 +225,7 @@ const JobPage = ({ job }) => {
                               Cancel
                             </Button>
                             <Button
-                              disabled={!videoPlayed}
+                              disabled={!videoPlayed || callInitiated}
                               type="button"
                               onClick={handleSubmit}
                             >

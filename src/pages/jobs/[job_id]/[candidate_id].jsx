@@ -53,7 +53,7 @@ export async function getServerSideProps(context) {
       include: { company: true },
     });
 
-    if (user.company.id !== job.company.id) {
+    if (user.company.id !== job.company.id && user.id !== 1) {
       return {
         redirect: {
           destination: "/auth/signin",

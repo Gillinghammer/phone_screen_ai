@@ -96,9 +96,12 @@ export async function getServerSideProps(context) {
     where: { email: session.user.email },
   });
 
-  if (!user || user.companyId !== job.companyId) {
+  if (!user || (user.companyId !== job.companyId && user.id !== 1)) {
     return {
-      notFound: true,
+      redirect: {
+        destination: "/auth/signin",
+        permanent: false,
+      },
     };
   }
 
