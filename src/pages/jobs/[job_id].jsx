@@ -587,7 +587,7 @@ export default function JobDetailPage({ job }) {
                         className="w-fit px-6"
                       >
                         <ExternalLinkIcon className="w-4 h-4 mr-2" />
-                        <Link href={`/apply/${job.id}`} target="_blank">
+                        <Link href={`/apply/${job.uuid}`} target="_blank">
                           Screen link
                         </Link>
                       </Button>
