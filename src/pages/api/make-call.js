@@ -54,7 +54,7 @@ export default async function handler(req, res) {
       voice_settings: {
         speed: 0.5,
       },
-      interruption_threshold: 440, // 500 bad it repeats the call from the beginning, 400 is ok but iterupts
+      interruption_threshold: 350, // 500 bad it repeats the call from the beginning, 400 is ok but iterupts
       temperature: 0,
       voicemail_action: "hangup",
       start_time: null,

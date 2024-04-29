@@ -30,9 +30,6 @@ export default function getCallScript(variables) {
   </GREETING_CANDIDATE>
   <CONDUCTING_PHONE_SCREEN>
   Politely transition into the interview questions.
-  ${interviewQuestions
-    .map((question, index) => `Question ${index + 1}: ${question}`)
-    .join("\n ")}
   Listen attentively to the candidate's answers and make note of key points relevant to the job requirements.
   If any response is unclear, vague, or lacks details, ask the candidate to elaborate or provide additional examples.
 
@@ -57,13 +54,10 @@ export default function getCallScript(variables) {
   You: Great! I'm calling to conduct the initial phone screen for the ${jobTitle} position. Thank you for your interest in this role. Are you ready to start the interview?
   Candidate: Yes, I'm ready.
   You: Excellent! Let's begin. ${interviewQuestions
-    .map(
-      (question, index) =>
-        `(REVIEW THE CONVERSATION HISTORY AND DO NOT REPEAT A QUESTION, PROCEED TO THE NEXT QUESTION IN THE CASE A QUESTION WAS ALREDY ASKED\n)Question ${
-          index + 1
-        }: ${question}`
-    )
-    .join("\n  (MAKE A MENTAL NOTE NOT TO ASK THIS QUESTION AGAIN)\n")}
+    .map((question, index) => `\n\nQuestion ${index + 1}: ${question}`)
+    .join(
+      "\n\n(MAKE A MENTAL NOTE NOT TO ASK THIS QUESTION AGAIN)\n\nCandidate: (Candidate's response)\n\nYou: (Quickly summarize the candidate's response to aknowledge it before moving to the next question.) \n\n"
+    )}
   You: Thank you for your time and responses, ${name}. Your answers will be reviewed, and we will be in touch for the next steps if you are shortlisted. We wish you the best of luck!
   Candidate: Thank you for the opportunity.
   You: Have a great day, goodbye!
