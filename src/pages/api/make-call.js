@@ -18,44 +18,48 @@ export default async function handler(req, res) {
       company,
       interviewQuestions,
     } = req.body;
-
+    console.log("DEBUG JOB ID", jobId);
     const headers = { Authorization: process.env.BLAND_API_KEY };
 
-    const script = getCallScript({
-      jobTitle,
-      company,
-      jobDescription,
-      jobResponsibilities: jobResponsibilities.set,
-      jobRequirements: jobRequirements.set,
-      jobLocation,
-      salary,
-      remoteFriendly,
-      name,
-      interviewQuestions: interviewQuestions.set,
-    });
-    console.log("debug", script);
+    // const script = getCallScript({
+    //   jobTitle,
+    //   company,
+    //   jobDescription,
+    //   jobResponsibilities: jobResponsibilities.set,
+    //   jobRequirements: jobRequirements.set,
+    //   jobLocation,
+    //   salary,
+    //   remoteFriendly,
+    //   name,
+    //   interviewQuestions: interviewQuestions.set,
+    // });
+    // console.log("debug", script);
     const data = {
       phone_number: phone,
       from: "+16469339096",
-      task: script,
+      // task: script,
       voice: "e1289219-0ea2-4f22-a994-c542c2a48a0f",
+      pathway_id: "35a93192-9060-4e74-86dc-b9d5207ecb09",
       request_data: {
-        job_title: jobTitle,
+        jobTitle,
         job_location: jobTitle,
-        company: company,
-        candidateName: name,
-        candidateEmail: email,
+        // company: company,
+        candidate_name: name,
+        question_number: 0, // needed for the pathway to lookup the first question
+        job_id: jobId, // needed for the pathway to lookup the first question
+        // candidateEmail: email,
         job_description: jobDescription,
         job_requirements: jobRequirements.set.join(", "),
         job_responsibilities: jobResponsibilities.set.join(", "),
         remote_friendly: remoteFriendly,
         salary: salary,
+        // interviewQuestions: interviewQuestions.set,
       },
       voice_settings: {
         speed: 0.5,
       },
-      interruption_threshold: 350, // 500 bad it repeats the call from the beginning, 400 is ok but iterupts
-      temperature: 0,
+      interruption_threshold: 500,
+      temperature: 0.5,
       voicemail_action: "hangup",
       start_time: null,
       transfer_phone_number: null,

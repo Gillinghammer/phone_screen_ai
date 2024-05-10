@@ -46,7 +46,7 @@ export default async function analyzeCall(req, res) {
       );
 
       const alignedTranscript = response.data.transcripts;
-
+      console.log("Transcript:", alignedTranscript);
       const msg = await anthropic.messages.create({
         model: "claude-3-sonnet-20240229", // "claude-3-opus-20240229", //"claude-3-haiku-20240307"
         max_tokens: 4096,
@@ -161,6 +161,10 @@ export default async function analyzeCall(req, res) {
       const scores = await Promise.all(scorePromises);
 
       // Update the PhoneScreen with the analysis result
+      const qualificationScore =
+        scores.reduce((acc, answer) => acc + (answer?.score ?? 0), 0) /
+        scores.length;
+
       const updatedPhoneScreen = await prisma.phoneScreen.update({
         where: { id: phoneScreenId },
         data: {
@@ -170,9 +174,8 @@ export default async function analyzeCall(req, res) {
             answer: qa.answer,
             score: scores[i].score,
           })),
-          qualificationScore:
-            scores.reduce((acc, answer) => acc + (answer?.score ?? 0), 0) /
-            scores.length,
+          qualificationScore,
+          status: qualificationScore < 1 ? "call failed" : undefined,
         },
       });
 

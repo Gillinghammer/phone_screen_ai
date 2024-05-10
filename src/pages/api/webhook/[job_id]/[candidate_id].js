@@ -7,7 +7,7 @@ export default async function webhook(req, res) {
   if (req.method === "POST") {
     // Extract the job_id and candidate_id from the query parameters
     const { job_id, candidate_id } = req.query;
-
+    console.log("webhook debug ", req.body);
     // Extract the data from the request body
     const {
       call_id,

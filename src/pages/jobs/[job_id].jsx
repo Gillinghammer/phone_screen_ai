@@ -537,7 +537,8 @@ export default function JobDetailPage({ job }) {
                         {daysSinceCreated}
                       </TableCell>
                       <TableCell>
-                        {candidate.phoneScreen ? (
+                        {candidate.phoneScreen &&
+                        candidate.phoneScreen.status !== "call failed" ? (
                           <Link
                             href={`/jobs/${job.id}/${candidate.id}`}
                             className="underline"
@@ -559,11 +560,16 @@ export default function JobDetailPage({ job }) {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {candidate.phoneScreen?.callLength ?? "-----"}
+                        {candidate.phoneScreen?.status === "call failed"
+                          ? "call failed"
+                          : candidate.phoneScreen?.callLength ?? "call failed"}
                       </TableCell>
                       <TableCell>
-                        {candidate.phoneScreen?.qualificationScore.toFixed(2) ??
-                          0}
+                        {candidate.phoneScreen?.status === "call failed"
+                          ? "-"
+                          : candidate.phoneScreen?.qualificationScore.toFixed(
+                              2
+                            ) ?? "-"}
                       </TableCell>
                       <TableCell>
                         <Badge variant={badgeVariant}>
