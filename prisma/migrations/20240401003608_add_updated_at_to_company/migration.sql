@@ -1,2 +1,2 @@
--- AlterTable
-ALTER TABLE "Company" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+-- Migration: 20240401003608_add_updated_at_to_company
+-- Add SQL or schema change commands here

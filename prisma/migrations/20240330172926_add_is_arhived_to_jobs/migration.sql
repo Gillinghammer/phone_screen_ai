@@ -1,2 +1,2 @@
--- AlterTable
-ALTER TABLE "Job" ADD COLUMN     "isArchived" BOOLEAN NOT NULL DEFAULT false;
+-- Migration: 20240330172926_add_is_arhived_to_jobs
+-- Add SQL or schema change commands here

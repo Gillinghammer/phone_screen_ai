@@ -1,5 +1,2 @@
--- AlterTable
-ALTER TABLE "Candidate" ALTER COLUMN "status" SET DEFAULT 'OPEN',
-ALTER COLUMN "callDuration" DROP NOT NULL,
-ALTER COLUMN "questionsAnswers" DROP NOT NULL,
-ALTER COLUMN "qualificationScore" DROP NOT NULL;
+-- Migration: 20240316033408_update_candidate_schema
+-- Add SQL or schema change commands here

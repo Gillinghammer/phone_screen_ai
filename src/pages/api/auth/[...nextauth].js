@@ -55,5 +55,6 @@ export default NextAuth({
     error: "/auth/error",
     verifyRequest: "/auth/verify-request",
     newUser: null,
+    resetPassword: "/auth/reset-password", // Add this line
   },
 });

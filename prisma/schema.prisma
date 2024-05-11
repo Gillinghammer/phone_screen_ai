@@ -13,9 +13,9 @@ model Company {
   domain    String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  users     User[]
   jobs      Job[]
   resumes   Resume[]
+  users     User[]
 }
 
 model User {
@@ -25,14 +25,15 @@ model User {
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  companyId Int?
   jobs      Job[]
   company   Company? @relation(fields: [companyId], references: [id])
-  companyId Int?
+  resetToken        String?   @unique 
+  resetTokenExpires DateTime? 
 }
 
 model Job {
   id                 Int           @id @default(autoincrement())
-  uuid               String        @default(uuid())
   interviewQuestions Json
   jobDescription     String
   jobLocation        String
@@ -43,12 +44,13 @@ model Job {
   userId             Int
   requirements       Json
   salary             Int?
-  company             Company? @relation(fields: [companyId], references: [id])
-  companyId           Int?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   isArchived         Boolean       @default(false)
+  companyId          Int?
+  uuid               String        @default(uuid())
   candidates         Candidate[]
+  company            Company?      @relation(fields: [companyId], references: [id])
   user               User          @relation(fields: [userId], references: [id])
   phoneScreens       PhoneScreen[]
 }
@@ -99,8 +101,8 @@ model PhoneScreen {
   variables              Json?
   wait                   Boolean?
   analysis               Json?
-  analysisV2            Json?
   qualificationScore     Float?
+  analysisV2             Json?
   candidate              Candidate @relation(fields: [candidateId], references: [id])
   job                    Job       @relation(fields: [jobId], references: [id])
 }
@@ -119,10 +121,10 @@ model Resume {
   id         Int      @id @default(autoincrement())
   url        String
   weaviateId String?
-  company    Company? @relation(fields: [companyId], references: [id])
   companyId  Int?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  company    Company? @relation(fields: [companyId], references: [id])
 }
 
 enum CandidateStatus {

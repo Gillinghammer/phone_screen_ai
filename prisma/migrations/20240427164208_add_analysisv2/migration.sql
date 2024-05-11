@@ -1,2 +1,2 @@
--- AlterTable
-ALTER TABLE "PhoneScreen" ADD COLUMN     "analysis_v2" JSONB;
+-- Migration: 20240427164208_add_analysisv2
+-- Add SQL or schema change commands here

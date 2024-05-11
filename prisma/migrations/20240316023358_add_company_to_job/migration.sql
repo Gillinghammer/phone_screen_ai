@@ -1,8 +1,2 @@
-/*
-  Warnings:
-
-  - Added the required column `company` to the `Job` table without a default value. This is not possible if the table is not empty.
-
-*/
--- AlterTable
-ALTER TABLE "Job" ADD COLUMN     "company" TEXT NOT NULL;
+-- Migration: 20240316023358_add_company_to_job
+-- Add SQL or schema change commands here

@@ -1,93 +1,57 @@
-// pages/reset-password.js
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { resetPassword } from "@/lib/auth";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export default function ResetPassword() {
+const ResetPasswordPage = () => {
   const router = useRouter();
   const { token } = router.query;
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const [newPassword, setNewPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    if (password !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
-    }
 
     try {
-      await resetPassword(token, password);
-      toast({
-        title: "Success",
-        description: "Your password has been reset",
+      const response = await axios.post("/api/auth/update-password", {
+        token,
+        newPassword,
       });
-      router.push("/auth/signin");
+      setMessage(response.data.message);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to reset password",
-        variant: "destructive",
-      });
+      setMessage("An error occurred. Please try again.");
     }
-
-    setLoading(false);
   };
 
   return (
-    <Card className="w-full max-w-md p-8 space-y-4 m-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl">Reset Password</CardTitle>
-      </CardHeader>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">Reset Password</h1>
+      {message && (
+        <Alert variant="default" className="mb-4">
+          <AlertTitle>Message</AlertTitle>
+          <AlertDescription>{message}</AlertDescription>
+        </Alert>
+      )}
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="password">New Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Resetting..." : "Reset Password"}
-          </Button>
-        </CardFooter>
+        <div className="mb-4">
+          <Label htmlFor="newPassword">New Password</Label>
+          <Input
+            id="newPassword"
+            type="password"
+            placeholder="Enter your new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+            className="w-full"
+          />
+        </div>
+        <Button type="submit">Reset Password</Button>
       </form>
-    </Card>
+    </div>
   );
-}
+};
+
+export default ResetPasswordPage;

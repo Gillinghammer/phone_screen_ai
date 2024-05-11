@@ -1,2 +1,2 @@
--- AlterTable
-ALTER TABLE "Job" ALTER COLUMN "salary" DROP NOT NULL;
+-- Migration: 20240316020432_make_salary_optional
+-- Add SQL or schema change commands here

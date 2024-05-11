@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import axios from "axios";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -22,16 +23,34 @@ export function ForgotPasswordForm() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate a forgot password request
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const response = await axios.post("/api/auth/reset-password", { email });
 
-    // Reset the form and show a success message
-    setEmail("");
+      if (response.status === 200) {
+        // Reset the form and show a success message
+        setEmail("");
+        toast({
+          title: "Password reset email sent",
+          description: "Please check your email for further instructions.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send password reset email.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+      toast({
+        title: "Error",
+        description:
+          "An error occurred while sending the password reset email.",
+        variant: "destructive",
+      });
+    }
+
     setLoading(false);
-    toast({
-      title: "Password reset email sent",
-      description: "Please check your email for further instructions.",
-    });
   };
 
   return (
