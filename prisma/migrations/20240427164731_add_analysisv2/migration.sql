@@ -1,2 +1,0 @@
--- Migration: 20240427164731_add_analysisv2
--- Add SQL or schema change commands here

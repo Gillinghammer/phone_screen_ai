@@ -1,2 +1,0 @@
--- Migration: 20240401003608_add_updated_at_to_company
--- Add SQL or schema change commands here

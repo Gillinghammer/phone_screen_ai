@@ -1,2 +1,0 @@
--- Migration: 20240310025055_add_name_to_user
--- Add SQL or schema change commands here

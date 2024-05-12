@@ -1,2 +1,0 @@
--- Migration: 20240310043327_add_public_url_to_job
--- Add SQL or schema change commands here

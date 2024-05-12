@@ -1,2 +1,0 @@
--- Migration: 20240331210203_vector
--- Add SQL or schema change commands here

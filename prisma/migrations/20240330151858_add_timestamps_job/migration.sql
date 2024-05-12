@@ -1,2 +1,0 @@
--- Migration: 20240330151858_add_timestamps_job
--- Add SQL or schema change commands here

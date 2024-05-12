@@ -1,2 +1,0 @@
--- Migration: 20240330172926_add_is_arhived_to_jobs
--- Add SQL or schema change commands here

@@ -1,2 +1,0 @@
--- Migration: 20240324132937_add_pilot_applicants
--- Add SQL or schema change commands here

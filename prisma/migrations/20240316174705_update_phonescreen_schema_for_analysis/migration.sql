@@ -1,2 +1,0 @@
--- Migration: 20240316174705_update_phonescreen_schema_for_analysis
--- Add SQL or schema change commands here

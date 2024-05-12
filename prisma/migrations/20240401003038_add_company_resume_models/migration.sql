@@ -1,2 +1,0 @@
--- Migration: 20240401003038_add_company_resume_models
--- Add SQL or schema change commands here

@@ -1,2 +1,0 @@
--- Migration: 20240316000623_init
--- Add SQL or schema change commands here

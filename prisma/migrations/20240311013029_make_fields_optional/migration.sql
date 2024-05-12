@@ -1,2 +1,0 @@
--- Migration: 20240311013029_make_fields_optional
--- Add SQL or schema change commands here

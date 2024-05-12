@@ -1,2 +1,0 @@
--- Migration: 20240316023358_add_company_to_job
--- Add SQL or schema change commands here

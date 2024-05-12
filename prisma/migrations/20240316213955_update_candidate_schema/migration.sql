@@ -1,2 +1,0 @@
--- Migration: 20240316213955_update_candidate_schema
--- Add SQL or schema change commands here

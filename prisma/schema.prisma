@@ -28,7 +28,7 @@ model User {
   companyId Int?
   jobs      Job[]
   company   Company? @relation(fields: [companyId], references: [id])
-  resetToken        String?   @unique 
+  resetToken        String?   
   resetTokenExpires DateTime? 
 }
 
