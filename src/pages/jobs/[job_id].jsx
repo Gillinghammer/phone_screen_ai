@@ -317,6 +317,31 @@ export default function JobDetailPage({ job }) {
     }
   };
 
+  const renderCallStatus = (candidate) => {
+    if (candidate.phoneScreen?.answeredBy === "voicemail") {
+      return (
+        <Badge className="bg-yellow-100 text-black" variant="outline">
+          Voicemail
+        </Badge>
+      );
+    } else if (candidate.phoneScreen?.status === "call failed") {
+      return (
+        <Badge className="bg-red-100 text-black" variant="outline">
+          Dropped
+        </Badge>
+      );
+    } else {
+      const callLength = candidate.phoneScreen?.callLength;
+      return callLength ? (
+        <Badge variant="secondary">{callLength}</Badge>
+      ) : (
+        <Badge className="bg-yellow-100 text-black" variant="outline">
+          Voicemail
+        </Badge>
+      );
+    }
+  };
+
   return (
     <>
       <Head>
@@ -461,10 +486,17 @@ export default function JobDetailPage({ job }) {
                       <Badge variant="outline">open</Badge>
                     </SelectItem>
                     <SelectItem value="rejected">
-                      <Badge variant="destructive">rejected</Badge>
+                      <Badge
+                        className="bg-red-200 text-black"
+                        variant="destructive"
+                      >
+                        rejected
+                      </Badge>
                     </SelectItem>
                     <SelectItem value="accepted">
-                      <Badge>accepted</Badge>
+                      <Badge className="bg-green-200 text-black">
+                        accepted
+                      </Badge>
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
@@ -522,6 +554,13 @@ export default function JobDetailPage({ job }) {
                       : candidate.status.toLowerCase() === "open"
                       ? "outline"
                       : "";
+
+                  const badgeClass =
+                    candidate.status.toLowerCase() === "rejected"
+                      ? "bg-red-200 text-black"
+                      : candidate.status.toLowerCase() === "open"
+                      ? ""
+                      : "bg-green-200 text-black";
                   return (
                     <TableRow key={candidate.id}>
                       <TableCell className="w-[50px]">
@@ -559,20 +598,16 @@ export default function JobDetailPage({ job }) {
                           <span className="text-xs">{candidate.phone}</span>
                         </div>
                       </TableCell>
+                      <TableCell>{renderCallStatus(candidate)}</TableCell>
                       <TableCell>
                         {candidate.phoneScreen?.status === "call failed"
-                          ? "call failed"
-                          : candidate.phoneScreen?.callLength ?? "call failed"}
-                      </TableCell>
-                      <TableCell>
-                        {candidate.phoneScreen?.status === "call failed"
-                          ? "-"
+                          ? ""
                           : candidate.phoneScreen?.qualificationScore.toFixed(
                               2
-                            ) ?? "-"}
+                            ) ?? ""}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={badgeVariant}>
+                        <Badge className={badgeClass} variant={badgeVariant}>
                           {candidate.status.toLowerCase()}
                         </Badge>
                       </TableCell>

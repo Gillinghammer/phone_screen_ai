@@ -39,8 +39,8 @@ export async function getServerSideProps(context) {
 
   let jobs = await prisma.job.findMany({
     where: {
-      companyId: user.companyId,
-      // userId, removed as it would prvent you from seeing jobs created by coworkers
+      // companyId: user.companyId,
+      companyId: 4,
       isArchived: false,
     },
     select: {

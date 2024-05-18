@@ -21,6 +21,7 @@ const ResetPasswordPage = () => {
         newPassword,
       });
       setMessage(response.data.message);
+      router.push("/auth/signin");
     } catch (error) {
       setMessage("An error occurred. Please try again.");
     }

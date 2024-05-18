@@ -1,5 +1,4 @@
 import axios from "axios";
-import getCallScript from "../../components/CallScript";
 export default async function handler(req, res) {
   if (req.method === "POST") {
     const {
@@ -21,19 +20,6 @@ export default async function handler(req, res) {
     console.log("DEBUG JOB ID", jobId);
     const headers = { Authorization: process.env.BLAND_API_KEY };
 
-    // const script = getCallScript({
-    //   jobTitle,
-    //   company,
-    //   jobDescription,
-    //   jobResponsibilities: jobResponsibilities.set,
-    //   jobRequirements: jobRequirements.set,
-    //   jobLocation,
-    //   salary,
-    //   remoteFriendly,
-    //   name,
-    //   interviewQuestions: interviewQuestions.set,
-    // });
-    // console.log("debug", script);
     const data = {
       phone_number: phone,
       from: "+16469339096",
@@ -63,7 +49,7 @@ export default async function handler(req, res) {
       voicemail_action: "hangup",
       start_time: null,
       transfer_phone_number: null,
-      answered_by_enabled: false,
+      answered_by_enabled: true,
       first_sentence: null,
       record: true,
       wait_for_greeting: false,
