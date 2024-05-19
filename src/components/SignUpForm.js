@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { usePosthog } from "posthog-js/react";
+import { usePostHog } from "posthog-js/react";
 
 const validateEmail = (email) => {
   const re =
@@ -27,7 +27,7 @@ const validatePassword = (password) => {
 };
 
 export function SignUpForm() {
-  const posthog = usePosthog();
+  const posthog = usePostHog();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
