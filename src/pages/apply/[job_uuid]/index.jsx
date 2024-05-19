@@ -89,7 +89,7 @@ const JobPage = ({ job }) => {
             ...applicantDetails,
             jobId: job.id,
             jobTitle: job.jobTitle,
-            company: job.company,
+            company: job.company.name,
           });
           track("Candidate application", {
             ...applicantDetails,
