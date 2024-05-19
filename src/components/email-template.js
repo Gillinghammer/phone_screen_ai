@@ -32,6 +32,9 @@ export function generateEmailTemplate(variables) {
           text-align: left;
           margin-bottom: 20px;
         }
+        .logo {
+          width: 365px;
+        }
         .content {
           margin-bottom: 20px;
         }
@@ -62,7 +65,7 @@ export function generateEmailTemplate(variables) {
       <div class="container">
         <div class="header">
           <a href="https://phonescreen.ai">
-            <img src="https://phonescreen.ai/small-logo.png" alt="${companyName}" width="386" />
+            <img class="logo" src="https://phonescreen.ai/small-logo.png" alt="${companyName}" />
           </a>
         </div>
         <div class="content">
