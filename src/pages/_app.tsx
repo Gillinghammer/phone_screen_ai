@@ -25,7 +25,7 @@ function MyApp({
 }: MyAppProps) {
   return (
     <SessionProvider session={session}>
-      <ThemeProvider attribute="class" defaultTheme="dark">
+      <ThemeProvider attribute="class" defaultTheme="light">
         <div
           className={cn(
             "min-h-screen bg-background font-sans antialiased dark:bg-gray-900 dark:text-white",

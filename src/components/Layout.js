@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { cn } from "@/lib/utils";
-import ThemeToggle from "./ThemeToggle";
 import { PersonIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
@@ -17,14 +16,17 @@ export default function Layout({ children }) {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between py-4">
-          <h1 className="text-xl font-bold">PhoneScreen.AI</h1>
+          <Link href="/jobs">
+            <img
+              src="/small-logo.png"
+              alt="PhoneScreen.AI Logo"
+              className="h-8"
+            />
+          </Link>
           <nav>
             <ul className="flex items-center space-x-4">
               {session && (
                 <>
-                  <li>
-                    <ThemeToggle />
-                  </li>
                   <li>
                     <Link href="/jobs">
                       <span
