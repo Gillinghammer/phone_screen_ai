@@ -38,6 +38,7 @@ export function generateEmailTemplate(variables) {
         }
         .content {
           margin-bottom: 20px;
+          margin-left: 4px;
         }
         .cta-button {
           display: inline-block;
