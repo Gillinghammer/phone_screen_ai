@@ -198,8 +198,9 @@ export default async function analyzeCall(req, res) {
         },
       });
 
-      client.capture({
-        distinctId: job.userId,
+      let captureEvent = {
+        api_key: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+        distinct_id: job.userId,
         event: "Candidate Screen Completed",
         properties: {
           companyId: job.companyId,
@@ -216,7 +217,21 @@ export default async function analyzeCall(req, res) {
           fromNumber: updatedPhoneScreen.from,
           toNumber: updatedPhoneScreen.to,
         },
-      });
+      };
+
+      try {
+        await axios.post("https://app.posthog.com/capture/", captureEvent, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } catch (err) {
+        console.error("PostHog had an error!", err);
+        console.error(
+          "PostHog had an error: ",
+          err?.response?.data || "Unknown"
+        );
+      }
 
       await sendEmail({
         to: candidate.email,
