@@ -85,7 +85,7 @@ export function SignUpForm() {
         if (res.ok) {
           // Create the user and associate with the company
           // Track the user signup event
-          posthog.capture("User signup", {
+          posthog.capture("User Sign Up", {
             email: data.user.email,
             name: data.user.name,
             company: data.user.company,
