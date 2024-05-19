@@ -14,6 +14,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { usePostHog } from "posthog-js/react";
 
 const prisma = new PrismaClient();
 
@@ -33,9 +34,24 @@ export async function getServerSideProps(context) {
     where: {
       email: session.user.email,
     },
+    select: {
+      id: true,
+      email: true,
+      companyId: true,
+      name: true,
+    },
   });
 
-  const userId = user.id;
+  const company = await prisma.company.findUnique({
+    where: {
+      id: user.companyId,
+    },
+    select: {
+      id: true,
+      name: true,
+      domain: true,
+    },
+  });
 
   let jobs = await prisma.job.findMany({
     where: {
@@ -89,24 +105,27 @@ export async function getServerSideProps(context) {
     })),
   }));
 
-  console.log("debug jobs", jobs);
+  // console.log("debug jobs", jobs);
 
   return {
     props: {
+      user,
+      company,
       jobs,
-      companyId: user.companyId,
     },
   };
 }
 
-export default function JobsPage({ jobs, companyId }) {
+export default function JobsPage({ user, company, jobs }) {
   const router = useRouter();
+  const posthog = usePostHog();
+
+  posthog.identify(user.id, user);
+  posthog.group("company", user.companyId, company);
 
   const refreshData = () => {
     router.replace(router.asPath);
   };
-
-  console.log("debug jobs", jobs);
 
   return (
     <>
@@ -133,7 +152,7 @@ export default function JobsPage({ jobs, companyId }) {
             <JobTable
               jobs={jobs}
               refetchJobs={refreshData}
-              companyId={companyId}
+              companyId={user.companyId}
             />
           </div>
         </div>

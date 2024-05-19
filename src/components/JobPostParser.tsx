@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/ui/spinner";
 import { Label } from "@/components/ui/label";
+import { usePostHog } from "posthog-js/react";
 
 interface JobPostParserProps {
   companyId: string;
@@ -10,6 +11,7 @@ interface JobPostParserProps {
 }
 
 const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
+  const posthog = usePostHog();
   const [jobPostText, setJobPostText] = useState("");
   const [loading, setLoading] = useState(false);
   const handleParseJobPost = async () => {
@@ -47,6 +49,12 @@ const JobPostParser = ({ companyId, onClose }: JobPostParserProps) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formattedParsedData),
+      });
+
+      posthog.capture("Job Added", {
+        company_id: companyId,
+        job_title: parsedData.job_title,
+        job_location: parsedData.job_location,
       });
 
       if (createResponse.ok) {

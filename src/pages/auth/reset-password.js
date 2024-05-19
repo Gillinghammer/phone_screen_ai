@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { usePostHog } from "posthog-js/react";
 
 const ResetPasswordPage = () => {
+  const posthog = usePostHog();
   const router = useRouter();
   const { token } = router.query;
   const [newPassword, setNewPassword] = useState("");
@@ -20,6 +22,7 @@ const ResetPasswordPage = () => {
         token,
         newPassword,
       });
+      posthog.capture("User Reset Password");
       setMessage(response.data.message);
       router.push("/auth/signin");
     } catch (error) {

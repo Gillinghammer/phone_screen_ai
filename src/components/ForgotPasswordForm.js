@@ -11,10 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { usePostHog } from "posthog-js/react";
 import Link from "next/link";
 import axios from "axios";
 
 export function ForgotPasswordForm() {
+  const posthog = usePostHog();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -27,6 +29,7 @@ export function ForgotPasswordForm() {
       const response = await axios.post("/api/auth/reset-password", { email });
 
       if (response.status === 200) {
+        posthog.capture("User Requested Password Reset Email");
         // Reset the form and show a success message
         setEmail("");
         toast({

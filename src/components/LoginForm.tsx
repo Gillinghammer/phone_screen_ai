@@ -14,8 +14,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { usePostHog } from "posthog-js/react";
 
 export function LoginForm() {
+  const posthog = usePostHog();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { data: session } = useSession();
@@ -51,6 +53,9 @@ export function LoginForm() {
       if (result?.error) {
         alert(result.error);
       } else {
+        posthog.capture("User Signed In", {
+          email: email,
+        });
         router.push("/jobs");
         toast({
           title: "Sign in successful",

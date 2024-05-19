@@ -4,8 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { usePostHog } from "posthog-js/react";
 
 const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
+  const posthog = usePostHog();
   const [jobDetails, setJobDetails] = useState(jobData);
   const [formErrors, setFormErrors] = useState({});
 
@@ -39,6 +41,7 @@ const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
 
   const handleAddQuestion = () => {
     if (jobDetails.interview_questions.length < 10) {
+      posthog.capture("Question Added");
       setJobDetails((prevDetails) => ({
         ...prevDetails,
         interview_questions: [...prevDetails.interview_questions, ""],
@@ -47,6 +50,7 @@ const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
   };
 
   const handleRemoveQuestion = (index) => {
+    posthog.capture("Question Removed");
     setJobDetails((prevDetails) => {
       const updatedQuestions = [...prevDetails.interview_questions];
       updatedQuestions.splice(index, 1);
@@ -113,6 +117,7 @@ const JobDetailsForm = ({ jobData, drawer, refreshData }) => {
         if (response.ok) {
           // Job updated successfully
           console.log("Job updated successfully");
+          posthog.capture("Job Updated");
           // Perform any necessary actions after successful update
           refreshData();
           drawer(false); // Close the drawer

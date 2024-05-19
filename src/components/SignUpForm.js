@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
+import { usePosthog } from "posthog-js/react";
 
 const validateEmail = (email) => {
   const re =
@@ -26,6 +27,7 @@ const validatePassword = (password) => {
 };
 
 export function SignUpForm() {
+  const posthog = usePosthog();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -83,6 +85,13 @@ export function SignUpForm() {
         if (res.ok) {
           // Create the user and associate with the company
           // Track the user signup event
+          posthog.capture("User signup", {
+            email: data.user.email,
+            name: data.user.name,
+            company: data.user.company,
+            domain: data.user.domain,
+          });
+
           track("User signup", {
             email: res.email,
             name: res.name,

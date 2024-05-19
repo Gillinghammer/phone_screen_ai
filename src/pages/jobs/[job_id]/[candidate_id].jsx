@@ -1,5 +1,5 @@
 // pages/jobs/[job_id]/[candidate_id].tsx
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import Layout from "../../../components/Layout";
@@ -27,6 +27,7 @@ import {
 import { useRouter } from "next/router";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
+import { usePostHog } from "posthog-js/react";
 
 const prisma = new PrismaClient();
 
@@ -81,32 +82,40 @@ export async function getServerSideProps(context) {
   };
 }
 
-async function updateCandidateStatus(candidateId, newStatus, refreshData) {
-  try {
-    const response = await fetch(`/api/candidates/${candidateId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status: newStatus }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update candidate status");
-    }
-
-    const updatedCandidate = await response.json();
-    console.log("Candidate updated:", updatedCandidate);
-    refreshData();
-  } catch (error) {
-    console.error("Error updating candidate status:", error);
-  }
-}
-
 export default function CandidateDetailPage({ phoneScreen, job }) {
+  const posthog = usePostHog();
   console.log("Phone Screen:", phoneScreen);
   const { toast } = useToast();
   const [isReScoring, setIsReScoring] = useState(false);
+
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    const audioElement = audioRef.current;
+
+    const handlePlay = () => {
+      posthog.capture("User Listened to Screen", {
+        candidate: phoneScreen.candidateId,
+        job: phoneScreen.jobTitle,
+        url: phoneScreen.recordingUrl,
+      });
+    };
+
+    if (audioElement) {
+      audioElement.addEventListener("play", handlePlay);
+    }
+
+    return () => {
+      if (audioElement) {
+        audioElement.removeEventListener("play", handlePlay);
+      }
+    };
+  }, [
+    phoneScreen.candidateId,
+    phoneScreen.jobTitle,
+    phoneScreen.recordingUrl,
+    posthog,
+  ]);
 
   const router = useRouter();
 
@@ -152,6 +161,11 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
       if (!response.ok) {
         throw new Error("Failed to re-score phone screen");
       }
+      posthog.capture("Score Recalculated", {
+        callId: phoneScreen.callId,
+        jobId: phoneScreen.jobId,
+        phoneScreenId: phoneScreen.id,
+      });
 
       const updatedPhoneScreen = await response.json();
       console.log("Phone screen re-scored:", updatedPhoneScreen);
@@ -160,6 +174,31 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
       console.error("Error re-scoring phone screen:", error);
     }
     setIsReScoring(false);
+  }
+
+  async function updateCandidateStatus(candidateId, newStatus, refreshData) {
+    try {
+      const response = await fetch(`/api/candidates/${candidateId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update candidate status");
+      }
+      posthog.capture("Candidate Status Updated", {
+        candidate: candidateId,
+        status: newStatus,
+      });
+      const updatedCandidate = await response.json();
+      console.log("Candidate updated:", updatedCandidate);
+      refreshData();
+    } catch (error) {
+      console.error("Error updating candidate status:", error);
+    }
   }
 
   function renderTranscript(conversation) {
@@ -341,6 +380,7 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                   <TabsContent value="listen">
                     <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
                       <audio
+                        ref={audioRef}
                         controls
                         src={phoneScreen.recordingUrl}
                         className="w-full mb-2 md:mb-0"

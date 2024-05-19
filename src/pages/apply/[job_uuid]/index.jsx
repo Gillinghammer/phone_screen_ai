@@ -19,9 +19,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 const prisma = new PrismaClient();
+import { usePostHog } from "posthog-js/react";
 
 const JobPage = ({ job }) => {
   const { setTheme } = useTheme();
+  const { posthog } = usePostHog();
   const [applicantDetails, setApplicantDetails] = useState({
     name: "",
     email: "",
@@ -83,6 +85,12 @@ const JobPage = ({ job }) => {
 
         if (response.ok) {
           setCallInitiated(true);
+          posthog.capture("Phone Screen Started", {
+            ...applicantDetails,
+            jobId: job.id,
+            jobTitle: job.jobTitle,
+            company: job.company,
+          });
           track("Candidate application", {
             ...applicantDetails,
             jobId: job.id,

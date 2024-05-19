@@ -1,4 +1,5 @@
 // pages/api/analyze-call.js
+import { PostHog } from "posthog-node";
 export const dynamic = "force-dynamic"; // static by default, unless reading the request
 // This function can run for a maximum of 5 seconds
 export const config = {
@@ -16,6 +17,9 @@ import axios from "axios";
 const prisma = new PrismaClient();
 
 export default async function analyzeCall(req, res) {
+  const client = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+    host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+  });
   if (req.method === "POST") {
     const { callId, jobId, phoneScreenId } = req.body;
 
@@ -25,7 +29,13 @@ export default async function analyzeCall(req, res) {
       // Fetch the job and its interview questions
       const job = await prisma.job.findUnique({
         where: { id: parseInt(jobId) },
-        select: { interviewQuestions: true, jobTitle: true, seniority: true },
+        select: {
+          interviewQuestions: true,
+          jobTitle: true,
+          seniority: true,
+          userId: true,
+          companyId: true,
+        },
       });
 
       if (!job) {
@@ -46,7 +56,6 @@ export default async function analyzeCall(req, res) {
       );
 
       const alignedTranscript = response.data.transcripts;
-      console.log("Transcript:", alignedTranscript);
       const msg = await anthropic.messages.create({
         model: "claude-3-sonnet-20240229", // "claude-3-opus-20240229", //"claude-3-haiku-20240307"
         max_tokens: 4096,
@@ -179,7 +188,23 @@ export default async function analyzeCall(req, res) {
         },
       });
 
-      //   console.log("Updated phone screen:", updatedPhoneScreen);
+      client.capture({
+        distinctId: job.userId,
+        event: "Candidate Screen Completed",
+        properties: {
+          companyId: job.companyId,
+          jobId: job.id,
+          userId: job.userId,
+          title: job.jobTitle,
+          location: job.jobLocation,
+          duration: updatedPhoneScreen.correctedDuration,
+          score: qualificationScore,
+          price: updatedPhoneScreen.price,
+          status: updatedPhoneScreen.status,
+          fromNumber: updatedPhoneScreen.from,
+          toNumber: updatedPhoneScreen.to,
+        },
+      });
 
       // Send the analysis result back to the client
       res.status(200).json(updatedPhoneScreen);

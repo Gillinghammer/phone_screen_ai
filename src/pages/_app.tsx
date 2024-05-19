@@ -6,6 +6,19 @@ import { Inter as FontSans } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
+import posthog from "posthog-js";
+import { PostHogProvider } from "posthog-js/react";
+
+if (typeof window !== "undefined") {
+  // checks that we are client-side
+  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+    api_host:
+      process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
+    loaded: (posthog) => {
+      if (process.env.NODE_ENV === "development") posthog.debug(); // debug mode in development
+    },
+  });
+}
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -32,7 +45,9 @@ function MyApp({
             fontSans.variable
           )}
         >
-          <Component {...pageProps} />
+          <PostHogProvider client={posthog}>
+            <Component {...pageProps} />
+          </PostHogProvider>
           <Analytics />
           <Toaster />
         </div>
