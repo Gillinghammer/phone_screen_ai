@@ -1,14 +1,7 @@
 // email-template.js
 export function generateEmailTemplate(variables) {
-  const {
-    companyName,
-    subject,
-    toEmail,
-    fromEmail,
-    ctaLink,
-    ctaMessage,
-    content,
-  } = variables;
+  const { subject, toEmail, fromEmail, ctaLink, ctaMessage, content } =
+    variables;
 
   return `
     <!DOCTYPE html>
@@ -67,7 +60,7 @@ export function generateEmailTemplate(variables) {
       <div class="container">
         <div class="header">
           <a href="https://phonescreen.ai">
-            <img class="logo" src="https://phonescreen.ai/small-logo.png" alt="${companyName}" />
+            <img class="logo" src="https://phonescreen.ai/small-logo.png" alt="PhoneScreen.AI" />
           </a>
         </div>
         <div class="content">

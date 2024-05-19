@@ -1,5 +1,7 @@
 // pages/api/analyze-call.js
 import { PostHog } from "posthog-node";
+import { sendEmail } from "../../../lib/utils";
+import { generateEmailTemplate } from "@/components/email-template";
 export const dynamic = "force-dynamic"; // static by default, unless reading the request
 // This function can run for a maximum of 5 seconds
 export const config = {
@@ -188,6 +190,14 @@ export default async function analyzeCall(req, res) {
         },
       });
 
+      const candidate = await prisma.candidate.findUnique({
+        where: { id: updatedPhoneScreen.candidateId },
+        select: {
+          name: true,
+          email: true,
+        },
+      });
+
       client.capture({
         distinctId: job.userId,
         event: "Candidate Screen Completed",
@@ -201,9 +211,24 @@ export default async function analyzeCall(req, res) {
           score: qualificationScore,
           price: updatedPhoneScreen.price,
           status: updatedPhoneScreen.status,
+          candidate: candidate.name,
+          email: candidate.email,
           fromNumber: updatedPhoneScreen.from,
           toNumber: updatedPhoneScreen.to,
         },
+      });
+
+      await sendEmail({
+        to: candidate.email,
+        subject: "Password Reset",
+        text: "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
+        html: generateEmailTemplate({
+          subject: `Phone Screen completed for the ${job.jobTitle} role`,
+          toEmail: candidate.email,
+          fromEmail: "no-reply@phonescreen.ai",
+          content:
+            "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
+        }),
       });
 
       // Send the analysis result back to the client
