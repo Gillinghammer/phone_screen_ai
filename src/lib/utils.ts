@@ -11,19 +11,17 @@ const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 interface SendEmailParams {
   to: string;
   subject: string;
-  text: string;
   html: string;
 }
-export async function sendEmail({ to, subject, text, html }: SendEmailParams): Promise<void> {
+export async function sendEmail({to, subject, html }: SendEmailParams): Promise<void> {
+  console.log('Sending email:', { to, subject, html });
   try {
     const emailParams = {
-      from: 'no-reply@phonescreen.ai',
+      from: "no-reply@phonescreen.ai",
       to,
       subject,
-      text,
-      html,
+      html
     };
-
     await resend.emails.send(emailParams);
   } catch (error) {
     console.error('Error sending email:', error);

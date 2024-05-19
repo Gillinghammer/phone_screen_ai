@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { sendEmail } from "../../../lib/utils";
+import { generateEmailTemplate } from "@/components/email-template";
 
 const prisma = new PrismaClient();
 
@@ -31,11 +32,26 @@ export default async function handler(req, res) {
 
       // Send the password reset email
       const resetUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password?token=${resetToken}`;
+
+      const subject = "Password Reset";
+
+      const emailContent = generateEmailTemplate({
+        companyName: "PhoneScreen.ai",
+        subject,
+        toEmail: email,
+        ctaLink: resetUrl,
+        ctaMessage: "Reset Password",
+        content: `
+      <p>We received a request to reset your password. If you didn't make this request, you can safely ignore this email.</p>
+      <p>To reset your password, click the button below:</p>
+    `,
+      });
+
       await sendEmail({
         to: email,
         subject: "Password Reset",
         text: `Click the following link to reset your password: ${resetUrl}`,
-        html: `<p>Click <a href="${resetUrl}">here</a> to reset your password.</p>`,
+        html: emailContent,
       });
 
       return res.status(200).json({ message: "Password reset email sent" });
