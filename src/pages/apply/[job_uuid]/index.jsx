@@ -23,7 +23,7 @@ import { usePostHog } from "posthog-js/react";
 
 const JobPage = ({ job }) => {
   const { setTheme } = useTheme();
-  const { posthog } = usePostHog();
+  const posthog = usePostHog();
   const [applicantDetails, setApplicantDetails] = useState({
     name: "",
     email: "",
