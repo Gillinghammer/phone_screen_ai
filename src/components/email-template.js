@@ -33,7 +33,8 @@ export function generateEmailTemplate(variables) {
           margin-bottom: 20px;
         }
         .logo {
-          width: 365px;
+          width: 154px;
+          max-width: 50%;
         }
         .content {
           margin-bottom: 20px;
