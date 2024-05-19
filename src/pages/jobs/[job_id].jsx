@@ -494,7 +494,7 @@ export default function JobDetailPage({ job }) {
                       </Badge>
                     </SelectItem>
                     <SelectItem value="accepted">
-                      <Badge className="bg-green-200 text-black">
+                      <Badge className="bg-purple-200 text-black">
                         accepted
                       </Badge>
                     </SelectItem>
@@ -560,7 +560,7 @@ export default function JobDetailPage({ job }) {
                       ? "bg-red-200 text-black"
                       : candidate.status.toLowerCase() === "open"
                       ? ""
-                      : "bg-green-200 text-black";
+                      : "bg-purple-200 text-black";
                   return (
                     <TableRow key={candidate.id}>
                       <TableCell className="w-[50px]">

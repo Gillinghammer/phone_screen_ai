@@ -20,7 +20,7 @@ export default function Layout({ children }) {
             <img
               src="/small-logo.png"
               alt="PhoneScreen.AI Logo"
-              className="h-8"
+              className="h-4"
             />
           </Link>
           <nav>

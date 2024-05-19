@@ -3,6 +3,8 @@ import { useState } from "react";
 import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import Layout from "../../../components/Layout";
+import { PlayIcon, QuoteIcon } from "@radix-ui/react-icons";
+
 import Head from "next/head";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -13,6 +15,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -159,6 +162,38 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
     setIsReScoring(false);
   }
 
+  function renderTranscript(conversation) {
+    const formattedTranscript = conversation
+      .replace(/assistant:/g, "Recruiter:")
+      .replace(/user:/g, "Candidate:")
+      .split(/(?=Recruiter:|Candidate:|agent-action:)/g);
+
+    const transcriptElements = formattedTranscript.map((line, index) => {
+      let [label, ...messageParts] = line.split(" ");
+      let message = messageParts.join(" ");
+
+      let badgeColor;
+      if (label === "Recruiter:") {
+        badgeColor = "bg-gray-500";
+      } else if (label === "Candidate:") {
+        badgeColor = "bg-indigo-500";
+      } else {
+        badgeColor = "bg-gray-500";
+      }
+
+      return (
+        <p key={index} className="my-4">
+          <Badge className={`${badgeColor} text-white`}>
+            {label.slice(0, -1)}
+          </Badge>
+          {" " + message}
+        </p>
+      );
+    });
+
+    return transcriptElements;
+  }
+
   return (
     <>
       <Head>
@@ -292,24 +327,40 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
             </div>
             {phoneScreen.recordingUrl && (
               <Card className="mb-6 p-4 shadow">
-                <h3 className="text-xl font-bold mb-4">
-                  Listen to Phone Screen
-                </h3>
-                <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
-                  <audio
-                    controls
-                    src={phoneScreen.recordingUrl}
-                    className="w-full mb-2 md:mb-0"
-                  >
-                    Your browser does not support the audio element.
-                  </audio>
-                  <div>
-                    <p className="text-sm text-gray-500">Duration:</p>
-                    <p className="text-lg">
-                      {formatCallDuration(phoneScreen.callLength)}
-                    </p>
-                  </div>
-                </div>
+                <Tabs defaultValue="listen" className="mb-4">
+                  <TabsList>
+                    <TabsTrigger value="listen">
+                      <PlayIcon className="w-4 h-4 mr-2" />
+                      Listen to phone screen
+                    </TabsTrigger>
+                    <TabsTrigger value="read">
+                      <QuoteIcon className="w-4 h-4 mr-2" />
+                      Read the transcript
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="listen">
+                    <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+                      <audio
+                        controls
+                        src={phoneScreen.recordingUrl}
+                        className="w-full mb-2 md:mb-0"
+                      >
+                        Your browser does not support the audio element.
+                      </audio>
+                      <div>
+                        <p className="text-sm text-gray-500">Duration:</p>
+                        <p className="text-lg">
+                          {formatCallDuration(phoneScreen.callLength)}
+                        </p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="read">
+                    <div className="prose">
+                      {renderTranscript(phoneScreen.concatenatedTranscript)}
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </Card>
             )}
             <div className="">
