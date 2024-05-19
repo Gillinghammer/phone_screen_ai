@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { track } from "@vercel/analytics";
+import { usePostHog } from "posthog-js/react";
 
 const PilotForm = () => {
+  const posthog = usePostHog();
   const [formState, setFormState] = useState({
     company: "",
     firstName: "",
@@ -25,6 +27,7 @@ const PilotForm = () => {
     if (response.ok) {
       console.log("Application submitted", data);
       track("Pilot submission", data);
+      posthog.capture("Lead Generated", data);
       // Handle success case
       setFormState({
         company: "",
