@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { sendEmail } from "../../lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -71,27 +70,6 @@ export default async function handle(req, res) {
     return res.status(200).json(candidate);
   } catch (error) {
     console.error("An error occurred:", error);
-    // Send email to candidate (alias) function sendEmail({ to, subject, text, html }: SendEmailParams):
-    await sendEmail({
-      to: email,
-      subject: "📞Oops we ran into an error with your phone screen",
-      html: `<!DOCTYPE html>
-              <html lang="en">
-              <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              </head>
-              <body>
-                <p>Hi ${name},</p>
-                <p>We apologize there was an error conducting your phone screen for ${job.jobTitle}. Please wait for a few minutes and try again.</p>
-                
-                <p>If the issue persists, please reach out to your point of contact for support.</p>
-                
-                <p>Best regards,<br>
-                PhoneScreen.AI Team</p>
-              </body>
-              </html>`,
-    });
     return res
       .status(500)
       .json({ message: "Internal server error", error: error.message });

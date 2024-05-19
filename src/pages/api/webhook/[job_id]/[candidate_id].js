@@ -108,29 +108,6 @@ export default async function webhook(req, res) {
           phoneScreenId: phoneScreen.id,
         }
       );
-
-      // Send email to candidate (alias) function sendEmail({ to, subject, text, html }: SendEmailParams):
-      await sendEmail({
-        to: variables.candidateEmail,
-        subject: "📞Thank you for completing the phone screen",
-        html: `<!DOCTYPE html>
-              <html lang="en">
-              <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              </head>
-              <body>
-                <p>Hi ${variables.candidateName},</p>
-                <p>Thank you for taking the time to complete the phone screen for the ${variables.job_title} position.</p>
-                
-                <p>We've shared your responses with the hiring team. If you're shortlisted for the role the team will be in touch with next steps.</p>
-                
-                <p>Best regards,<br>
-                PhoneScreen.AI Team</p>
-              </body>
-              </html>`,
-      });
-
       // Send a response back to acknowledge receipt of the data
       res.status(200).json({
         message: "Webhook data received and stored successfully",

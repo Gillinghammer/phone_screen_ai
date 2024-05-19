@@ -15,11 +15,11 @@ import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 
 const prisma = new PrismaClient();
+const client = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+  host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+});
 
 export default async function analyzeCall(req, res) {
-  const client = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-    host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-  });
   if (req.method === "POST") {
     const { callId, jobId, phoneScreenId } = req.body;
 
