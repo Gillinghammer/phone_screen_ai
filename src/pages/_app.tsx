@@ -10,18 +10,17 @@ import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 
 if (typeof window !== "undefined") {
-  // checks that we are client-side
-  const apiKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-  if (apiKey) {
-    posthog.init(apiKey, {
+  const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  if (posthogKey) {
+    posthog.init(posthogKey, {
       api_host:
         process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
       loaded: (posthog) => {
-        if (process.env.NODE_ENV === "development") posthog.debug(); // debug mode in development
+        console.log("PostHog loaded:", posthog);
       },
     });
   } else {
-    console.warn("PostHog API key is missing.");
+    console.error("PostHog key is not defined");
   }
 }
 
