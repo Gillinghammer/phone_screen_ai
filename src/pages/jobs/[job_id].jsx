@@ -302,7 +302,11 @@ export default function JobDetailPage({ job }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ candidateIds: selectedCandidates, status }),
+        body: JSON.stringify({
+          candidateIds: selectedCandidates,
+          status,
+          job: job,
+        }),
       });
       toast({
         title: "Candidate status updated",

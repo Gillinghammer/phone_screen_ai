@@ -233,12 +233,14 @@ export default async function analyzeCall(req, res) {
         );
       }
 
+      const subject = `Phone screen completed for the ${job.jobTitle} role`;
+
       await sendEmail({
         to: candidate.email,
-        subject: `Phone Screen completed for the ${job.jobTitle} role`,
+        subject: subject,
         text: "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
         html: generateEmailTemplate({
-          subject: `Phone Screen completed for the ${job.jobTitle} role`,
+          subject: subject,
           toEmail: candidate.email,
           fromEmail: "no-reply@phonescreen.ai",
           content:
