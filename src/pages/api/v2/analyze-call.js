@@ -17,9 +17,6 @@ import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 
 const prisma = new PrismaClient();
-const client = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-  host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-});
 
 export default async function analyzeCall(req, res) {
   if (req.method === "POST") {
@@ -43,7 +40,6 @@ export default async function analyzeCall(req, res) {
       if (!job) {
         return res.status(404).json({ message: "Job not found" });
       }
-      console.log("Job:", job);
 
       // Prepare the questions array for the 3rd party API request
       const questions = job.interviewQuestions?.set;
@@ -117,7 +113,7 @@ export default async function analyzeCall(req, res) {
       });
 
       const questionsAndAnswers = JSON5.parse(`[${msg.content[0].text}`);
-      console.log(questionsAndAnswers);
+      console.log({ questionsAndAnswers });
 
       const scorePromises = questionsAndAnswers.map(async (qa) => {
         const { question, answer } = qa;
@@ -128,31 +124,58 @@ export default async function analyzeCall(req, res) {
           system: `You're a professional recruiter. 
             You're conducting a phone screen for a ${job.jobTitle}, a ${job.seniority} role. 
             Based on the provided candidate answer to the interview questions, you will score each answer on a scale of 0 to 100, where 0 is the worst possible answer and 100 is the best possible answer.
-            You'll provide a json object in the following format: {score: integer }
+            You'll provide a json object in the following format: { score: integer, is_binary_question: boolean, reasoning: string }
             `,
           messages: [
             {
               role: "user",
               content: `
-                Consider the following interview question, and determine if it is a simply yes or no binary question or if it is asking for the candidate to provide specific examples of their experience. Simply stating they have a number of years of experience with a technology or skill is not enough to score highly on this question.
+                Review the following interview question and the candidate's supplied answer below.
+
                 <interview_question>
                 ${question}
                 </interview_question>
 
-                <is_binary_question></is_binary_question> // true or false
-                
-                To help determine the most accurate score possible, take a moment to think through what the perfect, avaerage, and bad answers to this question might look like. 
-                We want to make sure a candidate cannot just make up an answer to a question and get a high score, so please make sure to consider the context of the question and the role.
-
-                <example_perfect_answer></example_perfect_answer> // score 90-100
-                <example_average_answer></example_average_answer> // score 50-70
-                <example_bad_answer></example_bad_answer> // score 0-20
-
-                With these in mind, consider the candidate's answer and score it accordingly.
-    
                 <candidate_answer>
                 ${answer}
                 </candidate_answer>
+
+                Some questions are simple yes or no questions which require a binary yes or no answer. Think about the <interview_question> and determine if it is a binary question.
+                <is_binary_question></is_binary_question> // TRUE or FALSE
+
+                Examples of binary questions:
+                - "Are you authorized to work in the United States?"
+                - "Have you a license to operate a forklift?"
+                - "Do you have a degree in Computer Science?"
+                - "Are you able to lift 50 pounds?"
+                - "Are you ok with a day rate of $200?"
+                
+                <score_guidelines>
+                If <is_binary_question> is TRUE, provide a score of 100 if the candidate answered correctly and a score of 0 if the candidate answered incorrectly.
+                If <is_binary_question> is FALSE, provide a score between 0 and 100 based on the quality of the candidate's answer. A score of 0 indicates the candidate failed to provide an answer. A score of 100 indicates the candidate provided a perfect answer, demonstrating a deep understanding of the topic and providing specific examples to support their answer.
+                Sometimes a candidate may not have a good answer and attempt to pivot the conversation or provide vague imprecise answers. In these cases, you should provide a score that reflects the candidate's lack of understanding or inability to provide a clear answer.
+                </score_guidelines>
+
+                <scoring_examples>
+                Perfect Answer:
+                <sample_question> "What is your experience with React?" </sample_question>
+                <sample_answer> "I have 5 years of experience with React. I have worked on several projects including a large e-commerce platform where I was responsible for building the front-end using React and Redux. I also have experience with Next.js and Gatsby." </sample_answer>
+                <sample_score> 100 </sample_score>
+                Average Answer:
+                <sample_question> "What is your experience with React?" </sample_question>
+                <sample_answer> "I have some experience with React. I have worked on a few projects using React and Redux." </sample_answer>
+                <sample_score> 50 </sample_score>
+                Poor Answer:
+                <sample_question> "What is your experience with React?" </sample_question>
+                <sample_answer> "I have no experience with React." </sample_answer>
+                <sample_score> 0 </sample_score>
+                </scoring_examples>
+
+
+                Take a moment to think about the <interview_question>, <candidate_answer>, and <is_binary_question> and the provided <score_guidelines> and determine the score and provide your <reasoning> for the score.
+
+                <score></score> // Provide a score between 0 and 100
+                <reasoning></reasoning> // Provide a brief reasoning for the score
 
                 Now provide the score for the candidate's answer:
             `,
@@ -164,7 +187,6 @@ export default async function analyzeCall(req, res) {
           ],
         });
         console.log("Score:", score);
-        // console.log("{score:", score.content[0].text);
 
         return JSON5.parse(`{score: ${score.content[0].text}`);
       });

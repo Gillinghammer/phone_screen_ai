@@ -14,7 +14,7 @@ interface SendEmailParams {
   html: string;
 }
 export async function sendEmail({to, subject, html }: SendEmailParams): Promise<void> {
-  console.log('Sending email:', { to, subject, html });
+  // console.log('Sending email:', { to, subject, html });
   try {
     const emailParams = {
       from: "no-reply@phonescreen.ai",
