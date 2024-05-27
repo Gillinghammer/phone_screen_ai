@@ -22,8 +22,6 @@ export default async function analyzeCall(req, res) {
   if (req.method === "POST") {
     const { callId, jobId, phoneScreenId } = req.body;
 
-    console.log("Request body:", req.body);
-
     try {
       // Fetch the job and its interview questions
       const job = await prisma.job.findUnique({
@@ -113,7 +111,6 @@ export default async function analyzeCall(req, res) {
       });
 
       const questionsAndAnswers = JSON5.parse(`[${msg.content[0].text}`);
-      console.log({ questionsAndAnswers });
 
       const scorePromises = questionsAndAnswers.map(async (qa) => {
         const { question, answer } = qa;
@@ -186,13 +183,18 @@ export default async function analyzeCall(req, res) {
             },
           ],
         });
-        console.log("Score:", score);
 
-        return JSON5.parse(`{score: ${score.content[0].text}`);
+        const scoreText = score.content[0].text;
+        const parsedScore = JSON5.parse(`{"score": ` + scoreText);
+        return {
+          score: parsedScore.score,
+          is_binary_question: parsedScore.is_binary_question,
+          reasoning: parsedScore.reasoning,
+        };
       });
 
       const scores = await Promise.all(scorePromises);
-
+      console.log("Scores:", scores);
       // Update the PhoneScreen with the analysis result
       const qualificationScore =
         scores.reduce((acc, answer) => acc + (answer?.score ?? 0), 0) /
@@ -206,11 +208,15 @@ export default async function analyzeCall(req, res) {
             question: qa.question,
             answer: qa.answer,
             score: scores[i].score,
+            isBinaryQuestion: scores[i].is_binary_question,
+            reasoning: scores[i].reasoning,
           })),
           qualificationScore,
           status: qualificationScore < 1 ? "call failed" : undefined,
         },
       });
+
+      console.log("Updated phone screen:", updatedPhoneScreen);
 
       const candidate = await prisma.candidate.findUnique({
         where: { id: updatedPhoneScreen.candidateId },

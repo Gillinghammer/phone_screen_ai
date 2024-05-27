@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import Layout from "../../../components/Layout";
 import { PlayIcon, QuoteIcon } from "@radix-ui/react-icons";
-
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 import Head from "next/head";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -127,10 +127,12 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
 
   let questions = [];
   let answers = [];
+  let reasoning = [];
   if (phoneScreen.analysisV2?.length > 0) {
     phoneScreen.analysisV2.forEach((qa) => {
       questions.push([qa.question, ""]);
       answers.push({ answer: qa.answer, score: qa.score || 0 });
+      reasoning.push(qa.reasoning || "");
     });
   } else {
     questions = phoneScreen.analysis?.questions;
@@ -139,6 +141,7 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
 
   console.log("Questions:", questions);
   console.log("Answers:", answers);
+  console.log("Reasoning:", reasoning);
 
   async function handleReScore() {
     setIsReScoring(true);
@@ -417,9 +420,9 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
                         className="flex-1 mb-4 md:mb-0 md:mr-4"
                       >
                         <AccordionItem value={`item-${index}`}>
-                          <AccordionTrigger className="text-left">
+                          <AccordionTrigger className="text-left hover:no-underline">
                             <div className="flex flex-col items-start">
-                              <div className="text-sm mb-1">
+                              <div className="text-sm font-bold mb-1">
                                 Question {index + 1}
                               </div>
                               <p className="text-base md:text-lg mb-1">
@@ -429,9 +432,32 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
                           </AccordionTrigger>
                           <AccordionContent>
                             <Card className="bg-gray-50 p-4 my-2">
-                              <p className="text-base md:text-lg">
-                                {answers[index]?.answer || "N/A"}
-                              </p>
+                              <div className="relative group">
+                                <p className="text-base md:text-lg">
+                                  {answers[index]?.answer || "N/A"}
+                                </p>
+                                {reasoning[index] && (
+                                  <div className="mt-4">
+                                    <Accordion type="single" collapsible>
+                                      <AccordionItem
+                                        value={`reasoning-${index}`}
+                                      >
+                                        <AccordionTrigger className="flex items-start space-x-2 text-sm text-gray-600 hover:text-gray-900 focus:outline-none hover:no-underline">
+                                          <div className="flex">
+                                            <InfoCircledIcon className="w-4 h-4 mr-2" />
+                                            <span>Understand this score</span>
+                                          </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                          <p className="text-sm mt-2">
+                                            {reasoning[index]}
+                                          </p>
+                                        </AccordionContent>
+                                      </AccordionItem>
+                                    </Accordion>
+                                  </div>
+                                )}
+                              </div>
                             </Card>
                           </AccordionContent>
                         </AccordionItem>
