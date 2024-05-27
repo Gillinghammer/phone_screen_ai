@@ -78,11 +78,12 @@ export async function getServerSideProps(context) {
     props: {
       phoneScreen: JSON.parse(JSON.stringify(phoneScreen)),
       job: JSON.parse(JSON.stringify(job)),
+      role: session.user.id == 1 ? "admin" : "user",
     },
   };
 }
 
-export default function CandidateDetailPage({ phoneScreen, job }) {
+export default function CandidateDetailPage({ phoneScreen, job, role }) {
   const posthog = usePostHog();
   console.log("Phone Screen:", phoneScreen);
   const { toast } = useToast();
@@ -311,13 +312,15 @@ export default function CandidateDetailPage({ phoneScreen, job }) {
                 </div>
               </div>
               <div className="text-center">
-                <Button
-                  onClick={handleReScore}
-                  variant="ghost"
-                  disabled={isReScoring}
-                >
-                  {isReScoring ? "Recalculating..." : "Recalculate Score"}
-                </Button>
+                {role === "admin" && (
+                  <Button
+                    onClick={handleReScore}
+                    variant="ghost"
+                    disabled={isReScoring}
+                  >
+                    {isReScoring ? "Recalculating..." : "Recalculate Score"}
+                  </Button>
+                )}
                 <div className="text-4xl md:text-6xl font-bold">
                   {phoneScreen.qualificationScore.toFixed(2) ?? 0}
                 </div>
