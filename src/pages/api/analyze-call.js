@@ -95,8 +95,6 @@ export default async function analyzeCall(req, res) {
         },
       });
 
-      console.log("Updated phone screen:", updatedPhoneScreen);
-
       // Send the analysis result back to the client
       res.status(200).json(updatedPhoneScreen);
     } catch (error) {

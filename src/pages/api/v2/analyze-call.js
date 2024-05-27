@@ -194,7 +194,6 @@ export default async function analyzeCall(req, res) {
       });
 
       const scores = await Promise.all(scorePromises);
-      console.log("Scores:", scores);
       // Update the PhoneScreen with the analysis result
       const qualificationScore =
         scores.reduce((acc, answer) => acc + (answer?.score ?? 0), 0) /
@@ -215,8 +214,6 @@ export default async function analyzeCall(req, res) {
           status: qualificationScore < 1 ? "call failed" : undefined,
         },
       });
-
-      console.log("Updated phone screen:", updatedPhoneScreen);
 
       const candidate = await prisma.candidate.findUnique({
         where: { id: updatedPhoneScreen.candidateId },
