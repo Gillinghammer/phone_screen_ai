@@ -432,6 +432,28 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
                     <div className="prose">
                       {renderTranscript(phoneScreen.concatenatedTranscript)}
                     </div>
+                    <button
+                      className="mt-4 border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                      onClick={() => {
+                        const element = document.createElement("a");
+                        const file = new Blob(
+                          [phoneScreen.concatenatedTranscript],
+                          {
+                            type: "text/plain",
+                          }
+                        );
+                        element.href = URL.createObjectURL(file);
+                        element.download = phoneScreen.candidate.name + ".txt";
+                        document.body.appendChild(element);
+                        element.click();
+                        document.body.removeChild(element);
+                      }}
+                    >
+                      <div className="flex text-sm">
+                        <DownloadIcon className="w-4 h-4 mr-2 mt-0" />
+                        Transcript
+                      </div>
+                    </button>
                   </TabsContent>
                 </Tabs>
               </Card>
@@ -465,7 +487,7 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
                 >
                   <div className="flex text-sm">
                     <DownloadIcon className="w-4 h-4 mr-2 mt-0" />
-                    CSV download
+                    Screen as CSV
                   </div>
                 </button>
               </div>
