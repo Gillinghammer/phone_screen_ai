@@ -3,8 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import Layout from "../../../components/Layout";
-import { PlayIcon, QuoteIcon } from "@radix-ui/react-icons";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
+import {
+  PlayIcon,
+  QuoteIcon,
+  InfoCircledIcon,
+  DownloadIcon,
+} from "@radix-ui/react-icons";
 import Head from "next/head";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -399,8 +403,20 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
                           {formatCallDuration(phoneScreen.callLength)}
                         </p>
                       </div>
+                      <a
+                        href={phoneScreen.recordingUrl}
+                        target="_blank"
+                        className="mt-2 md:mt-0 border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                        download={phoneScreen.candidate.name + ".mp3"}
+                      >
+                        <div className="flex text-sm">
+                          <DownloadIcon className="w-4 h-4 mr-2 mt-0" />
+                          Recording
+                        </div>
+                      </a>
                     </div>
                   </TabsContent>
+
                   <TabsContent value="read">
                     <div className="prose">
                       {renderTranscript(phoneScreen.concatenatedTranscript)}
