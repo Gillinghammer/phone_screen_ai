@@ -209,6 +209,17 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
     }
   }
 
+  function generateCSV(questions, answers, reasoning) {
+    const header = "Question,Answer,Score,Reasoning\n";
+    const rows = questions.map((question, index) => {
+      const answer = answers[index]?.answer || "";
+      const score = answers[index]?.score || 0;
+      const reason = reasoning[index] || "";
+      return `"${question[0]}","${answer}",${score},"${reason}"`;
+    });
+    return header + rows.join("\n");
+  }
+
   function renderTranscript(conversation) {
     const formattedTranscript = conversation
       .replace(/assistant:/g, "Recruiter:")
@@ -426,6 +437,38 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
               </Card>
             )}
             <div className="">
+              <div className="mb-6">
+                <button
+                  onClick={() => {
+                    const csv = generateCSV(questions, answers, reasoning);
+                    const blob = new Blob([csv], {
+                      type: "text/csv;charset=utf-8;",
+                    });
+                    const link = document.createElement("a");
+                    if (link.download !== undefined) {
+                      const url = URL.createObjectURL(blob);
+                      link.setAttribute("href", url);
+                      link.setAttribute(
+                        "download",
+                        `candidate_answers_${phoneScreen.candidate.name.replace(
+                          / /g,
+                          "_"
+                        )}.csv`
+                      );
+                      link.style.visibility = "hidden";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }
+                  }}
+                  className="inline-block mt-2 md:mt-0 border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                >
+                  <div className="flex text-sm">
+                    <DownloadIcon className="w-4 h-4 mr-2 mt-0" />
+                    CSV download
+                  </div>
+                </button>
+              </div>
               {questions &&
                 questions.map((question, index) => (
                   <div key={index} className="mb-6">
