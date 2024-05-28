@@ -28,6 +28,20 @@ export default function Layout({ children }) {
               {session && (
                 <>
                   <li>
+                    <Link href="/dashboard">
+                      <span
+                        className={cn(
+                          "hover:text-primary",
+                          isActive("/dashboard")
+                            ? "text-primary"
+                            : "text-foreground"
+                        )}
+                      >
+                        Dashboard
+                      </span>
+                    </Link>
+                  </li>
+                  <li>
                     <Link href="/jobs">
                       <span
                         className={cn(

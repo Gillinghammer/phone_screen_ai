@@ -59,6 +59,7 @@
     "react-phone-number-input": "^3.3.12",
     "react-simple-player": "^1.1.0",
     "react-slick": "^0.30.2",
+    "recharts": "^2.12.7",
     "resend": "^3.2.0",
     "slick-carousel": "^1.8.1",
     "tailwind-merge": "^2.2.2",
