@@ -2,6 +2,8 @@
 import { PostHog } from "posthog-node";
 import { sendEmail } from "../../../lib/utils";
 import { generateEmailTemplate } from "@/components/email-template";
+import stripe from "../../../lib/stripe";
+
 export const dynamic = "force-dynamic"; // static by default, unless reading the request
 // This function can run for a maximum of 5 seconds
 export const config = {
@@ -244,34 +246,45 @@ export default async function analyzeCall(req, res) {
         },
       };
 
-      try {
+      const company = await prisma.company.findUnique({
+        where: { id: job.companyId },
+        select: {
+          stripeCustomerId: true,
+        },
+      });
+
+      // if updatedPhoneScreen.status === "call failed" then we don't want to create a meter event
+      if (updatedPhoneScreen.status !== "call failed") {
+        const meterEvent = await stripe.billing.meterEvents.create({
+          event_name: "completed_screen",
+          payload: {
+            value: "1",
+            stripe_customer_id: company.stripeCustomerId,
+          },
+        });
+        console.log("Meter event created:", meterEvent);
+
         await axios.post("https://app.posthog.com/capture/", captureEvent, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-      } catch (err) {
-        console.error("PostHog had an error!", err);
-        console.error(
-          "PostHog had an error: ",
-          err?.response?.data || "Unknown"
-        );
-      }
 
-      const subject = `Phone screen completed for the ${job.jobTitle} role`;
+        const subject = `Phone screen completed for the ${job.jobTitle} role`;
 
-      await sendEmail({
-        to: candidate.email,
-        subject: subject,
-        text: "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
-        html: generateEmailTemplate({
+        await sendEmail({
+          to: candidate.email,
           subject: subject,
-          toEmail: candidate.email,
-          fromEmail: "no-reply@phonescreen.ai",
-          content:
-            "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
-        }),
-      });
+          text: "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
+          html: generateEmailTemplate({
+            subject: subject,
+            toEmail: candidate.email,
+            fromEmail: "no-reply@phonescreen.ai",
+            content:
+              "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
+          }),
+        });
+      }
 
       // Send the analysis result back to the client
       res.status(200).json(updatedPhoneScreen);

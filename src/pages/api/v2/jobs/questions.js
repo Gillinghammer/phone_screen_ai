@@ -1,7 +1,7 @@
 // javascript api endpoint GET /api/v2/job/:jobId/questions
 // parse jobId from the request query
 // make sure the header contains a property called authorization with the value of the NEXTAUTH_SECRET
-import prisma from "../../../../../lib/prisma";
+import prisma from "../../../../lib/prisma";
 
 export default async function handler(req, res) {
   if (req.headers.authorization !== process.env.NEXTAUTH_SECRET) {

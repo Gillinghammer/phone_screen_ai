@@ -16,6 +16,8 @@ model Company {
   jobs      Job[]
   resumes   Resume[]
   users     User[]
+  stripeSubscriptionIds String[] 
+  stripeCustomerId String? @unique
 }
 
 model User {

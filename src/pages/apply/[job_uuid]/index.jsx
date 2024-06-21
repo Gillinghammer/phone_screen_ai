@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { PrismaClient } from "@prisma/client";
 import { track } from "@vercel/analytics";
 import { Card } from "@/components/ui/card";
@@ -21,7 +22,8 @@ import { useToast } from "@/components/ui/use-toast";
 const prisma = new PrismaClient();
 import { usePostHog } from "posthog-js/react";
 
-const JobPage = ({ job }) => {
+const JobPage = ({ job, subscriptionStatus }) => {
+  const router = useRouter();
   const { setTheme } = useTheme();
   const posthog = usePostHog();
   const [applicantDetails, setApplicantDetails] = useState({
@@ -136,115 +138,142 @@ const JobPage = ({ job }) => {
           <div className="p-0 md:flex md:flex-row flex-col-reverse">
             <CardContent className="p-0 border-0">
               <div className="p-6">
-                <CardTitle className="text-gray-900 text-lg font-normal pb-4">
-                  Complete the form to begin the phone screen for
-                  <br />
-                  <span className="font-bold">{job.jobTitle}</span>
-                </CardTitle>
-                <form className="space-y-4">
-                  <div className="mb-4">
-                    <Label htmlFor="name" className="text-gray-900 text-lg">
-                      Full Name
-                    </Label>
-                    <Input
-                      type="text"
-                      name="name"
-                      id="name"
-                      value={applicantDetails.name}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="Jack Smith"
-                      className="text-lg py-4 border-gray-300 focus:ring-green-500 focus:border-green-500 text-gray-900"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <Label htmlFor="email" className="text-gray-900 text-lg">
-                      Email Address
-                    </Label>
-                    <Input
-                      type="email"
-                      name="email"
-                      id="email"
-                      value={applicantDetails.email}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="jack.smith@gmail.com"
-                      className="text-lg py-4 border-gray-300 focus:ring-green-500 focus:border-green-500 text-gray-900"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <Label htmlFor="phone" className="text-gray-900 text-lg">
-                      Phone Number
-                    </Label>
-                    <div className="border border-gray-300 rounded-md">
-                      <PhoneInput
-                        international
-                        defaultCountry="US"
-                        value={applicantDetails.phone}
-                        onChange={(value) =>
-                          setApplicantDetails({
-                            ...applicantDetails,
-                            phone: value,
-                          })
-                        }
-                        className="text-gray-900 w-full rounded-md custom-phone-input"
-                      />
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button
-                          disabled={!isFormValid()}
-                          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
-                            isFormValid()
-                              ? "bg-gray-600 hover:bg-gray-700"
-                              : "bg-gray-400 cursor-not-allowed"
-                          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500`}
+                {subscriptionStatus ? (
+                  <>
+                    <CardTitle className="text-gray-900 text-lg font-normal pb-4">
+                      Complete the form to begin the phone screen for
+                      <br />
+                      <span className="font-bold">{job.jobTitle}</span>
+                    </CardTitle>
+                    <form className="space-y-4">
+                      <div className="mb-4">
+                        <Label htmlFor="name" className="text-gray-900 text-lg">
+                          Full Name
+                        </Label>
+                        <Input
+                          type="text"
+                          name="name"
+                          id="name"
+                          value={applicantDetails.name}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="Jack Smith"
+                          className="text-lg py-4 border-gray-300 focus:ring-green-500 focus:border-green-500 text-gray-900"
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <Label
+                          htmlFor="email"
+                          className="text-gray-900 text-lg"
                         >
-                          Begin phone screen
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-white text-gray-900 sm:max-w-md sm:mx-auto sm:w-auto sm:h-auto w-full h-full">
-                        <div className="flex flex-col gap-4">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            Prepare for your call
-                          </h3>
-                          <p className="text-gray-900">
-                            This phone screen will be conducted by an AI. Please
-                            watch this short video so that you have the best
-                            possible experience.
-                          </p>
-                          <div className="aspect-w-16 aspect-h-9">
-                            <video
-                              src="/instructions.mp4"
-                              controls
-                              className="w-full h-full object-cover"
-                              onPlay={() => setVideoPlayed(true)}
-                            ></video>
-                          </div>
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              type="button"
-                              className="text-gray-900"
-                              onClick={() => setIsDialogOpen(false)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              disabled={!videoPlayed || callInitiated}
-                              type="button"
-                              onClick={handleSubmit}
-                            >
-                              Ready for my phone screen
-                            </Button>
-                          </div>
+                          Email Address
+                        </Label>
+                        <Input
+                          type="email"
+                          name="email"
+                          id="email"
+                          value={applicantDetails.email}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="jack.smith@gmail.com"
+                          className="text-lg py-4 border-gray-300 focus:ring-green-500 focus:border-green-500 text-gray-900"
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <Label
+                          htmlFor="phone"
+                          className="text-gray-900 text-lg"
+                        >
+                          Phone Number
+                        </Label>
+                        <div className="border border-gray-300 rounded-md">
+                          <PhoneInput
+                            international
+                            defaultCountry="US"
+                            value={applicantDetails.phone}
+                            onChange={(value) =>
+                              setApplicantDetails({
+                                ...applicantDetails,
+                                phone: value,
+                              })
+                            }
+                            className="text-gray-900 w-full rounded-md custom-phone-input"
+                          />
                         </div>
-                      </DialogContent>
-                    </Dialog>
+                      </div>
+                      <div className="text-right">
+                        <Dialog
+                          open={isDialogOpen}
+                          onOpenChange={setIsDialogOpen}
+                        >
+                          <DialogTrigger asChild>
+                            <Button
+                              disabled={!isFormValid()}
+                              className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                                isFormValid()
+                                  ? "bg-gray-600 hover:bg-gray-700"
+                                  : "bg-gray-400 cursor-not-allowed"
+                              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500`}
+                            >
+                              Begin phone screen
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-white text-gray-900 sm:max-w-md sm:mx-auto sm:w-auto sm:h-auto w-full h-full">
+                            <div className="flex flex-col gap-4">
+                              <h3 className="text-lg font-semibold text-gray-900">
+                                Prepare for your call
+                              </h3>
+                              <p className="text-gray-900">
+                                This phone screen will be conducted by an AI.
+                                Please watch this short video so that you have
+                                the best possible experience.
+                              </p>
+                              <div className="aspect-w-16 aspect-h-9">
+                                <video
+                                  src="/instructions.mp4"
+                                  controls
+                                  className="w-full h-full object-cover"
+                                  onPlay={() => setVideoPlayed(true)}
+                                ></video>
+                              </div>
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="outline"
+                                  type="button"
+                                  className="text-gray-900"
+                                  onClick={() => setIsDialogOpen(false)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  disabled={!videoPlayed || callInitiated}
+                                  type="button"
+                                  onClick={handleSubmit}
+                                >
+                                  Ready for my phone screen
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </form>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-lg mb-4">
+                      Please finish setting up your subscription to begin
+                      screening candidates.
+                    </p>
+                    <Button
+                      onClick={() => {
+                        router.push("/payment-method");
+                      }}
+                    >
+                      Add Payment Method
+                    </Button>
                   </div>
-                </form>
+                )}
               </div>
               <div className="p-6 bg-gray-900 text-white italic text-sm">
                 AI candidate screening technology is powered by{" "}
@@ -279,6 +308,7 @@ export const getServerSideProps = async (context) => {
       salary: true,
       company: {
         select: {
+          id: true,
           name: true,
         },
       },
@@ -287,6 +317,18 @@ export const getServerSideProps = async (context) => {
       responsibilities: true,
     },
   });
+
+  const company = await prisma.company.findUniqueOrThrow({
+    where: { id: job.company.id },
+    select: {
+      name: true,
+      stripeSubscriptionIds: true,
+      stripeCustomerId: true,
+    },
+  });
+
+  const activeSubscription =
+    !!company.stripeCustomerId && !!company.stripeSubscriptionIds.length;
 
   if (!job) {
     return {
@@ -298,7 +340,7 @@ export const getServerSideProps = async (context) => {
   }
 
   return {
-    props: { job },
+    props: { job, subscriptionStatus: activeSubscription },
   };
 };
 
