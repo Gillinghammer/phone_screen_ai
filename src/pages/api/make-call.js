@@ -31,7 +31,7 @@ export default async function handler(req, res) {
         job_location: jobTitle,
         // company: company,
         candidate_name: name,
-        question_number: 0, // needed for the pathway to lookup the first question
+        questions: interviewQuestions,
         job_id: jobId, // needed for the pathway to lookup the first question
         // candidateEmail: email,
         job_description: jobDescription,
