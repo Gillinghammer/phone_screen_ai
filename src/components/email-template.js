@@ -60,7 +60,7 @@ export function generateEmailTemplate(variables) {
       <div class="container">
         <div class="header">
           <a href="https://phonescreen.ai">
-            <img class="logo" src="https://phonescreen.ai/small-logo.png" alt="PhoneScreen.AI" />
+            <img class="logo" src="https://app.phonescreen.ai/small-logo.png" alt="PhoneScreen.AI" />
           </a>
         </div>
         <div class="content">

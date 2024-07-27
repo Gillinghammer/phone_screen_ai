@@ -52,7 +52,10 @@ const Home: NextPage = () => {
           property="og:description"
           content="Revolutionize Phone Screen AI's hiring process with AI-powered phone screening. Save time and improve candidate selection with PhoneScreen.ai."
         />
-        <meta property="og:image" content="https://phonescreen.ai/og2.png" />
+        <meta
+          property="og:image"
+          content="https://app.phonescreen.ai/og2.png"
+        />
 
         {/* Twitter */}
         <meta
@@ -70,7 +73,7 @@ const Home: NextPage = () => {
         />
         <meta
           property="twitter:image"
-          content="https://phonescreen.ai/og2.png"
+          content="https://app.phonescreen.ai/og2.png"
         />
       </Head>
       <div className="relative bg-yellow-200 overflow-hidden">
