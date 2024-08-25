@@ -15,12 +15,25 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { usePostHog } from "posthog-js/react";
+import { withActiveSubscription } from '../../components/withActiveSubscription';
 
 const prisma = new PrismaClient();
 
 export async function getServerSideProps(context) {
-  const session = await getSession(context);
-  console.log("debug session", session);
+  let session = await getSession(context);
+  
+  if (!session) {
+    // Check for the cookie we set
+    const cookies = context.req.headers.cookie;
+    if (cookies) {
+      const sessionCookie = cookies.split(';').find(c => c.trim().startsWith('session='));
+      if (sessionCookie) {
+        const sessionData = JSON.parse(sessionCookie.split('=')[1]);
+        session = { user: sessionData };
+      }
+    }
+  }
+
   if (!session || !session.user?.email) {
     return {
       redirect: {
@@ -55,8 +68,8 @@ export async function getServerSideProps(context) {
 
   let jobs = await prisma.job.findMany({
     where: {
-      // companyId: user.companyId,
-      companyId: 4,
+      companyId: user.companyId,
+      // companyId: 4,
       isArchived: false,
     },
     select: {
@@ -116,7 +129,7 @@ export async function getServerSideProps(context) {
   };
 }
 
-export default function JobsPage({ user, company, jobs }) {
+function JobsPage({ user, company, jobs }) {
   const router = useRouter();
   const posthog = usePostHog();
 
@@ -160,3 +173,5 @@ export default function JobsPage({ user, company, jobs }) {
     </>
   );
 }
+
+export default withActiveSubscription(JobsPage);

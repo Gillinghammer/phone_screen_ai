@@ -8,30 +8,46 @@ datasource db {
 }
 
 model Company {
-  id        Int      @id @default(autoincrement())
-  name      String
-  domain    String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  jobs      Job[]
-  resumes   Resume[]
-  users     User[]
-  stripeSubscriptionIds String[] 
-  stripeCustomerId String? @unique
+  id                   Int           @id @default(autoincrement())
+  name                 String
+  domain               String        @unique
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  jobs                 Job[]
+  resumes              Resume[]
+  users                User[]
+  stripeCustomerId     String?       @unique
+  stripeSubscriptionIds String[]     // Array of subscription IDs
+  subscriptions        Subscription[] // Relation to Subscription model
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  companyId Int?
-  jobs      Job[]
-  company   Company? @relation(fields: [companyId], references: [id])
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  password          String
+  name              String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  companyId         Int?
+  company           Company?  @relation(fields: [companyId], references: [id])
+  role              UserRole  @default(MEMBER)
+  jobs              Job[]
   resetToken        String?   
   resetTokenExpires DateTime? 
+}
+
+model Subscription {
+  id                Int               @id @default(autoincrement())
+  companyId         Int
+  company           Company           @relation(fields: [companyId], references: [id])
+  stripeSubscriptionId String         @unique
+  status            SubscriptionStatus @default(INACTIVE)
+  plan              String            // Flexible string instead of enum
+  startDate         DateTime
+  endDate           DateTime?
+  product           String            // Identify which product this subscription is for
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 model Job {
@@ -134,4 +150,16 @@ enum CandidateStatus {
   ACCEPTED
   REJECTED
   ARCHIVED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum UserRole {
+  ADMIN
+  MEMBER
 }

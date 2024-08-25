@@ -27,9 +27,8 @@ export async function getServerSideProps(context) {
     },
     include: {
       company: {
-        select: {
-          name: true,
-          id: true,
+        include: {
+          subscriptions: true,
         },
       },
     },
@@ -127,6 +126,46 @@ const ProfilePage = ({ user }) => {
     }
   };
 
+  const renderSubscriptionInfo = () => {
+    const subscription = user.company?.subscriptions?.[0];
+    return (
+      <div className="mt-8 p-4 border rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Subscription Information</h2>
+        {subscription ? (
+          <>
+            <p>Status: <span className="font-medium">{subscription.status}</span></p>
+            <p>Plan: <span className="font-medium">{subscription.plan}</span></p>
+            <p>Product: <span className="font-medium">{subscription.product}</span></p>
+            <p>Start Date: <span className="font-medium">{new Date(subscription.startDate).toLocaleDateString()}</span></p>
+            {subscription.endDate && (
+              <p>End Date: <span className="font-medium">{new Date(subscription.endDate).toLocaleDateString()}</span></p>
+            )}
+          </>
+        ) : (
+          <p>No active subscription found.</p>
+        )}
+      </div>
+    );
+  };
+
+  const renderPaymentMethodInfo = () => {
+    const paymentMethod = user.company?.paymentMethod;
+    return (
+      <div className="mt-8 p-4 border rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
+        {paymentMethod ? (
+          <>
+            <p>Type: <span className="font-medium">{paymentMethod.type}</span></p>
+            <p>Last 4 digits: <span className="font-medium">{paymentMethod.last4}</span></p>
+            <p>Expiry: <span className="font-medium">{paymentMethod.expMonth}/{paymentMethod.expYear}</span></p>
+          </>
+        ) : (
+          <p>No payment method on file.</p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Layout>
       <div className="container mx-auto p-4">
@@ -184,6 +223,9 @@ const ProfilePage = ({ user }) => {
             <Button onClick={handleEditClick}>Edit Profile</Button>
           </div>
         )}
+
+        {renderSubscriptionInfo()}
+        {/* {renderPaymentMethodInfo()} */}
 
         {!isEditMode && (
           <div className="mt-4">

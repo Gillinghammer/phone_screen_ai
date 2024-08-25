@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken"; // Added this import
+
 const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
@@ -51,15 +53,12 @@ export default async function handler(req, res) {
 
       console.log("User created", user);
 
+      // Include the user's email in the token
+      const token = jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
       return res.status(201).json({
         message: "User created",
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          company: companyRecord.name,
-          domain: companyRecord.domain,
-        },
+        token: token
       });
     } catch (error) {
       return res

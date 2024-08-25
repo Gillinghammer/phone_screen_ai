@@ -83,29 +83,20 @@ export function SignUpForm() {
         });
         const data = await res.json();
         if (res.ok) {
-          // Create the user and associate with the company
-          // Track the user signup event
-          posthog.capture("User Sign Up", {
-            email: data.user.email,
-            name: data.user.name,
-            company: data.user.company,
-            domain: data.user.domain,
-          });
-
-          track("User signup", {
-            email: res.email,
-            name: res.name,
-            company: res.company,
-            domain: res.domain,
-          });
-          router.push("/auth/signin");
+          // Redirect to the new combined payment and subscription page
+          router.push(`/onboarding?token=${data.token}`);
         } else {
-          // Handle other errors (e.g., email already taken)
+          // Handle errors
+          toast({
+            title: "Error",
+            description: data.message || "An error occurred during signup",
+            variant: "destructive",
+          });
         }
       }
       setLoading(false);
     },
-    [email, password, name, company, confirmPassword, router]
+    [email, password, name, company, confirmPassword, router, toast]
   );
 
   return (
