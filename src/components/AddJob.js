@@ -9,8 +9,6 @@ const AddJob = ({ user }) => {
     setJobPost(e.target.value);
   };
 
-  console.log("debug add job");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);

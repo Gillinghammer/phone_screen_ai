@@ -20,27 +20,31 @@ export default async function handler(req, res) {
     console.log("DEBUG JOB ID", jobId);
     const headers = { Authorization: process.env.BLAND_API_KEY };
 
+    const requestData = {
+      jobTitle,
+      job_location: jobTitle,
+      // company: company,
+      candidate_name: name,
+      questions: interviewQuestions.set,
+      job_id: jobId, // needed for the pathway to lookup the first question
+      // candidateEmail: email,
+      job_description: jobDescription,
+      job_requirements: jobRequirements.set.join(", "),
+      job_responsibilities: jobResponsibilities.set.join(", "),
+      remote_friendly: remoteFriendly,
+      salary: salary,
+      // interviewQuestions: interviewQuestions.set,
+    }
+
+    console.log("DEBUG REQUEST DATA", requestData);
+
     const data = {
       phone_number: phone,
       from: "+16469339096",
       // task: script,
       voice: "e1289219-0ea2-4f22-a994-c542c2a48a0f",
       pathway_id: "35a93192-9060-4e74-86dc-b9d5207ecb09",
-      request_data: {
-        jobTitle,
-        job_location: jobTitle,
-        // company: company,
-        candidate_name: name,
-        questions: interviewQuestions.set,
-        job_id: jobId, // needed for the pathway to lookup the first question
-        // candidateEmail: email,
-        job_description: jobDescription,
-        job_requirements: jobRequirements.set.join(", "),
-        job_responsibilities: jobResponsibilities.set.join(", "),
-        remote_friendly: remoteFriendly,
-        salary: salary,
-        // interviewQuestions: interviewQuestions.set,
-      },
+      request_data: requestData,
       voice_settings: {
         speed: 0.5,
       },
