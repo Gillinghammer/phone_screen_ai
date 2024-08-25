@@ -55,7 +55,7 @@ export default async function analyzeCall(req, res) {
 
       const alignedTranscript = response.data.transcripts;
       const msg = await anthropic.messages.create({
-        model: "claude-3-sonnet-20240229", // "claude-3-opus-20240229", //"claude-3-haiku-20240307"
+        model: "claude-3-5-sonnet-20240620", //"claude-3-sonnet-20240229", // "claude-3-5-sonnet-20240620"
         max_tokens: 4096,
         temperature: 0,
         system: "You're a helpful assistant.",
@@ -117,7 +117,7 @@ export default async function analyzeCall(req, res) {
       const scorePromises = questionsAndAnswers.map(async (qa) => {
         const { question, answer } = qa;
         const score = await anthropic.messages.create({
-          model: "claude-3-haiku-20240307", // "claude-3-opus-20240229"
+          model: "claude-3-5-sonnet-20240620", //"claude-3-haiku-20240307", // "claude-3-opus-20240229"
           max_tokens: 4096,
           temperature: 0,
           system: `You're a professional recruiter. 
@@ -142,12 +142,7 @@ export default async function analyzeCall(req, res) {
                 Some questions are simple yes or no questions which require a binary yes or no answer. Think about the <interview_question> and determine if it is a binary question.
                 <is_binary_question></is_binary_question> // TRUE or FALSE
 
-                Examples of binary questions:
-                - "Are you authorized to work in the United States?"
-                - "Have you a license to operate a forklift?"
-                - "Do you have a degree in Computer Science?"
-                - "Are you able to lift 50 pounds?"
-                - "Are you ok with a day rate of $200?"
+                Important: If the question is binary, assume the question is asking the candidate to confirm or deny a specific experience or skill and only provide a score of 100 if the candidate confirm's the experience or skill, otherwise you should score them a 0.
                 
                 <score_guidelines>
                 If <is_binary_question> is TRUE, provide a score of 100 if the candidate answered correctly and a score of 0 if the candidate answered incorrectly.
@@ -167,6 +162,15 @@ export default async function analyzeCall(req, res) {
                 Poor Answer:
                 <sample_question> "What is your experience with React?" </sample_question>
                 <sample_answer> "I have no experience with React." </sample_answer>
+                <sample_score> 0 </sample_score>
+                <sample_question> "Have you ever been a people manager?"</sample_question> (binary)
+                <sample_answer> "No." </sample_answer>
+                <sample_score> 0 </sample_score>
+                <sample_question> "Do you posess a Commercial Driver License (CDL)?"</sample_question> (binary)
+                <sample_answer> "Yes." </sample_answer>
+                <sample_score> 100 </sample_score>
+                <sample_question> "Are you willing to work the nigh shift?"</sample_question> (binary)
+                <sample_answer> "No, sorry I'm not able to work a night shift" </sample_answer>
                 <sample_score> 0 </sample_score>
                 </scoring_examples>
 
