@@ -99,8 +99,19 @@ export default function Onboarding() {
   return (
     <Layout>
       <div className="container py-12 space-y-8">
-        <h1 className="text-3xl font-bold">Complete Your Registration</h1>
-        <p>Welcome {user.name}! Please add a payment method and subscribe to complete your registration.</p>
+        <h1 className="text-3xl font-bold mb-4">Set Up Usage-Based Subscription</h1>
+        <div className="space-y-4">
+          <p className="text-lg">Welcome, {user.name}!</p>
+          <p>To complete your registration, please add a payment method and subscribe to our service.</p>
+          <div className="bg-gray-100 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-2">Pricing Details:</h2>
+            <ul className="list-disc list-inside space-y-2">
+              <li>$3 per successful phone screen</li>
+              <li>Billed monthly</li>
+              <li>No charge for unanswered calls or calls dropped within the first minute</li>
+            </ul>
+          </div>
+        </div>
         <Elements stripe={stripePromise}>
           <PaymentForm user={user} company={company} onSuccess={handlePaymentSuccess} />
         </Elements>

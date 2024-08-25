@@ -1,7 +1,7 @@
 import stripe from "../../../lib/stripe";
 import prisma from "../../../lib/prisma";
 
-const PRICE_ID = "price_1PLygM08WrQYH15OLDhVfjsH";
+const PRICE_ID = process.env.STRIPE_PRICE_ID;
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
