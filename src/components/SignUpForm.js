@@ -83,6 +83,14 @@ export function SignUpForm() {
         });
         const data = await res.json();
         if (res.ok) {
+          // Capture the signup event in PostHog
+          posthog.capture('user_signed_up', {
+            email,
+            name,
+            company,
+            // You can add any other relevant properties here
+          });
+
           // Redirect to the new combined payment and subscription page
           router.push(`/onboarding?token=${data.token}`);
         } else {
@@ -96,7 +104,7 @@ export function SignUpForm() {
       }
       setLoading(false);
     },
-    [email, password, name, company, confirmPassword, router, toast]
+    [email, password, name, company, confirmPassword, router, toast, posthog]
   );
 
   return (
