@@ -84,7 +84,7 @@ export function SignUpForm() {
         const data = await res.json();
         if (res.ok) {
           // Capture the signup event in PostHog
-          posthog.capture('user_signed_up', {
+          posthog.capture('User Sign Up', {
             email,
             name,
             company,
