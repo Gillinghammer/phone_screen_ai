@@ -13,7 +13,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
-import { track } from "@vercel/analytics";
 import { usePostHog } from "posthog-js/react";
 
 const validateEmail = (email) => {

@@ -35,8 +35,8 @@ export default function PaymentForm({ user, company, onSuccess }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         paymentMethodId: paymentMethod.id,
-        userId: user.id,
-        companyId: company.id,
+        user,
+        company
       }),
     });
 

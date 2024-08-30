@@ -5,13 +5,21 @@ const PRICE_ID = process.env.STRIPE_PRICE_ID;
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
-    const { paymentMethodId, companyId } = req.body;
+    const { paymentMethodId, company, user } = req.body;
     const plan = req.body.plan || 'Basic';
     const product = req.body.product || 'Screening Plan';
 
     try {
       // Create a customer in Stripe
-      const customer = await stripe.customers.create();
+      const customer = await stripe.customers.create({
+        name: user.name,
+        email: user.email,
+        metadata: {
+          phoneScreenUserId: user.id,
+          company: company.name,
+          domain: company.domain
+        }
+      });
 
       // Attach the payment method to the customer
       await stripe.paymentMethods.attach(paymentMethodId, {
@@ -33,7 +41,7 @@ export default async function handler(req, res) {
       // Create a new subscription in the database
       const newSubscription = await prisma.subscription.create({
         data: {
-          companyId,
+          companyId: company.id,
           stripeSubscriptionId: subscription.id,
           status: 'ACTIVE',
           plan,
@@ -44,7 +52,7 @@ export default async function handler(req, res) {
 
       // Update the company's stripeSubscriptionIds array
       await prisma.company.update({
-        where: { id: companyId },
+        where: { id: company.id },
         data: {
           stripeCustomerId: customer.id,
           stripeSubscriptionIds: {
