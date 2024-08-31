@@ -209,7 +209,7 @@ const ProfilePage = ({ user }) => {
       <CardContent>
         <p className="mb-4">
           Webhooks allow you to receive real-time notifications about events in your account. 
-          When set up, we'll send HTTP POST requests to your specified URL for the following events:
+          When set up, we&apos;ll send HTTP POST requests to your specified URL for the following events:
         </p>
         <ul className="list-disc list-inside space-y-2 mb-4">
           <li>Job Added</li>
@@ -223,7 +223,7 @@ const ProfilePage = ({ user }) => {
         <div className="bg-purple-50 border-l-4 border-purple-500 p-4 mt-4">
           <p className="font-semibold mb-2">Tip: Use Zapier for Easy Integration</p>
           <p>
-            Don't have a webhook endpoint? You can use Zapier to easily integrate PhoneScreen.AI with your existing recruiting software. 
+            Don&apos;t have a webhook endpoint? You can use Zapier to easily integrate PhoneScreen.AI with your existing recruiting software. 
             Zapier can listen for your webhooks and trigger actions in other apps, making it simple to automate your workflow.
           </p>
           <a 
