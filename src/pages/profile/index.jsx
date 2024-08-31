@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { getSession } from "next-auth/react";
 import { PrismaClient } from "@prisma/client";
 import Layout from "../../components/Layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 
 const prisma = new PrismaClient();
 
@@ -47,6 +49,7 @@ const ProfilePage = ({ user }) => {
   const [name, setName] = useState(user.name || "");
   const [email, setEmail] = useState(user.email || "");
   const [companyName, setCompanyName] = useState(user.company?.name || "");
+  const [webhookUrl, setWebhookUrl] = useState(user.company?.webhookUrl || "");
 
   const handleEditClick = () => {
     setIsEditMode(true);
@@ -59,6 +62,7 @@ const ProfilePage = ({ user }) => {
       email: email,
       companyName,
       companyId: user.company.id,
+      webhookUrl,
     };
 
     try {
@@ -126,162 +130,238 @@ const ProfilePage = ({ user }) => {
     }
   };
 
+  const renderProfileSection = () => (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Profile Information</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isEditMode ? (
+          <form onSubmit={handleSaveClick}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled
+                />
+              </div>
+              <div>
+                <Label htmlFor="companyName">Company</Label>
+                <Input
+                  id="companyName"
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="webhookUrl">Webhook URL</Label>
+                <Input
+                  id="webhookUrl"
+                  type="url"
+                  value={webhookUrl}
+                  onChange={(e) => setWebhookUrl(e.target.value)}
+                  placeholder="https://example.com/webhook"
+                />
+              </div>
+              <div className="flex space-x-2">
+                <Button type="submit">Save</Button>
+                <Button variant="outline" onClick={() => setIsEditMode(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-2">
+            <p><strong>Name:</strong> {name}</p>
+            <p><strong>Email:</strong> {email}</p>
+            <p><strong>Company:</strong> {companyName}</p>
+            <p><strong>Webhook URL:</strong> {webhookUrl || "Not set"}</p>
+            <Button onClick={handleEditClick} className="mt-4">Edit Profile</Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  const renderWebhookInfo = () => (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Webhook Information</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="mb-4">
+          Webhooks allow you to receive real-time notifications about events in your account. 
+          When set up, we'll send HTTP POST requests to your specified URL for the following events:
+        </p>
+        <ul className="list-disc list-inside space-y-2 mb-4">
+          <li>Job Added</li>
+          <li>Job Updated</li>
+          <li>Candidate Screened</li>
+        </ul>
+        <p className="mb-4">
+          Ensure your endpoint is set up to handle these requests securely. 
+          For more information on setting up and using webhooks, please refer to our documentation.
+        </p>
+        <div className="bg-purple-50 border-l-4 border-purple-500 p-4 mt-4">
+          <p className="font-semibold mb-2">Tip: Use Zapier for Easy Integration</p>
+          <p>
+            Don't have a webhook endpoint? You can use Zapier to easily integrate PhoneScreen.AI with your existing recruiting software. 
+            Zapier can listen for your webhooks and trigger actions in other apps, making it simple to automate your workflow.
+          </p>
+          <a 
+            href="https://zapier.com/blog/what-are-webhooks/#example" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-purple-600 hover:underline mt-2 inline-block"
+          >
+            Learn how to set up webhooks with Zapier
+          </a>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   const renderSubscriptionInfo = () => {
     const subscription = user.company?.subscriptions?.[0];
     return (
-      <div className="mt-8 p-4 border rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Subscription Information</h2>
-        {subscription ? (
-          <>
-            <p>Status: <span className="font-medium">{subscription.status}</span></p>
-            <p>Plan: <span className="font-medium">{subscription.plan}</span></p>
-            <p>Product: <span className="font-medium">{subscription.product}</span></p>
-            <p>Start Date: <span className="font-medium">{new Date(subscription.startDate).toLocaleDateString()}</span></p>
-            {subscription.endDate && (
-              <p>End Date: <span className="font-medium">{new Date(subscription.endDate).toLocaleDateString()}</span></p>
-            )}
-          </>
-        ) : (
-          <p>No active subscription found.</p>
-        )}
-      </div>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Subscription Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {subscription ? (
+            <div className="space-y-2">
+              <p><strong>Status:</strong> {subscription.status}</p>
+              <p><strong>Plan:</strong> {subscription.plan}</p>
+              <p><strong>Product:</strong> {subscription.product}</p>
+              <p><strong>Start Date:</strong> {new Date(subscription.startDate).toLocaleDateString()}</p>
+              {subscription.endDate && (
+                <p><strong>End Date:</strong> {new Date(subscription.endDate).toLocaleDateString()}</p>
+              )}
+            </div>
+          ) : (
+            <p>No active subscription found.</p>
+          )}
+        </CardContent>
+      </Card>
     );
   };
 
   const renderPaymentMethodInfo = () => {
     const paymentMethod = user.company?.paymentMethod;
     return (
-      <div className="mt-8 p-4 border rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
-        {paymentMethod ? (
-          <>
-            <p>Type: <span className="font-medium">{paymentMethod.type}</span></p>
-            <p>Last 4 digits: <span className="font-medium">{paymentMethod.last4}</span></p>
-            <p>Expiry: <span className="font-medium">{paymentMethod.expMonth}/{paymentMethod.expYear}</span></p>
-          </>
-        ) : (
-          <p>No payment method on file.</p>
-        )}
-      </div>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Payment Method</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {paymentMethod ? (
+            <div className="space-y-2">
+              <p><strong>Type:</strong> {paymentMethod.type}</p>
+              <p><strong>Last 4 digits:</strong> {paymentMethod.last4}</p>
+              <p><strong>Expiry:</strong> {paymentMethod.expMonth}/{paymentMethod.expYear}</p>
+            </div>
+          ) : (
+            <p>No payment method on file.</p>
+          )}
+        </CardContent>
+      </Card>
     );
   };
+
+  const renderChangePassword = () => (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Change Password</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isChangePasswordMode ? (
+          <form onSubmit={handlePasswordChangeSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="destructive" type="submit">Change Password</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsChangePasswordMode(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </form>
+        ) : (
+          <Button variant="destructive" onClick={handleChangePasswordClick}>
+            Change Password
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
 
   return (
     <Layout>
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Profile</h1>
-
-        {isEditMode ? (
-          <form>
-            <div className="mb-4">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="mb-4">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled
-              />
-            </div>
-
-            <div className="mb-4">
-              <Label htmlFor="companyName">Company</Label>
-              <Input
-                id="companyName"
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="flex space-x-2">
-              <Button onClick={handleSaveClick}>Save</Button>
-              <Button variant="outline" onClick={() => setIsEditMode(false)}>
-                Cancel
-              </Button>
-            </div>
-          </form>
-        ) : (
+        <h1 className="text-3xl font-bold mb-6">Account Settings</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <p>Name: {name}</p>
-            <p>Email: {email}</p>
-            <p>Company: {companyName}</p>
-
-            <Button onClick={handleEditClick}>Edit Profile</Button>
+            {renderProfileSection()}
+            {renderChangePassword()}
           </div>
-        )}
-
-        {renderSubscriptionInfo()}
-        {/* {renderPaymentMethodInfo()} */}
-
-        {!isEditMode && (
-          <div className="mt-4">
-            {isChangePasswordMode ? (
-              <form onSubmit={handlePasswordChangeSubmit}>
-                <div className="mb-4">
-                  <Label htmlFor="currentPassword">Current Password</Label>
-                  <Input
-                    id="currentPassword"
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <Label htmlFor="newPassword">New Password</Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="flex space-x-2">
-                  <Button type="submit">Change Password</Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsChangePasswordMode(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            ) : (
-              <Button variant={"outline"} onClick={handleChangePasswordClick}>
-                Change Password
-              </Button>
-            )}
+          <div>
+            {renderWebhookInfo()}
+            {renderSubscriptionInfo()}
+            {/* {renderPaymentMethodInfo()} */}
           </div>
-        )}
+        </div>
       </div>
     </Layout>
   );

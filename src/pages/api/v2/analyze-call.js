@@ -20,6 +20,9 @@ import axios from "axios";
 
 const prisma = new PrismaClient();
 
+// Import the webhook function
+import { postCandidateScreenedWebhook } from '@/lib/webhooks';
+
 export default async function analyzeCall(req, res) {
   if (req.method === "POST") {
     const { callId, jobId, phoneScreenId } = req.body;
@@ -254,6 +257,7 @@ export default async function analyzeCall(req, res) {
         where: { id: job.companyId },
         select: {
           stripeCustomerId: true,
+          webhookUrl: true,
         },
       });
 
@@ -288,6 +292,12 @@ export default async function analyzeCall(req, res) {
               "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
           }),
         });
+      }
+      console.log("company: ", company);
+      // Call the webhook if the URL exists
+      if (company && company.webhookUrl) {
+        console.log("Posting webhook to: ", company.webhookUrl);
+        await postCandidateScreenedWebhook(company, updatedPhoneScreen, candidate, job);
       }
 
       // Send the analysis result back to the client

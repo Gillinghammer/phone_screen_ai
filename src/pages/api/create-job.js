@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { PrismaClient } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
+import { postJobAddedWebhook } from '@/lib/webhooks';
 
 const prisma = new PrismaClient();
 
@@ -51,6 +52,17 @@ export default async function handler(req, res) {
           interviewQuestions: { set: interviewQuestions },
         },
       });
+
+      // Fetch the company to get the webhookUrl
+      const company = await prisma.company.findUnique({
+        where: { id: companyId },
+      });
+
+      // Call the webhook if the URL exists
+      if (company && company.webhookUrl) {
+        await postJobAddedWebhook(company, job);
+      }
+
       res.status(200).json(job);
     } catch (error) {
       console.error("Error creating job:", error);

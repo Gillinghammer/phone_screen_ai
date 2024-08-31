@@ -7,15 +7,10 @@ import { getToken } from "next-auth/jwt";
 const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
-  console.log("req.method", req.method);
-  console.log("req.body", req.body);
-
-  // Ensure this API route only accepts PUT requests
   if (req.method !== "PUT") {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  // Get the user's session to confirm they are authenticated
   const session = await getServerSession(req, res, authOptions);
   const token = await getToken({ req });
 
@@ -23,32 +18,30 @@ export default async function handler(req, res) {
     return res.status(403).json({ message: "Unauthorized" });
   }
 
-  // Get the updated profile data from the request body
-  const { name, email, companyName, companyId } = req.body;
+  const { name, email, companyName, companyId, webhookUrl } = req.body;
 
   try {
-    // Update the user's profile in the database
-    const user = await prisma.user.update({
+    // Update user information
+    const updatedUser = await prisma.user.update({
       where: { id: token.id },
       data: {
         name,
         email,
-        company: {
-          connect: {
-            id: companyId,
-          },
-          update: {
-            name: companyName,
-          },
-        },
       },
-      include: { company: true },
     });
 
-    // Respond with the updated user profile
-    return res.status(200).json(user);
+    // Update company information
+    const updatedCompany = await prisma.company.update({
+      where: { id: companyId },
+      data: {
+        name: companyName,
+        webhookUrl,
+      },
+    });
+
+    return res.status(200).json({ user: updatedUser, company: updatedCompany });
   } catch (error) {
     console.error("Failed to update profile", error);
-    return res.status(500).json({ message: "Failed to update profile" });
+    return res.status(500).json({ message: "Failed to update profile", error: error.message });
   }
 }

@@ -11,6 +11,7 @@ model Company {
   id                   Int           @id @default(autoincrement())
   name                 String
   domain               String        @unique
+  webhookUrl           String?       // Add this line
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   jobs                 Job[]
