@@ -261,6 +261,12 @@ export default async function analyzeCall(req, res) {
         },
       });
 
+      // Call the webhook if the URL exists
+      if (company && company.webhookUrl) {
+        console.log("Posting webhook to: ", company.webhookUrl);
+        await postCandidateScreenedWebhook(company, updatedPhoneScreen, candidate, job);
+      }
+
       // if updatedPhoneScreen.status === "call failed" then we don't want to create a meter event
       if (updatedPhoneScreen.status !== "call failed") {
         const meterEvent = await stripe.billing.meterEvents.create({
@@ -292,12 +298,6 @@ export default async function analyzeCall(req, res) {
               "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
           }),
         });
-      }
-      console.log("company: ", company);
-      // Call the webhook if the URL exists
-      if (company && company.webhookUrl) {
-        console.log("Posting webhook to: ", company.webhookUrl);
-        await postCandidateScreenedWebhook(company, updatedPhoneScreen, candidate, job);
       }
 
       // Send the analysis result back to the client
