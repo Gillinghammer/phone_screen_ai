@@ -14,11 +14,22 @@ import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import { usePostHog } from "posthog-js/react";
+import freeDomains from 'free-email-domains';
+
+const isFreeEmailProvider = (email) => {
+  const domain = email.split('@')[1];
+  const isFree = freeDomains.includes(domain);
+
+  return isFree;
+};
 
 const validateEmail = (email) => {
   const re =
     /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(email);
+  const isValidFormat = re.test(email);
+  const isFreeEmail = isFreeEmailProvider(email);
+  console.log('Email validation:', { isValidFormat, isFreeEmail });
+  return isValidFormat && !isFreeEmail;
 };
 
 const validatePassword = (password) => {
@@ -51,8 +62,13 @@ export function SignUpForm() {
       setLoading(true);
       let isValid = true;
 
+      console.log('Validating email:', email);
       if (!validateEmail(email)) {
-        setEmailError("Invalid email format");
+        if (isFreeEmailProvider(email)) {
+          setEmailError("Please use your business email address");
+        } else {
+          setEmailError("Invalid email format");
+        }
         isValid = false;
       } else {
         setEmailError("");

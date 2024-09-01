@@ -104,9 +104,18 @@ dependencies:
   date-fns:
     specifier: ^3.6.0
     version: 3.6.0
+  disposable-email:
+    specifier: ^0.2.3
+    version: 0.2.3
+  disposable-email-domains:
+    specifier: ^1.0.62
+    version: 1.0.62
   formidable:
     specifier: ^3.5.1
     version: 3.5.1
+  free-email-domains:
+    specifier: ^1.2.14
+    version: 1.2.14
   he:
     specifier: ^1.2.0
     version: 1.2.0
@@ -2971,6 +2980,13 @@ packages:
     resolution: {integrity: sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==}
     dev: false
 
+  /decompress-response@6.0.0:
+    resolution: {integrity: sha512-aW35yZM6Bb/4oJlZncMH2LCoZtJXTRxES17vE3hoRiowU2kWHaJKFkSBDnDR+cm9J+9QhXmREyIfv0pji9ejCQ==}
+    engines: {node: '>=10'}
+    dependencies:
+      mimic-response: 3.1.0
+    dev: false
+
   /deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
     dev: true
@@ -3053,6 +3069,14 @@ packages:
     dependencies:
       path-type: 4.0.0
     dev: true
+
+  /disposable-email-domains@1.0.62:
+    resolution: {integrity: sha512-LBQvhRw7mznQTPoyZbsmYeNOZt1pN5aCsx4BAU/3siVFuiM9f2oyKzUaB8v1jbxFjE3aYqYiMo63kAL4pHgfWQ==}
+    dev: false
+
+  /disposable-email@0.2.3:
+    resolution: {integrity: sha512-gkBQQ5Res431ZXqLlAafrXHizG7/1FWmi8U2RTtriD78Vc10HhBUvdJun3R4eSF0KRIQQJs+wHlxjkED/Hr1EQ==}
+    dev: false
 
   /dlv@1.1.3:
     resolution: {integrity: sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==}
@@ -3719,6 +3743,14 @@ packages:
   /fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
     dev: true
+
+  /free-email-domains@1.2.14:
+    resolution: {integrity: sha512-Hom2ok7myA/eUro+rVgMengkJbUn/tDsr/AxQbHrZc4WHe9sknIgbV7wdB1c7wqBBvaZfZ6gLhe/v8+ZO6Z50w==}
+    engines: {node: '>= 14'}
+    requiresBuild: true
+    dependencies:
+      simple-get: 4.0.1
+    dev: false
 
   /fs-minipass@2.1.0:
     resolution: {integrity: sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==}
@@ -4802,6 +4834,11 @@ packages:
     engines: {node: '>= 0.6'}
     dependencies:
       mime-db: 1.52.0
+    dev: false
+
+  /mimic-response@3.1.0:
+    resolution: {integrity: sha512-z0yWI+4FDrrweS8Zmt4Ej5HdJmky15+L2e6Wgn3+iK5fWzb6T3fhNFq2+MeTRb064c6Wr4N/wv0DzQTjNzHNGQ==}
+    engines: {node: '>=10'}
     dev: false
 
   /minimatch@3.1.2:
@@ -5941,6 +5978,18 @@ packages:
   /signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
+
+  /simple-concat@1.0.1:
+    resolution: {integrity: sha512-cSFtAPtRhljv69IK0hTVZQ+OfE9nePi/rtJmw5UjHeVyVroEqJXP1sFztKUy1qU+xvz3u/sfYJLa947b7nAN2Q==}
+    dev: false
+
+  /simple-get@4.0.1:
+    resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
+    dependencies:
+      decompress-response: 6.0.0
+      once: 1.4.0
+      simple-concat: 1.0.1
+    dev: false
 
   /slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
