@@ -69,7 +69,7 @@ export async function getServerSideProps(context) {
   let jobs = await prisma.job.findMany({
     where: {
       companyId: user.companyId,
-      // companyId: 4,
+      // companyId: 27,
       isArchived: false,
     },
     select: {
