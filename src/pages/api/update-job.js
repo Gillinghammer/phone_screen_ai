@@ -18,18 +18,19 @@ export default async function handler(req, res) {
     }
 
     const {
-      job_id,
-      company,
-      job_title,
-      job_location,
-      job_description,
-      remote_friendly,
+      id,
+      jobTitle,
+      jobLocation,
+      jobDescription,
+      remoteFriendly,
       seniority,
       salary,
+      requiredSkills,
+      interviewQuestions,
       responsibilities,
-      interview_questions,
+      requirements,
     } = req.body;
-    console.log("update job", req.body);
+    console.log("Updating job:", req.body);
 
     if (!session.user || !token.id) {
       return res.status(403).json({ message: "Invalid user session." });
@@ -37,20 +38,21 @@ export default async function handler(req, res) {
 
     try {
       const job = await prisma.job.update({
-        where: {
-          id: job_id,
-        },
+        where: { id: parseInt(id) },
         data: {
-          jobTitle: job_title,
-          jobLocation: job_location,
-          jobDescription: job_description,
-          remoteFriendly: remote_friendly,
+          jobTitle,
+          jobLocation,
+          jobDescription,
+          remoteFriendly: remoteFriendly === true || remoteFriendly === 'true',
           seniority,
-          salary,
-          responsibilities: { set: responsibilities },
-          interviewQuestions: { set: interview_questions },
+          salary: salary ? parseInt(salary) : null,
+          requirements,
+          responsibilities,
+          interviewQuestions,
         },
       });
+
+      console.log("Updated job:", job);
 
       // Fetch the company to get the webhookUrl
       const company = await prisma.company.findUnique({
@@ -64,6 +66,7 @@ export default async function handler(req, res) {
 
       res.status(200).json(job);
     } catch (error) {
+      console.error("Error updating job:", error);
       res.status(500).json({
         message: "Something went wrong when updating the job.",
         error: error.message,

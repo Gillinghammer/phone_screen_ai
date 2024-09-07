@@ -1,23 +1,20 @@
+import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import { PrismaClient } from "@prisma/client";
-import { getToken } from "next-auth/jwt";
-import { postJobAddedWebhook } from '@/lib/webhooks';
 
 const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
-  const token = await getToken({ req });
-  if (req.method === "POST") {
-    const session = await getServerSession(req, res, authOptions);
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
 
-    if (!session) {
-      return res
-        .status(403)
-        .json({ message: "You must be signed in to create a job." });
-    }
+  const session = await getServerSession(req, res, authOptions);
+  if (!session) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 
-    // Ensure all required fields are included in the request body
+  try {
     const {
       companyId,
       jobTitle,
@@ -30,49 +27,38 @@ export default async function handler(req, res) {
       responsibilities,
       interviewQuestions,
     } = req.body;
-    console.log("add job", req.body);
-    // Check if the session contains a user and that user has an ID
-    if (!session.user || !token.id) {
-      return res.status(403).json({ message: "Invalid user session." });
+
+    // Fetch the user based on the session
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    try {
-      const job = await prisma.job.create({
-        data: {
-          userId: token.id,
-          companyId,
-          jobTitle,
-          jobLocation,
-          jobDescription,
-          remoteFriendly,
-          seniority,
-          salary,
-          requirements: { set: requirements },
-          responsibilities: { set: responsibilities },
-          interviewQuestions: { set: interviewQuestions },
-        },
-      });
+    const job = await prisma.job.create({
+      data: {
+        userId: user.id,
+        companyId,
+        jobTitle,
+        jobLocation,
+        jobDescription,
+        remoteFriendly,
+        seniority,
+        salary: salary || 0,
+        requirements,
+        responsibilities,
+        interviewQuestions,
+      },
+    });
 
-      // Fetch the company to get the webhookUrl
-      const company = await prisma.company.findUnique({
-        where: { id: companyId },
-      });
-
-      // Call the webhook if the URL exists
-      if (company && company.webhookUrl) {
-        await postJobAddedWebhook(company, job);
-      }
-
-      res.status(200).json(job);
-    } catch (error) {
-      console.error("Error creating job:", error);
-      res.status(500).json({
-        message: "Something went wrong when creating the job.",
-        error: error.message,
-      });
-    }
-  } else {
-    res.setHeader("Allow", ["POST"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    res.status(201).json(job);
+  } catch (error) {
+    console.error('Error creating job:', error);
+    res.status(500).json({
+      message: "Something went wrong when creating the job.",
+      error: error.message,
+    });
   }
 }

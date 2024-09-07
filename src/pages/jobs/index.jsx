@@ -1,144 +1,79 @@
-// pages/jobs/index.js
 import { PrismaClient } from "@prisma/client";
 import Head from "next/head";
-import React from "react";
-import Layout from "../../components/Layout";
 import { getSession } from "next-auth/react";
-import JobTable from "../../components/JobTable";
-import { format } from "date-fns";
 import { useRouter } from "next/router";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { usePostHog } from "posthog-js/react";
+import { useEffect } from "react";
+
+import Layout from "../../components/Layout";
+import JobTable from "../../components/JobTable";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage } from "@/components/ui/breadcrumb"; // Update this import
 import { withActiveSubscription } from '../../components/withActiveSubscription';
+import { getUserAndCompany, getJobs } from '../../lib/dataFetchers';
 
 const prisma = new PrismaClient();
 
+// Add this function
+async function getSessionData(context) {
+  const session = await getSession(context);
+  return session;
+}
+
 export async function getServerSideProps(context) {
-  let session = await getSession(context);
-  
-  if (!session) {
-    // Check for the cookie we set
-    const cookies = context.req.headers.cookie;
-    if (cookies) {
-      const sessionCookie = cookies.split(';').find(c => c.trim().startsWith('session='));
-      if (sessionCookie) {
-        const sessionData = JSON.parse(sessionCookie.split('=')[1]);
-        session = { user: sessionData };
-      }
-    }
-  }
+  const session = await getSessionData(context);
 
   if (!session || !session.user?.email) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
+    return { redirect: { destination: "/auth/signin", permanent: false } };
   }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      email: session.user.email,
-    },
-    select: {
-      id: true,
-      email: true,
-      companyId: true,
-      name: true,
-    },
-  });
+  const { user, company } = await getUserAndCompany(session.user.email);
+  const jobs = await getJobs(user.companyId);
 
-  const company = await prisma.company.findUnique({
-    where: {
-      id: user.companyId,
-    },
-    select: {
-      id: true,
-      name: true,
-      domain: true,
-    },
-  });
+  return { props: { user, company, jobs } };
+}
 
-  let jobs = await prisma.job.findMany({
-    where: {
-      companyId: user.companyId,
-      // companyId: 27,
-      isArchived: false,
-    },
-    select: {
-      id: true,
-      uuid: true,
-      jobLocation: true,
-      company: {
-        select: {
-          name: true,
-        },
-      },
-      jobTitle: true,
-      createdAt: true,
-      updatedAt: true,
-      candidates: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          status: true,
-          phoneScreen: {
-            select: {
-              id: true,
-              callLength: true,
-              qualificationScore: true,
-            },
-          },
-        },
-      },
-    },
-  });
+// Add this hook definition
+function usePostHogTracking(posthog, user, company) {
+  useEffect(() => {
+    if (posthog && user && company) {
+      posthog.identify(user.id, {
+        email: user.email,
+        company: company.name,
+      });
+    }
+  }, [posthog, user, company]);
+}
 
-  // Convert DateTime fields to strings
-  jobs = jobs.map((job) => ({
-    ...job,
-    createdAt: format(job.createdAt, "yyyy-MM-dd HH:mm:ss"),
-    updatedAt: format(job.updatedAt, "yyyy-MM-dd HH:mm:ss"),
-    candidates: job.candidates.map((candidate) => ({
-      ...candidate,
-      phoneScreen: candidate.phoneScreen
-        ? {
-            ...candidate.phoneScreen,
-          }
-        : null,
-    })),
-  }));
+function JobsBreadcrumb() {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Jobs</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
 
-  // console.log("debug jobs", jobs);
-
-  return {
-    props: {
-      user,
-      company,
-      jobs,
-    },
-  };
+function JobsHeader() {
+  return (
+    <div className="flex justify-between items-center mb-6">
+      <h1 className="text-2xl font-bold">Active Job Screens</h1>
+    </div>
+  );
 }
 
 function JobsPage({ user, company, jobs }) {
   const router = useRouter();
   const posthog = usePostHog();
 
-  posthog.identify(user.id, user);
-  posthog.group("company", user.companyId, company);
+  usePostHogTracking(posthog, user, company);
 
-  const refreshData = () => {
-    router.replace(router.asPath);
-  };
+  const refreshData = () => router.replace(router.asPath);
 
   return (
     <>
@@ -147,20 +82,8 @@ function JobsPage({ user, company, jobs }) {
       </Head>
       <Layout>
         <div className="container mx-auto mt-10">
-          <Breadcrumb className="mb-4">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/jobs">Jobs</BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-4xl font-bold">Active Job Screens</h1>
-          </div>
+          <JobsBreadcrumb />
+          <JobsHeader />
           <div className="overflow-x-auto">
             <JobTable
               jobs={jobs}
