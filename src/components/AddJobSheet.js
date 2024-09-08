@@ -9,7 +9,7 @@ const AddJobSheet = ({ isOpen, onClose, companyId, onJobAdded }) => {
         <SheetHeader>
           <SheetTitle>Add Job</SheetTitle>
           <SheetDescription>
-            Paste your job posting below and click "Parse Job" to automatically fill in the details.
+            Paste your job posting below and click &ldquo;Parse Job&rdquo; to automatically fill in the details.
           </SheetDescription>
         </SheetHeader>
         <div className="h-[calc(100vh-120px)] mt-4">
