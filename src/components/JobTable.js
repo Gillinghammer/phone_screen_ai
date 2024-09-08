@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Link from "next/link";
+import Link from 'next/link';
 import { formatDistanceToNow, parseISO } from "date-fns";
 import {
   Table,
@@ -149,7 +149,7 @@ const JobTable = ({ jobs, refetchJobs, companyId }) => {
                 <SheetHeader>
                   <SheetTitle>Add Job</SheetTitle>
                   <SheetDescription>
-                    Paste your job posting below and click "Parse Job" to automatically fill in the details.
+                    Paste your job posting below and click &quot;Parse Job&quot; to automatically fill in the details.
                   </SheetDescription>
                 </SheetHeader>
                 <div className="h-[calc(100vh-120px)] mt-4">
