@@ -15,6 +15,7 @@ import { Pagination } from '@/components/Pagination';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import AddJobSheet from "@/components/AddJobSheet";
 
 const prisma = new PrismaClient();
 const ITEMS_PER_PAGE = 10;
@@ -56,13 +57,12 @@ function usePostHogTracking(posthog, user, company) {
   }, [posthog, user, company]);
 }
 
-
-
 function JobsPage({ user, company, jobs }) {
   const router = useRouter();
   const posthog = usePostHog();
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [isAddJobSheetOpen, setIsAddJobSheetOpen] = useState(false);
 
   usePostHogTracking(posthog, user, company);
 
@@ -92,12 +92,13 @@ function JobsPage({ user, company, jobs }) {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <h3 className="text-lg font-semibold mb-2">No jobs yet</h3>
-                    <p className="text-gray-500 mb-6">Create your first job to get started</p>
-                    <Link href="/jobs/new">
-                      <Button className="w-full bg-gray-100 text-gray-900 hover:bg-gray-200">
-                        Add New Job
-                      </Button>
-                    </Link>
+                    <p className="text-gray-500 mb-6">List your first job to get started</p>
+                    <Button 
+                      className="w-full bg-gray-100 text-gray-900 hover:bg-gray-200"
+                      onClick={() => setIsAddJobSheetOpen(true)}
+                    >
+                      Add New Job
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -121,6 +122,12 @@ function JobsPage({ user, company, jobs }) {
           </div>
         </div>
       </div>
+      <AddJobSheet
+        isOpen={isAddJobSheetOpen}
+        onClose={() => setIsAddJobSheetOpen(false)}
+        companyId={user.companyId}
+        onJobAdded={refreshData}
+      />
     </Layout>
   );
 }

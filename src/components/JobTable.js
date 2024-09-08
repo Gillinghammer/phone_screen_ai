@@ -1,4 +1,5 @@
 import { useState } from "react";
+import AddJobSheet from "./AddJobSheet";
 import Link from 'next/link';
 import { formatDistanceToNow, parseISO } from "date-fns";
 import {
@@ -138,28 +139,10 @@ const JobTable = ({ jobs, refetchJobs, companyId }) => {
                 {selectedJobs.length} job(s) selected
               </span>
             </div>
-            <Sheet open={isAddJobSheetOpen} onOpenChange={setIsAddJobSheetOpen}>
-              <SheetTrigger asChild>
-                <Button variant="default">
-                  <PlusCircledIcon className="w-4 h-4 mr-2" />
-                  Add Job
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[80vw] max-w-[1200px] sm:max-w-none">
-                <SheetHeader>
-                  <SheetTitle>Add Job</SheetTitle>
-                  <SheetDescription>
-                    Paste your job posting below and click &quot;Parse Job&quot; to automatically fill in the details.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="h-[calc(100vh-120px)] mt-4">
-                  <JobPostParser
-                    companyId={companyId}
-                    onClose={handleCloseSheet}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
+            <Button variant="default" onClick={() => setIsAddJobSheetOpen(true)}>
+              <PlusCircledIcon className="w-4 h-4 mr-2" />
+              Add Job
+            </Button>
           </div>
           <ScrollArea className="h-[calc(100vh-300px)]">
             <Table>
@@ -250,6 +233,12 @@ const JobTable = ({ jobs, refetchJobs, companyId }) => {
           )}
         </div>
       </CardContent>
+      <AddJobSheet
+        isOpen={isAddJobSheetOpen}
+        onClose={() => setIsAddJobSheetOpen(false)}
+        companyId={companyId}
+        onJobAdded={refetchJobs}
+      />
     </Card>
   );
 };
