@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { getSession } from "next-auth/react";
@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Pagination } from '@/components/Pagination';
 
 import Layout from "@/components/Layout";
 import CandidateTable from '../../components/CandidateTable';
@@ -14,8 +16,8 @@ import JobPageHeader from "@/components/JobPageHeader";
 import JobEditDrawer from "@/components/JobEditDrawer";
 import { JobPageBreadcrumb } from "@/components/JobPageBreadcrumb";
 
-import { getFilteredCandidates } from "@/lib/utils";
-import { fetchJob } from "@/lib/dataFetchers";
+import { getFilteredCandidates, performBulkAction } from "@/lib/utils";
+import { fetchJob, getPaginatedCandidates } from "@/lib/dataFetchers";
 
 const RECORDS_PER_PAGE = 20;
 
@@ -32,49 +34,84 @@ export async function getServerSideProps(context) {
     return { notFound: true };
   }
 
-  return { props: { job } };
+  const candidates = await getPaginatedCandidates(job.id);
+
+  return { 
+    props: { 
+      job,
+      candidates,
+    } 
+  };
 }
 
-function JobDetailPage({ job }) {
-  console.log('Rendering JobDetailPage, job:', job);
+function JobDetailPage({ job, candidates }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCandidates, setSelectedCandidates] = useState([]);
+  const [hideArchived, setHideArchived] = useState(true);
+  const [hideDroppedMissed, setHideDroppedMissed] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortColumn, setSortColumn] = useState("screened");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [selectedStatus, setSelectedStatus] = useState("any");
+  const [loading, setLoading] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  
+
   const { toast } = useToast();
   const router = useRouter();
 
-  const refreshData = () => router.replace(router.asPath);
-
-  const filteredCandidates = job.candidates ? getFilteredCandidates(
-    job.candidates,
-    searchTerm,
-    selectedStatus,
-    sortColumn,
-    sortOrder
-  ) : [];
+  const filteredCandidates = useMemo(() => {
+    return candidates.filter(candidate => {
+      const matchesSearch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesArchived = hideArchived ? candidate.status !== 'ARCHIVED' : true;
+      const matchesDroppedMissed = hideDroppedMissed ? 
+        !(candidate.phoneScreen?.qualificationScore === 0 || !candidate.phoneScreen) : true;
+      return matchesSearch && matchesArchived && matchesDroppedMissed;
+    });
+  }, [candidates, searchTerm, hideArchived, hideDroppedMissed]);
 
   const totalPages = Math.ceil(filteredCandidates.length / RECORDS_PER_PAGE);
-  const paginatedCandidates = filteredCandidates.slice(
-    (currentPage - 1) * RECORDS_PER_PAGE,
-    currentPage * RECORDS_PER_PAGE
-  );
 
-  const handleSearchTermChange = (event) => setSearchTerm(event.target.value);
-  const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortOrder("asc");
+  const paginatedCandidates = useMemo(() => {
+    const startIndex = (currentPage - 1) * RECORDS_PER_PAGE;
+    return filteredCandidates.slice(startIndex, startIndex + RECORDS_PER_PAGE);
+  }, [filteredCandidates, currentPage]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleSearchTermChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleHideArchivedChange = (checked) => {
+    setHideArchived(checked);
+    setCurrentPage(1);
+  };
+
+  const handleHideDroppedMissedChange = (checked) => {
+    setHideDroppedMissed(checked);
+    setCurrentPage(1);
+  };
+
+  const handleBulkAction = async (action, candidateIds) => {
+    try {
+      setLoading(true);
+      await performBulkAction(job, action, candidateIds);
+      toast({
+        title: "Bulk action completed",
+        description: `Successfully ${action.toLowerCase()}ed ${candidateIds.length} candidates`,
+      });
+      router.replace(router.asPath);
+    } catch (error) {
+      console.error('Error performing bulk action:', error);
+      toast({
+        title: "Error",
+        description: "Failed to perform bulk action",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-  const handleStatusChange = (status) => setSelectedStatus(status);
 
   const renderContent = () => {
     const emptyStateCard = (
@@ -95,26 +132,8 @@ function JobDetailPage({ job }) {
     );
 
     return (
-      <div className="bg-white shadow-sm border rounded-lg">
-        <div className="p-4 sm:p-6 border-b">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <Input
-                type="text"
-                placeholder="Search candidates..."
-                value={searchTerm}
-                onChange={handleSearchTermChange}
-                className="max-w-xs"
-              />
-              {/* Add filter dropdown here if needed */}
-            </div>
-            <Button variant="outline" onClick={() => setIsDrawerOpen(true)} className="bg-gray-100 text-gray-900 hover:bg-gray-200">
-              Edit Job
-            </Button>
-          </div>
-        </div>
-
-        {(!job.candidates || job.candidates.length === 0) ? (
+      <div className="bg-white shadow-sm rounded-lg">
+        {(!paginatedCandidates || paginatedCandidates.length === 0) ? (
           <div className="flex justify-center items-center p-8 sm:p-12">
             <Card className="w-full max-w-md">
               <CardContent className="pt-6">
@@ -124,11 +143,48 @@ function JobDetailPage({ job }) {
           </div>
         ) : (
           <div className="p-4 sm:p-6">
+            <div className="mb-4 flex justify-between items-center">
+              <Input
+                type="text"
+                placeholder="Search candidates..."
+                value={searchTerm}
+                onChange={handleSearchTermChange}
+                className="max-w-sm"
+              />
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <Checkbox 
+                    id="hideArchived" 
+                    checked={hideArchived} 
+                    onCheckedChange={handleHideArchivedChange}
+                  />
+                  <label htmlFor="hideArchived" className="ml-2 text-sm text-gray-700">
+                    Hide Archived
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <Checkbox 
+                    id="hideDroppedMissed" 
+                    checked={hideDroppedMissed} 
+                    onCheckedChange={handleHideDroppedMissedChange}
+                  />
+                  <label htmlFor="hideDroppedMissed" className="ml-2 text-sm text-gray-700">
+                    Hide Dropped/Missed
+                  </label>
+                </div>
+              </div>
+            </div>
             <CandidateTable
               candidates={paginatedCandidates}
               jobId={job.id}
+              onBulkAction={handleBulkAction}
             />
-            {/* Add pagination controls here */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              loading={loading}
+            />
           </div>
         )}
       </div>
@@ -136,31 +192,29 @@ function JobDetailPage({ job }) {
   };
 
   return (
-    <>
+    <Layout>
       <Head>
         <title>{job.jobTitle} | Job Details</title>
       </Head>
-      {/* Comment out the Layout component temporarily */}
-      {/* <Layout> */}
-        <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <JobPageBreadcrumb jobTitle={job.jobTitle} />
-          <div className="bg-white shadow-sm border rounded-lg mt-4">
-            <div className="p-4 sm:p-6 border-b">
-              <JobPageHeader 
-                job={job}
-              />
-            </div>
-            {renderContent()}
+      <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <JobPageBreadcrumb jobTitle={job.jobTitle} />
+        <div className="bg-white shadow-sm rounded-lg mt-4">
+          <div className="p-4 sm:p-6">
+            <JobPageHeader 
+              job={job}
+              onEditJobClick={() => setIsDrawerOpen(true)}
+            />
           </div>
+          {renderContent()}
         </div>
-      {/* </Layout> */}
+      </div>
       <JobEditDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         job={job}
-        refreshData={refreshData}
+        refreshData={() => router.replace(router.asPath)}
       />
-    </>
+    </Layout>
   );
 }
 

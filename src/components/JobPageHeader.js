@@ -1,10 +1,20 @@
 import React from 'react';
+import { Button } from "@/components/ui/button";
 
-export default function JobPageHeader({ job }) {
+export default function JobPageHeader({ 
+  job, 
+  onEditJobClick
+}) {
   return (
-    <div className="space-y-1">
+    <div className="flex justify-between items-center">
       <h1 className="text-2xl font-bold tracking-tight">{job.jobTitle}</h1>
-      <p className="text-gray-500">{job.jobLocation || 'Location not specified'}</p>
+      <Button 
+        variant="outline" 
+        onClick={onEditJobClick}
+        className="bg-gray-100 text-gray-900 hover:bg-gray-200"
+      >
+        Edit Job
+      </Button>
     </div>
   );
 }

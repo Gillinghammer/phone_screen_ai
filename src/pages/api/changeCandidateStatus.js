@@ -8,10 +8,10 @@ export default async function handler(req, res) {
     const { candidateIds, status, job } = req.body;
     console.log("Changing candidate status:", candidateIds, status);
 
-    if (!candidateIds || !status) {
+    if (!candidateIds || !status || !job) {
       return res
         .status(400)
-        .json({ message: "Candidate IDs and status are required" });
+        .json({ message: "Candidate IDs, status, and job are required" });
     }
 
     const validStatuses = ["ACCEPTED", "REJECTED", "ARCHIVED", "OPEN"];
@@ -20,16 +20,22 @@ export default async function handler(req, res) {
     }
 
     try {
+      // Convert candidateIds to integers
+      const intCandidateIds = candidateIds.map(id => parseInt(id, 10));
+
       const updatedCandidates = await prisma.candidate.updateMany({
-        where: { id: { in: candidateIds } },
+        where: {
+          id: { in: intCandidateIds },
+          jobPost: { id: job.id } // Use jobPost.id instead of jobId
+        },
         data: { status },
       });
 
       if (updatedCandidates.count > 0) {
         console.log("Candidate statuses changed:", updatedCandidates);
 
-        // Loop through the updated candidates and submit events
-        for (const candidateId of candidateIds) {
+        // Submit events to PostHog
+        for (const candidateId of intCandidateIds) {
           const captureEvent = {
             api_key: process.env.NEXT_PUBLIC_POSTHOG_KEY,
             distinct_id: job.userId,
@@ -37,6 +43,7 @@ export default async function handler(req, res) {
             properties: {
               status: status,
               title: job.jobTitle,
+              bulk_action: intCandidateIds.length > 1,
             },
           };
 
