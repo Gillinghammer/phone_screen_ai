@@ -146,7 +146,7 @@ export default function CandidateTable({
                 />
               </TableCell>
               <TableCell className="font-medium text-center">
-                <Link href={`/jobs/${jobId}/${candidate.id}`} className="text-black hover:underline">
+                <Link href={`/jobs/${jobId}/${candidate.id}`} className="text-black underline">
                   {candidate.name}
                 </Link>
               </TableCell>
