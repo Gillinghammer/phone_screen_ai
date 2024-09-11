@@ -164,15 +164,15 @@ export default function CandidateTable({
               <TableCell className="text-center">
                 {getDurationLabel(candidate.phoneScreen)}
               </TableCell>
-              <TableCell className="text-center">
-                <div className="flex flex-col items-center">
+              <TableCell className="text-center p-2">
+                <div className="flex flex-col items-start mx-auto w-fit">
                   <div className="flex items-center">
-                    <MobileIcon className="mr-2" />
-                    {candidate.phone}
+                    <MobileIcon className="w-4 h-4 mr-2" />
+                    <span>{candidate.phone}</span>
                   </div>
                   <div className="flex items-center mt-1">
-                    <EnvelopeClosedIcon className="mr-2" />
-                    {candidate.email}
+                    <EnvelopeClosedIcon className="w-4 h-4 mr-2" />
+                    <span>{candidate.email}</span>
                   </div>
                 </div>
               </TableCell>
