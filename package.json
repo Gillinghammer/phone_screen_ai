@@ -47,6 +47,7 @@
     "disposable-email": "^0.2.3",
     "disposable-email-domains": "^1.0.62",
     "formidable": "^3.5.1",
+    "framer-motion": "^11.5.4",
     "free-email-domains": "^1.2.14",
     "he": "^1.2.0",
     "html-to-text": "^9.0.5",
