@@ -116,6 +116,9 @@ dependencies:
   formidable:
     specifier: ^3.5.1
     version: 3.5.1
+  framer-motion:
+    specifier: ^11.5.4
+    version: 11.5.4(react-dom@18.2.0)(react@18.2.0)
   free-email-domains:
     specifier: ^1.2.14
     version: 1.2.14
@@ -3794,6 +3797,25 @@ packages:
   /fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
     dev: true
+
+  /framer-motion@11.5.4(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-E+tb3/G6SO69POkdJT+3EpdMuhmtCh9EWuK4I1DnIC23L7tFPrl8vxP+LSovwaw6uUr73rUbpb4FgK011wbRJQ==}
+    peerDependencies:
+      '@emotion/is-prop-valid': '*'
+      react: ^18.0.0
+      react-dom: ^18.0.0
+    peerDependenciesMeta:
+      '@emotion/is-prop-valid':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      tslib: 2.6.2
+    dev: false
 
   /free-email-domains@1.2.14:
     resolution: {integrity: sha512-Hom2ok7myA/eUro+rVgMengkJbUn/tDsr/AxQbHrZc4WHe9sknIgbV7wdB1c7wqBBvaZfZ6gLhe/v8+ZO6Z50w==}
