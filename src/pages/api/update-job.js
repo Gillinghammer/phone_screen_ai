@@ -3,6 +3,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { PrismaClient } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 import { postJobUpdatedWebhook } from '@/lib/webhooks';
+import axios from 'axios';
 
 const prisma = new PrismaClient();
 
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
       responsibilities,
       requirements,
     } = req.body;
-    console.log("Updating job:", req.body);
+    // console.log("Updating job:", req.body);
 
     if (!session.user || !token.id) {
       return res.status(403).json({ message: "Invalid user session." });
@@ -52,7 +53,7 @@ export default async function handler(req, res) {
         },
       });
 
-      console.log("Updated job:", job);
+      // console.log("Updated job:", job);
 
       // Fetch the company to get the webhookUrl
       const company = await prisma.company.findUnique({
@@ -64,6 +65,15 @@ export default async function handler(req, res) {
         await postJobUpdatedWebhook(company, job);
       }
 
+      // If the job has a blandPathwayId, update the pathway
+      
+      const pathwayResponse = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/bland/update-pathway`, {
+        pathwayId: job.blandPathwayId,
+        jobId: job.id,
+        jobTitle: job.jobTitle,
+        interviewQuestions: job.interviewQuestions.set
+      });
+      console.log("Pathway response:", pathwayResponse);
       res.status(200).json(job);
     } catch (error) {
       console.error("Error updating job:", error);

@@ -59,6 +59,7 @@ export default async function handle(req, res) {
           remoteFriendly: job.remoteFriendly,
           salary: job.salary,
           interviewQuestions: job.interviewQuestions,
+          pathwayId: job.blandPathwayId
         }),
       }
     );

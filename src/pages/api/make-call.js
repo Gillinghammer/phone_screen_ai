@@ -16,6 +16,7 @@ export default async function handler(req, res) {
       salary,
       company,
       interviewQuestions,
+      pathwayId
     } = req.body;
     console.log("DEBUG JOB ID", jobId);
     const headers = { Authorization: process.env.BLAND_API_KEY };
@@ -43,7 +44,7 @@ export default async function handler(req, res) {
       from: "+16469339096",
       // task: script,
       voice: "e1289219-0ea2-4f22-a994-c542c2a48a0f",
-      pathway_id: "35a93192-9060-4e74-86dc-b9d5207ecb09",
+      pathway_id: pathwayId,
       request_data: requestData,
       voice_settings: {
         speed: 0.5,

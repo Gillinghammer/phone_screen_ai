@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import axios from 'axios';
 
 const prisma = new PrismaClient();
 
@@ -37,6 +38,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Create the job
     const job = await prisma.job.create({
       data: {
         userId: user.id,
@@ -52,6 +54,25 @@ export default async function handler(req, res) {
         interviewQuestions,
       },
     });
+
+    // Create a Bland AI pathway
+    const createPathwayResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/bland/create-pathway`, {
+      name: `Pathway for ${jobTitle}`,
+      description: `Phone screen pathway for ${jobTitle} position`,
+      questions: interviewQuestions.set,
+      jobTitle: jobTitle,
+      jobId: job.id
+    });
+
+    if (createPathwayResponse.data && createPathwayResponse.data.pathway_id) {
+      // Update the job with the Bland AI pathway ID
+      await prisma.job.update({
+        where: { id: job.id },
+        data: { blandPathwayId: createPathwayResponse.data.pathway_id },
+      });
+
+      job.blandPathwayId = createPathwayResponse.data.pathway_id;
+    }
 
     res.status(201).json(job);
   } catch (error) {
