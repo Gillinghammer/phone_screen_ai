@@ -8,6 +8,16 @@ const nextConfig = {
         destination: '/jobs',
         permanent: true,
       },
+      {
+        source: '/login',
+        destination: '/auth/signin',
+        permanent: true,
+      },
+      {
+        source: '/signup',
+        destination: '/auth/signup',
+        permanent: true,
+      },
     ];
   },
 };
