@@ -71,11 +71,11 @@ export default async function handler(req, res) {
       text: question,
       condition: "The candidate has finished answering the question, even if they didn't provide the answer you were looking for.",
       modelOptions: {
-        modelType: "smart",
+        modelName: "smart",
         temperature: 0,
         skipUserResponse: false,
         block_interruptions: false,
-        interruptionThreshold: 200
+        interruptionThreshold: 300
       },
       extractVars: [["answer", "string", "The candidate's answer to the question"]]
     },

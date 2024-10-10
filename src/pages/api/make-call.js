@@ -65,7 +65,7 @@ export default async function handler(req, res) {
     };
 
     try {
-      const response = await axios.post("https://api.bland.ai/call", data, {
+      const response = await axios.post("https://api.bland.ai/v1/calls", data, {
         headers,
       });
       console.log("make call");
