@@ -296,20 +296,23 @@ export default async function analyzeCall(req, res) {
           },
         });
 
-        const subject = `Phone screen completed for the ${job.jobTitle} role`;
+        // Only send email if there's no parentCompanyId
+        if (!company.parentCompanyId) {
+          const subject = `Phone screen completed for the ${job.jobTitle} role`;
 
-        await sendEmail({
-          to: candidate.email,
-          subject: subject,
-          text: "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
-          html: generateEmailTemplate({
+          await sendEmail({
+            to: candidate.email,
             subject: subject,
-            toEmail: candidate.email,
-            fromEmail: "no-reply@phonescreen.ai",
-            content:
-              "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
-          }),
-        });
+            text: "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
+            html: generateEmailTemplate({
+              subject: subject,
+              toEmail: candidate.email,
+              fromEmail: "no-reply@phonescreen.ai",
+              content:
+                "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
+            }),
+          });
+        }
       }
 
       // Send the analysis result back to the client

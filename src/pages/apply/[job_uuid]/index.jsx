@@ -274,16 +274,18 @@ const JobPage = ({ job, subscriptionStatus }) => {
                   </div>
                 )}
               </div>
-              <div className="p-6 bg-gray-900 text-white italic text-sm">
-                AI candidate screening technology is powered by{" "}
-                <a
-                  target="_blank"
-                  href="https://phonescreen.ai/"
-                  className="font-bold"
-                >
-                  PhoneScreen.AI
-                </a>
-              </div>
+              {!job.company.parentCompanyId && (
+                <div className="p-6 bg-gray-900 text-white italic text-sm">
+                  AI candidate screening technology is powered by{" "}
+                  <a
+                    target="_blank"
+                    href="https://phonescreen.ai/"
+                    className="font-bold"
+                  >
+                    PhoneScreen.AI
+                  </a>
+                </div>
+              )}
             </CardContent>
           </div>
         </Card>
