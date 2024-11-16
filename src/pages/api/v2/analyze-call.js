@@ -255,8 +255,23 @@ export default async function analyzeCall(req, res) {
         select: {
           stripeCustomerId: true,
           webhookUrl: true,
+          parentCompanyId: true,
         },
       });
+
+      // Get parent company's Stripe details if parentCompanyId exists
+      let billingCompany = company;
+      if (company.parentCompanyId) {
+        const parentCompany = await prisma.company.findUnique({
+          where: { id: company.parentCompanyId },
+          select: {
+            stripeCustomerId: true,
+          },
+        });
+        if (parentCompany) {
+          billingCompany = parentCompany;
+        }
+      }
 
       // Call the webhook if the URL exists
       if (company && company.webhookUrl) {
@@ -270,7 +285,7 @@ export default async function analyzeCall(req, res) {
           event_name: "completed_screen",
           payload: {
             value: "1",
-            stripe_customer_id: company.stripeCustomerId,
+            stripe_customer_id: billingCompany.stripeCustomerId, // Use the billing company's Stripe ID
           },
         });
         console.log("Meter event created:", meterEvent);

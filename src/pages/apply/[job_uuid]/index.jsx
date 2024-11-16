@@ -309,6 +309,7 @@ export const getServerSideProps = async (context) => {
         select: {
           id: true,
           name: true,
+          parentCompanyId: true,
         },
       },
       requirements: true,
@@ -316,18 +317,6 @@ export const getServerSideProps = async (context) => {
       responsibilities: true,
     },
   });
-
-  const company = await prisma.company.findUniqueOrThrow({
-    where: { id: job.company.id },
-    select: {
-      name: true,
-      stripeSubscriptionIds: true,
-      stripeCustomerId: true,
-    },
-  });
-
-  const activeSubscription =
-    !!company.stripeCustomerId && !!company.stripeSubscriptionIds.length;
 
   if (!job) {
     return {
@@ -337,6 +326,33 @@ export const getServerSideProps = async (context) => {
       },
     };
   }
+
+  const company = await prisma.company.findUniqueOrThrow({
+    where: { id: job.company.id },
+    select: {
+      name: true,
+      stripeSubscriptionIds: true,
+      stripeCustomerId: true,
+      parentCompanyId: true,
+    },
+  });
+
+  let billingCompany = company;
+  if (company.parentCompanyId) {
+    const parentCompany = await prisma.company.findUnique({
+      where: { id: company.parentCompanyId },
+      select: {
+        stripeSubscriptionIds: true,
+        stripeCustomerId: true,
+      },
+    });
+    if (parentCompany) {
+      billingCompany = parentCompany;
+    }
+  }
+
+  const activeSubscription =
+    !!billingCompany.stripeCustomerId && !!billingCompany.stripeSubscriptionIds.length;
 
   return {
     props: { job, subscriptionStatus: activeSubscription },
