@@ -9,26 +9,37 @@ export function withActiveSubscription(WrappedComponent) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-      if (status === 'authenticated') {
-        fetch('/api/user/check-subscription')
-          .then(res => res.json())
-          .then(data => {
-            if (!data.hasActiveSubscription) {
-              router.push('/onboarding');
-            } else {
-              setLoading(false);
-            }
-          })
-          .catch(err => {
-            console.error(err);
+      async function checkSubscription() {
+        try {
+          const res = await fetch('/api/user/check-subscription');
+          const data = await res.json();
+          
+          if (data.error) {
             router.push('/auth/signin');
-          });
+            return;
+          }
+
+          // Allow access if user has active subscription OR is a white-label user
+          if (!data.hasActiveSubscription && !data.isWhiteLabel) {
+            router.push('/onboarding');
+            return;
+          }
+
+          setLoading(false);
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+          router.push('/auth/signin');
+        }
+      }
+
+      if (status === 'authenticated') {
+        checkSubscription();
       } else if (status === 'unauthenticated') {
         router.push('/auth/signin');
       }
     }, [status, router]);
 
-    if (loading || status === 'loading') {
+    if (loading) {
       return <div>Loading...</div>;
     }
 

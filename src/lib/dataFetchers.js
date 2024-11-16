@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from './prisma';
 import { format } from "date-fns";
-
-const prisma = new PrismaClient();
 
 export async function getUserAndCompany(email) {
   const user = await prisma.user.findUnique({

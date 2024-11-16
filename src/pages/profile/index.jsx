@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getSession } from "next-auth/react";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '../../lib/prisma';
 import Layout from "../../components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
-
-const prisma = new PrismaClient();
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);

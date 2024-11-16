@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { PrismaClient } from "@prisma/client";
 import { track } from "@vercel/analytics";
 import { Card } from "@/components/ui/card";
 import Head from "next/head";
@@ -19,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-const prisma = new PrismaClient();
+import { prisma } from '../../../lib/prisma';
 import { usePostHog } from "posthog-js/react";
 
 const JobPage = ({ job, subscriptionStatus }) => {

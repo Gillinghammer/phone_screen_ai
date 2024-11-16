@@ -2,11 +2,9 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs"; // Make sure to install bcryptjs if you haven't
+import { prisma } from '../../../lib/prisma';
+import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
 
 export default NextAuth({
   providers: [
@@ -68,6 +66,6 @@ export default NextAuth({
     error: "/auth/error",
     verifyRequest: "/auth/verify-request",
     newUser: null,
-    resetPassword: "/auth/reset-password", // Add this line
+    resetPassword: "/auth/reset-password",
   },
 });

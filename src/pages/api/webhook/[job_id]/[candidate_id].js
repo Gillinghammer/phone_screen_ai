@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '../../../../lib/prisma';
 import axios from "axios";
 import { sendEmail } from "../../../../lib/utils";
-const prisma = new PrismaClient();
 
 export default async function webhook(req, res) {
   if (req.method === "POST") {

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '../../lib/prisma';
 import Head from "next/head";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import AddJobSheet from "@/components/AddJobSheet";
 
-const prisma = new PrismaClient();
 const ITEMS_PER_PAGE = 10;
 
 // Add this function

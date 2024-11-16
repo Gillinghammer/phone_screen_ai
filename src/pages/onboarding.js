@@ -21,7 +21,8 @@ export default function Onboarding() {
       fetch('/api/user/check-subscription')
         .then(res => res.json())
         .then(data => {
-          if (data.hasActiveSubscription) {
+          console.log(data);
+          if (data.hasActiveSubscription || data.isWhiteLabel) {
             router.push('/jobs');
           } else {
             fetch('/api/user/get-onboarding-data')
@@ -54,7 +55,7 @@ export default function Onboarding() {
             setUser(data.user);
             setCompany(data.company);
             setLoading(false);
-            if (data.hasActiveSubscription) {
+            if (data.hasActiveSubscription || data.company.parentCompanyId) {
               // Sign in the user before redirecting
               const result = await signIn('credentials', {
                 email: data.user.email,

@@ -1,6 +1,5 @@
 // pages/jobs/[job_id]/[candidate_id].tsx
 import { useState, useEffect, useRef } from "react";
-import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import Layout from "../../../components/Layout";
 import {
@@ -32,8 +31,7 @@ import { useRouter } from "next/router";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { usePostHog } from "posthog-js/react";
-
-const prisma = new PrismaClient();
+import { prisma } from '../../../lib/prisma';
 
 export async function getServerSideProps(context) {
   const { job_id, candidate_id } = context.params;

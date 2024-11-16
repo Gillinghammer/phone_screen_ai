@@ -15,10 +15,8 @@ import JSON5 from "json5";
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '../../../lib/prisma';
 import axios from "axios";
-
-const prisma = new PrismaClient();
 
 // Import the webhook function
 import { postCandidateScreenedWebhook } from '@/lib/webhooks';

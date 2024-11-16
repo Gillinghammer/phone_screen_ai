@@ -1,13 +1,11 @@
 // pages/subscribe.js
 import { useState } from "react";
 import Layout from "../components/Layout";
-import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { prisma } from '../lib/prisma';
 
 export async function getServerSideProps(context) {
-  const prisma = new PrismaClient();
-
   const session = await getSession(context);
 
   if (!session || !session.user?.email) {

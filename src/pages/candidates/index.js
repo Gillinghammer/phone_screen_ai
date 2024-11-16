@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '../../lib/prisma';
 import Head from "next/head";
 import React, { useState } from "react";
 import Link from "next/link";
 import Layout from "../../components/Layout";
 import { getSession } from "next-auth/react";
-
-const prisma = new PrismaClient();
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);

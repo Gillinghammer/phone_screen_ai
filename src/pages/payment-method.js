@@ -1,16 +1,14 @@
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "@/components/PaymentForm"; // Update the import statement
-import { PrismaClient } from "@prisma/client";
 import { getSession } from "next-auth/react";
+import { prisma } from '../lib/prisma';
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 );
 
 export async function getServerSideProps(context) {
-  const prisma = new PrismaClient();
-
   const session = await getSession(context);
 
   if (!session || !session.user?.email) {

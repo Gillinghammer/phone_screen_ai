@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../src/lib/prisma';
 import axios from 'axios';
-
-const prisma = new PrismaClient();
 
 async function createPathway(job, index, total) {
   console.log(`\nProcessing job ${index + 1} of ${total}`);

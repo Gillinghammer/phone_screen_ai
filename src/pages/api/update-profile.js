@@ -1,10 +1,8 @@
 // pages/api/updateProfile.js
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '../../lib/prisma';
 import { getToken } from "next-auth/jwt";
-
-const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
   if (req.method !== "PUT") {

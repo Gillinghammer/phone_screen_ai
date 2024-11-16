@@ -36,7 +36,7 @@ const validatePassword = (password) => {
   return password.length >= 8;
 };
 
-export function SignUpForm() {
+export function SignUpForm({ isWhiteLabel = false, parentCompanyId = null }) {
   const posthog = usePostHog();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -94,7 +94,13 @@ export function SignUpForm() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password, name, company }),
+          body: JSON.stringify({ 
+            email, 
+            password, 
+            name, 
+            company,
+            parentCompanyId: isWhiteLabel ? parentCompanyId : null 
+          }),
         });
         const data = await res.json();
         if (res.ok) {
@@ -103,11 +109,17 @@ export function SignUpForm() {
             email,
             name,
             company,
-            // You can add any other relevant properties here
+            isWhiteLabel,
+            parentCompanyId
           });
 
-          // Redirect to the new combined payment and subscription page
-          router.push(`/onboarding?token=${data.token}`);
+          if (isWhiteLabel) {
+            // Redirect white-label users to a different page if needed
+            router.push(`/dashboard?token=${data.token}`);
+          } else {
+            // Regular signup flow
+            router.push(`/onboarding?token=${data.token}`);
+          }
         } else {
           // Handle errors
           toast({
@@ -119,7 +131,7 @@ export function SignUpForm() {
       }
       setLoading(false);
     },
-    [email, password, name, company, confirmPassword, router, toast, posthog]
+    [email, password, name, company, confirmPassword, router, toast, posthog, isWhiteLabel, parentCompanyId]
   );
 
   return (

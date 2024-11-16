@@ -8,18 +8,21 @@ datasource db {
 }
 
 model Company {
-  id                   Int           @id @default(autoincrement())
-  name                 String
-  domain               String        @unique
-  webhookUrl           String?       // Add this line
-  createdAt            DateTime      @default(now())
-  updatedAt            DateTime      @updatedAt
-  jobs                 Job[]
-  resumes              Resume[]
-  users                User[]
-  stripeCustomerId     String?       @unique
-  stripeSubscriptionIds String[]     // Array of subscription IDs
-  subscriptions        Subscription[] // Relation to Subscription model
+  id                    Int      @id @default(autoincrement())
+  name                  String
+  domain                String   @unique
+  webhookUrl            String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  stripeCustomerId      String?  @unique
+  stripeSubscriptionIds String[]
+  parentCompanyId       Int?
+
+  // Relations with other models
+  jobs          Job[]
+  resumes       Resume[]
+  users         User[]
+  subscriptions Subscription[]
 }
 
 model User {
@@ -33,22 +36,22 @@ model User {
   company           Company?  @relation(fields: [companyId], references: [id])
   role              UserRole  @default(MEMBER)
   jobs              Job[]
-  resetToken        String?   
-  resetTokenExpires DateTime? 
+  resetToken        String?
+  resetTokenExpires DateTime?
 }
 
 model Subscription {
-  id                Int               @id @default(autoincrement())
-  companyId         Int
-  company           Company           @relation(fields: [companyId], references: [id])
-  stripeSubscriptionId String         @unique
-  status            SubscriptionStatus @default(INACTIVE)
-  plan              String            // Flexible string instead of enum
-  startDate         DateTime
-  endDate           DateTime?
-  product           String            // Identify which product this subscription is for
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  id                   Int                @id @default(autoincrement())
+  companyId            Int
+  company              Company            @relation(fields: [companyId], references: [id])
+  stripeSubscriptionId String             @unique
+  status               SubscriptionStatus @default(INACTIVE)
+  plan                 String // Flexible string instead of enum
+  startDate            DateTime
+  endDate              DateTime?
+  product              String // Identify which product this subscription is for
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 }
 
 model Job {
@@ -68,7 +71,7 @@ model Job {
   isArchived         Boolean       @default(false)
   companyId          Int?
   uuid               String        @default(uuid())
-  blandPathwayId     String?       // Add this line
+  blandPathwayId     String? // Add this line
   candidates         Candidate[]
   company            Company?      @relation(fields: [companyId], references: [id])
   user               User          @relation(fields: [userId], references: [id])

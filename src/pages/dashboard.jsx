@@ -1,15 +1,13 @@
 // pages/dashboard.js
 import Layout from "../components/Layout";
-import { PrismaClient } from "@prisma/client";
 import { formatDistanceToNow } from "date-fns";
 import { getSession } from "next-auth/react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { prisma } from '../lib/prisma';
 
 export async function getServerSideProps(context) {
-  const prisma = new PrismaClient();
-
   const session = await getSession(context);
 
   if (!session || !session.user?.email) {
