@@ -5,10 +5,15 @@ import { useRouter } from "next/router";
 import { cn } from "@/lib/utils";
 import { PersonIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
-export default function Layout({ children }) {
+export default function Layout({ children, whitelabelLogo }) {
   const { data: session } = useSession();
   const router = useRouter();
+  console.log("whitelabelLogo", whitelabelLogo);  
+  // Use whitelabelLogo prop if provided, otherwise fallback to session data
+  const companyLogo = whitelabelLogo || session?.user?.company?.whitelabel_logo;
+  const logoSrc = companyLogo ? `/logos/${companyLogo}` : "/small-logo.png";
 
   const isActive = (pathname) => router.pathname === pathname;
 
@@ -17,10 +22,12 @@ export default function Layout({ children }) {
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between py-4">
           <Link href="/jobs">
-            <img
-              src="/small-logo.png"
-              alt="PhoneScreen.AI Logo"
-              className="h-4"
+            <Image
+              src={logoSrc}
+              alt={companyLogo ? "Company Logo" : "PhoneScreen.AI Logo"}
+              width={120}
+              height={160}
+              className="h-8 max-w-[160px] w-auto object-contain"
             />
           </Link>
           <nav>
