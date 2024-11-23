@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,18 +9,20 @@ import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
+import { DragHandleDots2Icon } from '@radix-ui/react-icons';
 
-export default function JobEditDrawer({ isOpen, onClose, job, refreshData }) {
-  const { register, control, handleSubmit, reset, formState: { errors } } = useForm();
-  const { fields: interviewQuestionFields, append: appendInterviewQuestion, remove: removeInterviewQuestion } = useFieldArray({
+export default function JobEditDialog({ isOpen, onClose, job, refreshData }) {
+  const { register, control, handleSubmit, reset, formState: { errors }, getValues } = useForm();
+  const { fields: interviewQuestionFields, append: appendInterviewQuestion, remove: removeInterviewQuestion, move: moveInterviewQuestion } = useFieldArray({
     control,
     name: "interviewQuestions"
   });
   const { toast } = useToast();
 
+  const [draggedIndex, setDraggedIndex] = useState(null);
+
   useEffect(() => {
     if (job) {
-      console.log("Job data in drawer:", job);
       reset({
         jobTitle: job.jobTitle || '',
         jobLocation: job.jobLocation || '',
@@ -37,7 +39,6 @@ export default function JobEditDrawer({ isOpen, onClose, job, refreshData }) {
 
   const onSubmit = async (data) => {
     try {
-      console.log("Submitting data:", data);  // Log the data being submitted
       const response = await fetch(`/api/update-job`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -57,7 +58,6 @@ export default function JobEditDrawer({ isOpen, onClose, job, refreshData }) {
       }
 
       const updatedJob = await response.json();
-      console.log("Updated job:", updatedJob);
 
       toast({
         title: "Job Updated",
@@ -67,7 +67,6 @@ export default function JobEditDrawer({ isOpen, onClose, job, refreshData }) {
       refreshData();
       onClose();
     } catch (error) {
-      console.error('Error updating job:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to update job. Please try again.",
@@ -76,12 +75,27 @@ export default function JobEditDrawer({ isOpen, onClose, job, refreshData }) {
     }
   };
 
+  const handleDragStart = (index) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnter = (index) => {
+    if (draggedIndex !== null && draggedIndex !== index) {
+      moveInterviewQuestion(draggedIndex, index);
+      setDraggedIndex(index);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
   return (
-    <Drawer open={isOpen} onClose={onClose}>
-      <DrawerContent className="w-[800px] max-w-[100vw]">
-        <DrawerHeader>
-          <DrawerTitle>Edit Job: {job?.jobTitle}</DrawerTitle>
-        </DrawerHeader>
+    <Dialog open={isOpen} onClose={onClose}>
+      <DialogContent className="w-[800px] max-w-[100vw]">
+        <DialogHeader>
+          <DialogTitle>Edit Job: {job?.jobTitle}</DialogTitle>
+        </DialogHeader>
         <ScrollArea className="h-[calc(100vh-10rem)] px-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <Tabs defaultValue="basic" className="w-full">
@@ -168,11 +182,30 @@ export default function JobEditDrawer({ isOpen, onClose, job, refreshData }) {
                 <div>
                   <Label>Interview Questions</Label>
                   {interviewQuestionFields.map((field, index) => (
-                    <div key={field.id} className="flex items-center space-x-2 mt-2">
+                    <div
+                      key={field.id}
+                      className={`flex items-center space-x-2 mt-2 group ${draggedIndex === index ? 'bg-blue-100 border border-blue-300' : ''}`}
+                      draggable
+                      onDragStart={(e) => {
+                        handleDragStart(index);
+                        const img = new Image();
+                        img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E";
+                        e.dataTransfer.setDragImage(img, 0, 0);
+                      }}
+                      onDragEnter={() => handleDragEnter(index)}
+                      onDragEnd={handleDragEnd}
+                      style={{ transition: 'background-color 0.2s ease, border 0.2s ease' }}
+                    >
+                      <DragHandleDots2Icon className="cursor-move text-gray-500" />
                       <Input
                         {...register(`interviewQuestions.${index}`, { required: "Question is required" })}
                       />
-                      <Button type="button" onClick={() => removeInterviewQuestion(index)} variant="destructive" size="sm">
+                      <Button 
+                        type="button" 
+                        onClick={() => removeInterviewQuestion(index)} 
+                        variant="destructive" 
+                        size="sm"
+                      >
                         Remove
                       </Button>
                     </div>
@@ -190,11 +223,11 @@ export default function JobEditDrawer({ isOpen, onClose, job, refreshData }) {
             </Tabs>
           </form>
         </ScrollArea>
-        <DrawerFooter>
+        <DialogFooter>
           <Button type="submit" onClick={handleSubmit(onSubmit)}>Save Changes</Button>
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
