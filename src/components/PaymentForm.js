@@ -34,18 +34,22 @@ export default function PaymentForm({ user, company, onSuccess }) {
       return;
     }
 
-    const result = await stripe.createPaymentMethod({
-      type: 'card',
-      card: elements.getElement(CardElement),
-      billing_details: {
-        email: user.email,
-      },
-    });
+    try {
+      const result = await stripe.createPaymentMethod({
+        type: 'card',
+        card: elements.getElement(CardElement),
+        billing_details: {
+          email: user.email,
+          name: user.name,
+        },
+      });
 
-    if (result.error) {
-      setError(result.error.message);
-      setProcessing(false);
-    } else {
+      if (result.error) {
+        setError(result.error.message);
+        setProcessing(false);
+        return;
+      }
+
       const response = await fetch('/api/billing/setup-subscription', {
         method: 'POST',
         headers: {
@@ -55,6 +59,8 @@ export default function PaymentForm({ user, company, onSuccess }) {
           paymentMethodId: result.paymentMethod.id,
           user: user,
           company: company,
+          plan: 'Basic',
+          product: 'Screening Plan'
         }),
       });
 
@@ -64,8 +70,15 @@ export default function PaymentForm({ user, company, onSuccess }) {
         setError(data.error);
         setProcessing(false);
       } else {
-        onSuccess();
+        setProcessing(false);
+        if (onSuccess && typeof onSuccess === 'function') {
+          await onSuccess();
+        }
       }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      setError('An error occurred while setting up the subscription.');
+      setProcessing(false);
     }
   };
 

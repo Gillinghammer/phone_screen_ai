@@ -114,14 +114,3 @@ export default NextAuth({
     resetPassword: "/auth/reset-password", // Add this line
   },
 });
-
-// You can run this in a separate API endpoint temporarily
-const company = await prisma.company.findUnique({
-  where: { id: 37 },
-  select: {
-    id: true,
-    name: true,
-    whitelabel_logo: true
-  }
-});
-console.log('Direct company query:', company);

@@ -90,6 +90,7 @@ export default function Onboarding() {
       password: router.query.token, // Use the token as a temporary password
       redirect: false,
     });
+    
     if (result.ok) {
       router.push('/jobs');
     } else {
@@ -114,7 +115,11 @@ export default function Onboarding() {
           </div>
         </div>
         <Elements stripe={stripePromise}>
-          <PaymentForm user={user} company={company} onSuccess={handlePaymentSuccess} />
+          <PaymentForm 
+            user={user} 
+            company={company} 
+            onSuccess={handlePaymentSuccess} 
+          />
         </Elements>
       </div>
     </Layout>

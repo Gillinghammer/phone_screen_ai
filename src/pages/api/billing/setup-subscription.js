@@ -1,13 +1,15 @@
 import stripe from "../../../lib/stripe";
-import prisma from "../../../lib/prisma";
+import { prisma } from "../../../lib/prisma";
 
 const PRICE_ID = process.env.STRIPE_PRICE_ID;
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
-    const { paymentMethodId, company, user } = req.body;
-    const plan = req.body.plan || 'Basic';
-    const product = req.body.product || 'Screening Plan';
+    const { paymentMethodId, company, user, plan = 'Basic', product = 'Screening Plan' } = req.body;
+
+    if (!paymentMethodId || !company || !user) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
 
     try {
       // Create a customer in Stripe
@@ -32,7 +34,7 @@ export default async function handler(req, res) {
       });
 
       // Create a subscription
-      const subscription = await stripe.subscriptions.create({
+      const stripeSubscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [{ price: PRICE_ID }],
         expand: ['latest_invoice.payment_intent'],
@@ -42,7 +44,7 @@ export default async function handler(req, res) {
       const newSubscription = await prisma.subscription.create({
         data: {
           companyId: company.id,
-          stripeSubscriptionId: subscription.id,
+          stripeSubscriptionId: stripeSubscription.id,
           status: 'ACTIVE',
           plan,
           product,
@@ -50,20 +52,24 @@ export default async function handler(req, res) {
         },
       });
 
-      // Update the company's stripeSubscriptionIds array
+      // Update the company's stripe information
       await prisma.company.update({
         where: { id: company.id },
         data: {
           stripeCustomerId: customer.id,
           stripeSubscriptionIds: {
-            set: [...(company.stripeSubscriptionIds || []), subscription.id],
+            set: [stripeSubscription.id],
           },
         },
       });
 
-      res.status(200).json({ success: true, subscriptionId: subscription.id });
+      res.status(200).json({ 
+        success: true, 
+        subscriptionId: stripeSubscription.id,
+        customerId: customer.id 
+      });
     } catch (error) {
-      console.error(error);
+      console.error('Subscription setup error:', error);
       res.status(500).json({ error: 'An error occurred while setting up the subscription.' });
     }
   } else {
