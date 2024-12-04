@@ -56,7 +56,7 @@ export default async function handler(req, res) {
         data: {
           stripeCustomerId: customer.id,
           stripeSubscriptionIds: {
-            push: subscription.id,
+            set: [...(company.stripeSubscriptionIds || []), subscription.id],
           },
         },
       });

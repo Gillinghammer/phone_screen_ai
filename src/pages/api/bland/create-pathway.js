@@ -75,7 +75,7 @@ export default async function handler(req, res) {
         temperature: 0,
         skipUserResponse: false,
         block_interruptions: false,
-        interruptionThreshold: 300
+        interruptionThreshold: 200
       },
       extractVars: [["answer", "string", "The candidate's answer to the question"]]
     },

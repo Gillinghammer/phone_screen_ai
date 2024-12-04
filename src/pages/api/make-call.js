@@ -49,7 +49,7 @@ export default async function handler(req, res) {
       voice_settings: {
         speed: 0.5,
       },
-      interruption_threshold: 500,
+      interruption_threshold: 200,
       temperature: 0.5,
       voicemail_action: "hangup",
       start_time: null,
