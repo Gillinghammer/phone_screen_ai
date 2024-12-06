@@ -19,7 +19,9 @@ export default async function handler(req, res) {
       pathwayId
     } = req.body;
     console.log("DEBUG JOB ID", jobId);
-    const headers = { Authorization: process.env.BLAND_API_KEY };
+    const headers = { Authorization: process.env.BLAND_API_KEY,
+      encrypted_key: process.env.BLAND_ENCRYPTION_KEY
+      };
 
     const requestData = {
       jobTitle,
