@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 
     const data = {
       phone_number: phone,
-      from: "+16469339096",
+      from: "+16506996300",
       // task: script,
       voice: "e1289219-0ea2-4f22-a994-c542c2a48a0f",
       pathway_id: pathwayId,
