@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { prisma } from '../../../lib/prisma';
+import { NODE_CONFIGS, createEdges } from '../../../lib/config/bland';
 
 export default async function handler(req, res) {
   if (req.method !== 'PUT') {
@@ -14,7 +15,7 @@ export default async function handler(req, res) {
 
   try {
     // Fetch the existing pathway
-    const getResponse = await axios.get(`https://api.bland.ai/v1/convo_pathway/${pathwayId}`, {
+    const getResponse = await axios.get(`https://api.bland.ai/v1/pathway/${pathwayId}`, {
       headers: {
         'authorization': process.env.BLAND_API_KEY
       }
@@ -30,71 +31,17 @@ export default async function handler(req, res) {
       });
     }
 
-    // Find the start and end nodes
-    const startNode = existingPathway.nodes.find(node => node.data.isStart);
-    const endNode = existingPathway.nodes.find(node => node.type === 'End Call');
-
-    if (!startNode || !endNode) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Invalid pathway structure: missing start or end node'
-      });
-    }
-
-    // Create new question nodes
-    const questionNodes = interviewQuestions.map((question, index) => ({
-      id: `question_${index + 1}`,
-      data: {
-        name: `Question ${index + 1}`,
-        type: "Default",
-        text: question,
-        isStart: false,
-        isGlobal: false,
-        condition: "The candidate has finished answering the question, even if they didn't provide the answer you were looking for.",
-        extractVars: [["answer", "string", "The candidate's answer to the question"]],
-        modelOptions: {
-          modelType: "smart",
-          temperature: 0,
-          skipUserResponse: false,
-          block_interruptions: false,
-          interruptionThreshold: 200
-        }
-      },
-      type: "Default"
-    }));
-
-    // Update the ready node
-    const readyNode = {
-      id: "ready_to_begin",
-      data: {
-        name: "Ready to begin",
-        text: `Ok great, and to confirm you are ready to begin the phone screen for the ${jobTitle} position?`,
-        active: false,
-        condition: "The condition is achieved if the user confirms yes, or they are ready to begin",
-        globalPrompt: "You're a professional candidate recruiter named Ashley performing a phone screen for this candidate you've just called. After the candidate has been asked a question you will wait for an appropriate amount of time to move on to the next question. Never ask the candidate to elaborate, simply accept their answer and continue.",
-        modelOptions: {
-          modelType: "Bland Beta",
-          temperature: 0
-        }
-      },
-      type: "Default"
-    };
+    // Create nodes using config
+    const startNode = NODE_CONFIGS.start;
+    const readyNode = NODE_CONFIGS.ready(jobTitle);
+    const questionNodes = interviewQuestions.map((question, index) => NODE_CONFIGS.question(question, index));
+    const endNode = NODE_CONFIGS.end;
 
     // Combine all nodes
     const updatedNodes = [startNode, readyNode, ...questionNodes, endNode];
 
-    // Create edges
-    const edges = [
-      { id: "edge-start-ready", label: "User responds", source: startNode.id, target: readyNode.id },
-      { id: "edge-ready-first-question", label: "User confirms ready to begin", source: readyNode.id, target: questionNodes[0].id },
-      ...questionNodes.slice(0, -1).map((node, index) => ({
-        id: `edge-question-${index + 1}`,
-        label: "Candidate answered the interview question",
-        source: node.id,
-        target: questionNodes[index + 1].id
-      })),
-      { id: "edge-lastquestion-end", label: "Candidate answered the interview question", source: questionNodes[questionNodes.length - 1].id, target: endNode.id }
-    ];
+    // Create edges using config
+    const edges = createEdges({ startNode, readyNode, questionNodes, endNode });
 
     // Prepare the updated pathway
     const updatedPathway = {
@@ -106,7 +53,7 @@ export default async function handler(req, res) {
     };
 
     // Update the pathway
-    const updateResponse = await axios.post(`https://api.bland.ai/v1/convo_pathway/${pathwayId}`, 
+    const updateResponse = await axios.post(`https://api.bland.ai/v1/pathway/${pathwayId}`, 
       updatedPathway,
       {
         headers: {
@@ -116,7 +63,7 @@ export default async function handler(req, res) {
       }
     );
 
-    // Update the job in the database with the new pathwayId
+    // Update the job in the database with the pathwayId
     await prisma.job.update({
       where: { id: jobId },
       data: { blandPathwayId: pathwayId }

@@ -1,116 +1,25 @@
 import axios from 'axios';
+import { NODE_CONFIGS, createEdges } from '../../../lib/config/bland';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { name, description, questions = [], jobTitle = "open", jobId } = req.body;
+  const { name, description, questions, jobTitle, jobId } = req.body;
 
-  if (!name) {
-    return res.status(400).json({ message: 'Missing required field: name' });
+  if (!name || !description || !questions || !Array.isArray(questions)) {
+    return res.status(400).json({ message: 'Missing or invalid required fields' });
   }
 
-  const startNode = {
-    id: "1",
-    data: {
-      name: "Phone Screen AI introduces themself to the candidate",
-      text: "Hi, this is Ashley your AI recruiter. Is now a good time to chat?",
-      active: false,
-      isStart: true,
-      globalPrompt: "You're a professional candidate recruiter named Ashley performing a phone screen for this candidate you've just called. Ask each question and wait for the candidate to respond before moving to the next question.",
-      modelOptions: {
-        modelType: "Bland Beta",
-        temperature: 0
-      }
-    },
-    type: "Default"
-  };
-
-  const readyToBeginNode = {
-    id: "ready_to_begin",
-    data: {
-      name: "Ready to begin",
-      text: `Ok great, and to confirm you are ready to begin the phone screen for the ${jobTitle} position?`,
-      active: false,
-      condition: "The condition is achieved if the user confirms yes, or they are ready to begin",
-      globalPrompt: "You're a professional candidate recruiter named Ashley performing a phone screen for this candidate you've just called. After the candidate has been asked a question you will wait for an appropriate amount of time to move on to the next question. Never ask the candidate to elaborate, simply accept their answer and continue.",
-      modelOptions: {
-        modelType: "Bland Beta",
-        temperature: 0
-      }
-    },
-    type: "Default"
-  };
-
-  const endNode = {
-    id: "end",
-    data: {
-      name: "End Call",
-      active: true,
-      prompt: "Thank the candidate for their participation and that their answers will be reviewed and a human member of the team will be in touch.",
-      globalPrompt: "You're a professional candidate recruiter named Ashley performing a phone screen for this candidate you've just called. Ask each question and wait for the candidate to respond before moving to the next question.",
-      modelOptions: {
-        modelType: "smart",
-        temperature: 0,
-        skipUserResponse: false,
-        block_interruptions: false
-      }
-    },
-    type: "End Call"
-  };
-
-  // Create nodes for each question
-  const questionNodes = questions.map((question, index) => ({
-    id: `question_${index + 1}`,
-    data: {
-      name: `Question ${index + 1}`,
-      isStart: false,
-      isGlobal: false,
-      type: "Default",
-      text: question,
-      condition: "The candidate has finished answering the question, even if they didn't provide the answer you were looking for.",
-      modelOptions: {
-        modelName: "smart",
-        temperature: 0,
-        skipUserResponse: false,
-        block_interruptions: false,
-        interruptionThreshold: 200
-      },
-      extractVars: [["answer", "string", "The candidate's answer to the question"]]
-    },
-    type: "Default"
-  }));
-
-  // Combine all nodes
-  const allNodes = [startNode, readyToBeginNode, ...questionNodes, endNode];
-
-  // Create edges
-  const edges = [
-    {
-      id: "edge-start-ready",
-      source: "1",
-      target: "ready_to_begin",
-      label: "User responds"
-    },
-    {
-      id: "edge-ready-first-question",
-      source: "ready_to_begin",
-      target: "question_1",
-      label: "User confirms ready to begin"
-    },
-    ...questionNodes.map((node, index) => ({
-      id: `edge-question-${index + 1}`,
-      source: node.id,
-      target: index === questionNodes.length - 1 ? "end" : `question_${index + 2}`,
-      label: "Candidate answered the interview question"
-    }))
-  ];
-
   try {
-    // Step 1: Create the basic pathway
-    const createResponse = await axios.post('https://api.bland.ai/v1/convo_pathway/create', 
-      { name:jobId, description },
+    // Step 1: Create empty pathway
+    console.log('Creating empty pathway...');
+    const createResponse = await axios.post('https://api.bland.ai/v1/pathway/create', 
+      { 
+        name,
+        description
+      },
       {
         headers: {
           'Content-Type': 'application/json',
@@ -120,13 +29,30 @@ export default async function handler(req, res) {
     );
 
     const pathwayId = createResponse.data.pathway_id;
+    console.log(`Empty pathway created with ID: ${pathwayId}`);
 
-    // Add a 5-second delay
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Create nodes using config
+    const startNode = NODE_CONFIGS.start;
+    const readyNode = NODE_CONFIGS.ready(jobTitle);
+    const questionNodes = questions.map((question, index) => NODE_CONFIGS.question(question, index));
+    const endNode = NODE_CONFIGS.end;
+
+    // Combine all nodes
+    const nodes = [startNode, readyNode, ...questionNodes, endNode];
+
+    // Create edges using config
+    const edges = createEdges({ startNode, readyNode, questionNodes, endNode });
 
     // Step 2: Update the pathway with nodes and edges
-    const updateResponse = await axios.post(`https://api.bland.ai/v1/convo_pathway/${pathwayId}`, 
-      { name: jobId, description, nodes: allNodes, edges },
+    console.log('Updating pathway with nodes and edges...');
+    const updateResponse = await axios.post(
+      `https://api.bland.ai/v1/pathway/${pathwayId}`,
+      {
+        name,
+        description,
+        nodes,
+        edges
+      },
       {
         headers: {
           'Content-Type': 'application/json',
@@ -135,17 +61,24 @@ export default async function handler(req, res) {
       }
     );
 
+    // Update the job in the database with the new pathwayId
+    await prisma.job.update({
+      where: { id: jobId },
+      data: { blandPathwayId: pathwayId }
+    });
+
     res.status(200).json({
       status: 'success',
       pathway_id: pathwayId,
-      message: 'Pathway created and updated successfully',
-      pathway_data: updateResponse.data.pathway_data
+      message: 'Pathway created and configured successfully'
     });
   } catch (error) {
-    console.error('Error creating/updating pathway:', error.response?.data || error.message);
+    console.error('Error creating pathway:', error);
+    console.error('Error details:', error.response?.data);
     res.status(error.response?.status || 500).json({ 
       status: 'error',
-      message: error.response?.data?.message || 'Error creating/updating pathway'
+      message: error.response?.data?.message || 'Error creating pathway',
+      details: error.message
     });
   }
 }

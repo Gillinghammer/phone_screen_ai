@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       phone_number: phone,
       from: "+16506996300",
       // task: script,
-      voice: "e1289219-0ea2-4f22-a994-c542c2a48a0f",
+      voice: "13843c96-ab9e-4938-baf3-ad53fcee541d", //"e1289219-0ea2-4f22-a994-c542c2a48a0f",
       pathway_id: pathwayId,
       request_data: requestData,
       voice_settings: {
