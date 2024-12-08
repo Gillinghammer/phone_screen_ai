@@ -43,7 +43,7 @@ export const NODE_CONFIGS = {
     type: "Default",
     data: {
       name: `Question ${index + 1}`,
-      text: question,
+      prompt:`Ask the candidate the question: ${question}`,
       isStart: false,
       isGlobal: false,
       condition: "The candidate has finished answering the question, even if they didn't provide the answer you were looking for.",
