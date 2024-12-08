@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { NODE_CONFIGS, createEdges } from '../../../lib/config/bland';
+import { prisma } from '../../../lib/prisma';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
