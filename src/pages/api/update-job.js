@@ -65,15 +65,6 @@ export default async function handler(req, res) {
         await postJobUpdatedWebhook(company, job);
       }
 
-      // If the job has a blandPathwayId, update the pathway
-      
-      const pathwayResponse = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/bland/update-pathway`, {
-        pathwayId: job.blandPathwayId,
-        jobId: job.id,
-        jobTitle: job.jobTitle,
-        interviewQuestions: job.interviewQuestions.set
-      });
-      console.log("Pathway response:", pathwayResponse);
       res.status(200).json(job);
     } catch (error) {
       console.error("Error updating job:", error);
