@@ -3,6 +3,7 @@ import { PostHog } from "posthog-node";
 import { sendEmail } from "../../../lib/utils";
 import { generateEmailTemplate } from "@/components/email-template";
 import stripe from "../../../lib/stripe";
+import { format } from "date-fns";
 
 export const dynamic = "force-dynamic"; // static by default, unless reading the request
 // This function can run for a maximum of 5 seconds
@@ -23,14 +24,23 @@ import { postCandidateScreenedWebhook } from '@/lib/webhooks';
 
 export default async function analyzeCall(req, res) {
   if (req.method === "POST") {
-    const { callId, jobId, phoneScreenId } = req.body;
-
+    const { callId, jobId, candidateId, phoneScreenId, transcript, questions, callStartedAt, callCompletedAt, recordingUrl } = req.body;
+    console.log("analyze-call body", req.body);
     try {
-      // Fetch the job and its interview questions
+      // First update the phoneScreen with the callId and timestamps
+      await prisma.phoneScreen.update({
+        where: { id: phoneScreenId },
+        data: {
+          callId,
+          createdAt: new Date(callStartedAt),
+          endAt: new Date(callCompletedAt),
+        },
+      });
+
+      // Fetch the job details (we still need this for other metadata)
       const job = await prisma.job.findUnique({
         where: { id: parseInt(jobId) },
         select: {
-          interviewQuestions: true,
           jobTitle: true,
           seniority: true,
           userId: true,
@@ -42,20 +52,9 @@ export default async function analyzeCall(req, res) {
         return res.status(404).json({ message: "Job not found" });
       }
 
-      // Prepare the questions array for the 3rd party API request
-      const questions = job.interviewQuestions?.set;
-
-      const response = await axios.get(
-        `https://api.bland.ai/v1/calls/${callId}`,
-        {
-          headers: {
-            authorization: process.env.BLAND_API_KEY,
-          },
-        }
-      );
-      const alignedTranscript = response.data.transcripts;
+      // Prepare the questions array for the analysis
       const msg = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20240620", //"claude-3-sonnet-20240229", // "claude-3-5-sonnet-20240620"
+        model: "claude-3-5-sonnet-20240620",
         max_tokens: 4096,
         temperature: 0,
         system: "You're a helpful assistant.",
@@ -73,9 +72,9 @@ export default async function analyzeCall(req, res) {
             </interview_questions>
 
             <conversation_transcript>
-            ${alignedTranscript
+            ${transcript
               .map((msg) => {
-                if (msg.user === "assistant") {
+                if (msg.role === "Assistant") {
                   return `<assistant>${msg.text}</assistant>`;
                 } else {
                   return `<user>${msg.text}</user>`;
@@ -139,7 +138,7 @@ export default async function analyzeCall(req, res) {
                 ${answer}
                 </candidate_answer>
 
-                Some questions are simple yes or no questions which require a binary yes or no answer. Think about the <interview_question> and determine if it is a binary question.
+                Some questions are simple yes or no questions which require a binary yes or no answer. Think about the <interview_question>, <candidate_answer>, and determine if it is a binary question.
                 <is_binary_question></is_binary_question> // TRUE or FALSE
 
                 Important: If the question is binary, assume the question is asking the candidate to confirm or deny a specific experience or skill and only provide a score of 100 if the candidate confirm's the experience or skill, otherwise you should score them a 0.
@@ -182,33 +181,42 @@ export default async function analyzeCall(req, res) {
 
                 Now provide the score for the candidate's answer:
             `,
-            },
-            {
-              role: "assistant",
-              content: `{"score":`,
-            },
-          ],
-        });
-
-        const scoreText = score.content[0].text;
-        const parsedScore = JSON5.parse(`{"score": ` + scoreText);
-        return {
-          score: parsedScore.score,
-          is_binary_question: parsedScore.is_binary_question,
-          reasoning: parsedScore.reasoning,
-        };
+          },
+          {
+            role: "assistant",
+            content: `{"score":`,
+          },
+        ],
       });
 
-      const scores = await Promise.all(scorePromises);
-      // Update the PhoneScreen with the analysis result
-      const qualificationScore =
-        scores.reduce((acc, answer) => acc + (answer?.score ?? 0), 0) /
-        scores.length;
+      const scoreText = score.content[0].text;
+      const parsedScore = JSON5.parse(`{"score": ` + scoreText);
+      return {
+        score: parsedScore.score,
+        is_binary_question: parsedScore.is_binary_question,
+        reasoning: parsedScore.reasoning,
+      };
+    });
 
+    const scores = await Promise.all(scorePromises);
+      
+      // Format the transcript into a string with proper prefixes
+      const formattedTranscript = transcript
+        .map(msg => {
+          const prefix = msg.role === 'Assistant' ? 'assistant: ' : 'user: ';
+          return `${prefix}${msg.text}`;
+        })
+        .join('\n');
+
+      // Update the phone screen with analysis and formatted transcript
       const updatedPhoneScreen = await prisma.phoneScreen.update({
         where: { id: phoneScreenId },
         data: {
           analysis: [],
+          answeredBy: 'human',
+          concatenatedTranscript: formattedTranscript,
+          callLength: (new Date(callCompletedAt) - new Date(callStartedAt)) / (1000 * 60),
+          correctedDuration: (new Date(callCompletedAt) - new Date(callStartedAt)) / 1000,
           analysisV2: questionsAndAnswers.map((qa, i) => ({
             question: qa.question,
             answer: qa.answer,
@@ -216,13 +224,19 @@ export default async function analyzeCall(req, res) {
             isBinaryQuestion: scores[i].is_binary_question,
             reasoning: scores[i].reasoning,
           })),
-          qualificationScore,
-          status: qualificationScore < 1 ? "call failed" : undefined,
+          qualificationScore:
+            scores.reduce((acc, answer) => acc + (answer?.score ?? 0), 0) /
+            scores.length,
+          status: scores.reduce((acc, answer) => acc + (answer?.score ?? 0), 0) / scores.length < 1 ? "call failed" : "completed",
+          completed: true,
+          queueStatus: 'complete',
+          record: true,
+          recordingUrl: recordingUrl,
         },
       });
 
       const candidate = await prisma.candidate.findUnique({
-        where: { id: updatedPhoneScreen.candidateId },
+        where: { id: parseInt(candidateId) },
         select: {
           name: true,
           email: true,
@@ -239,8 +253,8 @@ export default async function analyzeCall(req, res) {
           userId: job.userId,
           title: job.jobTitle,
           location: job.jobLocation,
-          duration: updatedPhoneScreen.correctedDuration,
-          score: qualificationScore,
+          duration: updatedPhoneScreen.completedAt - updatedPhoneScreen.startedAt,
+          score: updatedPhoneScreen.qualificationScore,
           price: updatedPhoneScreen.price,
           status: updatedPhoneScreen.status,
           candidate: candidate.name,
@@ -279,7 +293,7 @@ export default async function analyzeCall(req, res) {
         await postCandidateScreenedWebhook(company, updatedPhoneScreen, candidate, job);
       }
 
-      // if updatedPhoneScreen.status === "call failed" then we don't want to create a meter event
+      // if phoneScreen.status === "call failed" then we don't want to create a meter event
       if (updatedPhoneScreen.status !== "call failed") {
         const meterEvent = await stripe.billing.meterEvents.create({
           event_name: "completed_screen",
