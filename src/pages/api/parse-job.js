@@ -27,8 +27,10 @@ Your response should be in JSON format.
 const parseJob = async (req, res) => {
   if (req.method === "POST") {
     const details = req.body.details;
+    console.log('Received job details:', details?.substring(0, 100) + '...')
 
     try {
+      console.log('Starting first OpenAI request: Parse job posting')
       // First request: Parse job posting
       const jobResponse = await openai.chat.completions.create({
         model: model,
@@ -71,8 +73,11 @@ const parseJob = async (req, res) => {
         function_call: { name: "parse_job_posting" },
       });
 
+      console.log('Received job parsing response')
       const parsedJob = JSON.parse(jobResponse.choices[0].message.function_call.arguments);
+      console.log('Parsed job data:', parsedJob)
 
+      console.log('Starting second OpenAI request: Generate interview questions')
       // Second request: Generate interview questions
       const questionsResponse = await openai.chat.completions.create({
         model: model,
@@ -100,7 +105,9 @@ const parseJob = async (req, res) => {
         function_call: { name: "generate_interview_questions" },
       });
 
+      console.log('Received interview questions response')
       const generatedQuestions = JSON.parse(questionsResponse.choices[0].message.function_call.arguments);
+      console.log('Generated questions:', generatedQuestions)
 
       // Merge parsed job and interview questions
       const finalResult = {
@@ -115,15 +122,18 @@ const parseJob = async (req, res) => {
         "responsibilities", "interview_questions"
       ];
 
+      console.log('Checking required fields...')
       for (const field of requiredFields) {
         if (finalResult[field] === undefined) {
+          console.error(`Missing required field: ${field}`)
           throw new Error(`Missing required field: ${field}`);
         }
       }
 
+      console.log('All checks passed, sending response')
       res.status(200).json(finalResult);
     } catch (error) {
-      console.error(`Error during API call: ${error}`);
+      console.error(`Error during API call:`, error)
       res.status(500).json({ error: "An error occurred while processing the job posting" });
     }
   } else {

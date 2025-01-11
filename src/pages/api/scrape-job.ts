@@ -1,4 +1,30 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import axios from 'axios'
+import * as cheerio from 'cheerio'
+
+async function scrapeJobPage(url: string): Promise<string> {
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
+      timeout: 5000 // 5 second timeout
+    })
+    const $ = cheerio.load(response.data)
+    
+    // Remove script and style elements
+    $('script').remove()
+    $('style').remove()
+    
+    // Get all text content
+    return $('body').text().trim()
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .replace(/\n+/g, '\n') // Replace multiple newlines with single newline
+  } catch (error) {
+    console.error('Error scraping page:', error)
+    throw error
+  }
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,40 +41,28 @@ export default async function handler(
       return res.status(400).json({ message: 'URL is required' })
     }
 
-    // Simulate a delay for scraping
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    // Mock job description
-    const jobDescription = `Job Title: Senior Marketing Manager
-
-Company: Tesla
-
-Location: Palo Alto, CA
-
-Job Description:
-We are seeking a highly motivated and experienced Senior Marketing Manager to join our team at Tesla. The ideal candidate will have a strong background in digital marketing, brand management, and team leadership.
-
-Responsibilities:
-- Develop and implement comprehensive marketing strategies
-- Lead a team of marketing professionals
-- Analyze market trends and competitor activities
-- Manage budget and resource allocation for marketing initiatives
-- Collaborate with cross-functional teams to align marketing efforts with overall business goals
-
-Requirements:
-- Bachelor's degree in Marketing, Business, or related field
-- 7+ years of experience in marketing, with at least 3 years in a senior role
-- Proven track record of successful marketing campaigns
-- Strong analytical and problem-solving skills
-- Excellent communication and leadership abilities
-- Experience with digital marketing tools and platforms
-- Knowledge of the automotive industry is a plus
-
-If you are passionate about sustainable energy and want to be part of a revolutionary company, we encourage you to apply for this exciting opportunity at Tesla.`
-
-    res.status(200).json({ jobDescription })
+    try {
+      const jobDescription = await scrapeJobPage(url)
+      if (!jobDescription) {
+        throw new Error('No content found')
+      }
+      res.status(200).json({ jobDescription })
+    } catch (error) {
+      console.error('Failed to scrape job listing:', error)
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED') {
+          res.status(408).json({ message: 'Request timeout' })
+        } else if (error.response?.status === 403) {
+          res.status(403).json({ message: 'Access denied by the job board. Please copy and paste the job description directly.' })
+        } else {
+          res.status(500).json({ message: 'Failed to access the job listing. Please copy and paste the job description directly.' })
+        }
+      } else {
+        res.status(500).json({ message: 'Failed to scrape job listing. Please copy and paste the job description directly.' })
+      }
+    }
   } catch (error) {
-    console.error('Error scraping job:', error)
+    console.error('Error in job scraping handler:', error)
     res.status(500).json({ message: 'Failed to scrape job listing' })
   }
 }
