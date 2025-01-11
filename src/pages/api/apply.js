@@ -44,7 +44,7 @@ export default async function handle(req, res) {
       candidateId: candidate.id,
       phoneScreenId: phoneScreen.id,
       jobTitle: job.jobTitle,
-      questions: job.interviewQuestions.set,
+      questions: job.interviewQuestions,
       transcript_webhook: process.env.TRANSCRIPT_WEBHOOK
     };
 

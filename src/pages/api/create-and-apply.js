@@ -21,8 +21,12 @@ export default async function handler(req, res) {
       // Candidate details
       name,
       email,
-      phone
+      phone,
+      resumeUrl,
+      hiringManagerEmail
     } = req.body;
+
+    console.log('Received job:', JSON.stringify(req.body, null, 2));
 
     // First, create the job
     const jobResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/create-job`, {
@@ -62,6 +66,7 @@ export default async function handler(req, res) {
         name,
         email,
         phone,
+        resumeUrl,
         job: {
           jobTitle,
           jobLocation,
