@@ -28,9 +28,47 @@ export default function JobDetails({ jobDescription, parsedJob, onBack }: JobDet
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
 
-  const handleStartInterview = () => {
-    console.log('Starting interview with:', { name, email, phone })
-  }
+  const handleStartInterview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('/api/create-and-apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyId: 12,
+          userId: 17,
+          jobTitle: parsedJob.job_title,
+          jobLocation: parsedJob.job_location,
+          jobDescription: parsedJob.job_description,
+          requirements: parsedJob.requirements,
+          responsibilities: parsedJob.responsibilities,
+          seniority: parsedJob.seniority,
+          salary: parsedJob.salary || 0,
+          remoteFriendly: parsedJob.remote_friendly || false,
+          interviewQuestions: {
+            set: parsedJob.interview_questions || []
+          },
+          // Candidate details
+          name,
+          email,
+          phone,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create job and application');
+      }
+
+      const data = await response.json();
+      window.location.href = `/apply/${data.job.id}`;
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle error appropriately
+    }
+  };
 
   if (!parsedJob) {
     console.log('No parsed job data available')
@@ -120,7 +158,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack }: JobDet
               </Card.CardDescription>
             </Card.CardHeader>
             <Card.CardContent>
-              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-4" onSubmit={handleStartInterview}>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-sm font-medium">
@@ -163,7 +201,6 @@ export default function JobDetails({ jobDescription, parsedJob, onBack }: JobDet
                   <Button
                     className="w-full"
                     size="lg"
-                    onClick={handleStartInterview}
                     disabled={!name || !email || !phone}
                   >
                     Start Phone Screen

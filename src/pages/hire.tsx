@@ -137,7 +137,7 @@ const HirePage: NextPage = () => {
     <main className="container mx-auto p-4">
       <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
         <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6">AI Job Interview Assistant</h1>
+          <h1 className="text-3xl font-bold mb-6">AI Interview Agent</h1>
           <div className="mb-8 flex justify-between items-center">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">

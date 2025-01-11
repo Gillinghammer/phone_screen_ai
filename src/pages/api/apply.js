@@ -2,7 +2,11 @@ import { prisma } from '../../lib/prisma';
 import axios from 'axios';
 
 export default async function handle(req, res) {
-  const { name, email, phone, resumeUrl, jobId, job } = req.body;
+  const { name, email, phone, resumeUrl = '', jobId, job } = req.body;
+
+  // Debug logging
+  console.log('Received job:', JSON.stringify(job, null, 2));
+  console.log('Interview questions:', JSON.stringify(job.interviewQuestions, null, 2));
 
   // Validate input data
   if (!name || !email || !phone || !jobId || !job) {
@@ -31,42 +35,45 @@ export default async function handle(req, res) {
       },
     });
 
+    // Debug logging before making call
+    const callPayload = {
+      phoneNumber: phone,
+      name,
+      email,
+      jobId,
+      candidateId: candidate.id,
+      phoneScreenId: phoneScreen.id,
+      jobTitle: job.jobTitle,
+      questions: job.interviewQuestions.set,
+      transcript_webhook: process.env.TRANSCRIPT_WEBHOOK
+    };
+
+    console.log('Call payload:', JSON.stringify(callPayload, null, 2));
+
     // Make the call request to the conversational server
     const callResponse = await axios.post(
       `${process.env.CONVERSATIONAL_SERVER}/call`,
-      {
-        phoneNumber: phone,
-        name: name,
-        email: email,
-        jobId: jobId,
-        candidateId: candidate.id,
-        phoneScreenId: phoneScreen.id,
-        jobTitle: job.jobTitle,
-        jobLocation: job.jobLocation,
-        jobDescription: job.jobDescription,
-        remoteFriendly: job.remoteFriendly,
-        seniority: job.seniority,
-        salary: job.salary,
-        requirements: job.requirements.set,
-        responsibilities: job.responsibilities.set,
-        questions: job.interviewQuestions.set,
-        transcript_webhook: process.env.TRANSCRIPT_WEBHOOK
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
+      callPayload
     );
 
-    return res.status(200).json({
+    // Update the PhoneScreen record with the call ID
+    if (callResponse.data && callResponse.data.callId) {
+      await prisma.phoneScreen.update({
+        where: { id: phoneScreen.id },
+        data: { callId: callResponse.data.callId },
+      });
+    }
+
+    res.status(201).json({
       candidate,
-      call: callResponse.data
+      phoneScreen,
+      call: callResponse.data,
     });
   } catch (error) {
-    console.error("An error occurred:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    console.error('Error:', error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+    }
+    res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 }
