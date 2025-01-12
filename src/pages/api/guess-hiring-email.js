@@ -13,6 +13,8 @@ Given a company name, provide your best guess for a professional email address t
 Use common patterns like careers@company.com, recruiting@company.com, or hr@company.com.
 Remove any spaces or special characters from the company name and convert to lowercase.
 
+Start by asking yourself what the domain name is for the provided company name to get started.
+
 Your response MUST be in this exact JSON format:
 {
   "email": "careers@companyname.com"

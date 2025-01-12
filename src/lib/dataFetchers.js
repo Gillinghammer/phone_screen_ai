@@ -1,6 +1,17 @@
 import { prisma } from './prisma';
 import { format } from "date-fns";
 
+// Helper function to safely format dates
+function safeFormatDate(date, formatStr) {
+  if (!date) return null;
+  try {
+    return format(date, formatStr);
+  } catch (error) {
+    console.error('Invalid date:', date, error);
+    return null;
+  }
+}
+
 export async function getUserAndCompany(email) {
   const user = await prisma.user.findUnique({
     where: { email },
@@ -44,15 +55,26 @@ export async function getJobs(companyId) {
     },
   });
 
-  return jobs.map((job) => ({
-    ...job,
-    createdAt: format(job.createdAt, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
-    updatedAt: format(job.updatedAt, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
-    candidates: job.candidates.map((candidate) => ({
-      ...candidate,
-      phoneScreen: candidate.phoneScreen ? { ...candidate.phoneScreen } : null,
-    })),
-  }));
+  return jobs
+    .map((job) => {
+      const createdAt = safeFormatDate(job.createdAt, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+      const updatedAt = safeFormatDate(job.updatedAt, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+      
+      if (!createdAt || !updatedAt) return null;
+
+      return {
+        ...job,
+        createdAt,
+        updatedAt,
+        candidates: job.candidates
+          .map((candidate) => ({
+            ...candidate,
+            phoneScreen: candidate.phoneScreen ? { ...candidate.phoneScreen } : null,
+          }))
+          .filter(Boolean),
+      };
+    })
+    .filter(Boolean);
 }
 
 export async function fetchJob(jobId, userEmail) {
@@ -91,24 +113,45 @@ export async function fetchJob(jobId, userEmail) {
     return null;
   }
 
+  const createdAt = safeFormatDate(job.createdAt, "yyyy-MM-dd HH:mm:ss");
+  const updatedAt = safeFormatDate(job.updatedAt, "yyyy-MM-dd HH:mm:ss");
+  
+  if (!createdAt || !updatedAt) return null;
+
+  const validCandidates = job.candidates
+    .map((candidate) => {
+      if (!candidate) return null;
+      
+      if (candidate.phoneScreen) {
+        const phoneScreenCreatedAt = safeFormatDate(candidate.phoneScreen.createdAt, "yyyy-MM-dd HH:mm:ss");
+        const phoneScreenUpdatedAt = safeFormatDate(candidate.phoneScreen.updatedAt, "yyyy-MM-dd HH:mm:ss");
+        const phoneScreenEndAt = safeFormatDate(candidate.phoneScreen.endAt, "yyyy-MM-dd HH:mm:ss");
+        
+        if (!phoneScreenCreatedAt || !phoneScreenUpdatedAt) return null;
+
+        return {
+          ...candidate,
+          phoneScreen: {
+            ...candidate.phoneScreen,
+            createdAt: phoneScreenCreatedAt,
+            updatedAt: phoneScreenUpdatedAt,
+            endAt: phoneScreenEndAt,
+          },
+        };
+      }
+
+      return {
+        ...candidate,
+        phoneScreen: null,
+      };
+    })
+    .filter(Boolean);
+
   return {
     ...job,
-    createdAt: format(job.createdAt, "yyyy-MM-dd HH:mm:ss"),
-    updatedAt: format(job.updatedAt, "yyyy-MM-dd HH:mm:ss"),
-    candidates: job.candidates.map((candidate) => ({
-      ...candidate,
-      phoneScreen: candidate.phoneScreen
-        ? {
-            ...candidate.phoneScreen,
-            createdAt: format(candidate.phoneScreen.createdAt, "yyyy-MM-dd HH:mm:ss"),
-            updatedAt: format(candidate.phoneScreen.updatedAt, "yyyy-MM-dd HH:mm:ss"),
-            endAt: candidate.phoneScreen.endAt 
-              ? format(candidate.phoneScreen.endAt, "yyyy-MM-dd HH:mm:ss")
-              : null,
-            // Format any other date fields here if they exist
-          }
-        : null,
-    })),
+    createdAt,
+    updatedAt,
+    candidates: validCandidates,
   };
 }
 
@@ -138,21 +181,43 @@ export async function getPaginatedCandidates(jobId, filters = {}) {
     orderBy: { createdAt: 'desc' },
   });
 
-  return candidates.map(candidate => ({
-    ...candidate,
-    createdAt: format(candidate.createdAt, "yyyy-MM-dd HH:mm:ss"),
-    updatedAt: format(candidate.updatedAt, "yyyy-MM-dd HH:mm:ss"),
-    phoneScreen: candidate.phoneScreen
-      ? {
-          ...candidate.phoneScreen,
-          createdAt: format(candidate.phoneScreen.createdAt, "yyyy-MM-dd HH:mm:ss"),
-          updatedAt: format(candidate.phoneScreen.updatedAt, "yyyy-MM-dd HH:mm:ss"),
-          endAt: candidate.phoneScreen.endAt 
-            ? format(candidate.phoneScreen.endAt, "yyyy-MM-dd HH:mm:ss")
-            : null,
-        }
-      : null,
-  }));
+  return candidates
+    .map(candidate => {
+      if (!candidate) return null;
+
+      const candidateCreatedAt = safeFormatDate(candidate.createdAt, "yyyy-MM-dd HH:mm:ss");
+      const candidateUpdatedAt = safeFormatDate(candidate.updatedAt, "yyyy-MM-dd HH:mm:ss");
+
+      if (!candidateCreatedAt || !candidateUpdatedAt) return null;
+
+      if (candidate.phoneScreen) {
+        const phoneScreenCreatedAt = safeFormatDate(candidate.phoneScreen.createdAt, "yyyy-MM-dd HH:mm:ss");
+        const phoneScreenUpdatedAt = safeFormatDate(candidate.phoneScreen.updatedAt, "yyyy-MM-dd HH:mm:ss");
+        const phoneScreenEndAt = safeFormatDate(candidate.phoneScreen.endAt, "yyyy-MM-dd HH:mm:ss");
+
+        if (!phoneScreenCreatedAt || !phoneScreenUpdatedAt) return null;
+
+        return {
+          ...candidate,
+          createdAt: candidateCreatedAt,
+          updatedAt: candidateUpdatedAt,
+          phoneScreen: {
+            ...candidate.phoneScreen,
+            createdAt: phoneScreenCreatedAt,
+            updatedAt: phoneScreenUpdatedAt,
+            endAt: phoneScreenEndAt,
+          },
+        };
+      }
+
+      return {
+        ...candidate,
+        createdAt: candidateCreatedAt,
+        updatedAt: candidateUpdatedAt,
+        phoneScreen: null,
+      };
+    })
+    .filter(Boolean);
 }
 
 // Remove getTotalCandidates function as it's no longer needed

@@ -1,9 +1,7 @@
 // pages/api/analyze-call.js
-import { PostHog } from "posthog-node";
-import { sendEmail } from "../../../lib/utils";
-import { generateEmailTemplate } from "@/components/email-template";
+import { sendEmailHiringManager, sendEmailCandidate } from "../../../lib/utils";
 import stripe from "../../../lib/stripe";
-import { format } from "date-fns";
+import axios from "axios";
 
 export const dynamic = "force-dynamic"; // static by default, unless reading the request
 // This function can run for a maximum of 5 seconds
@@ -17,7 +15,6 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 import { prisma } from '../../../lib/prisma';
-import axios from "axios";
 
 // Import the webhook function
 import { postCandidateScreenedWebhook } from '@/lib/webhooks';
@@ -45,12 +42,32 @@ export default async function analyzeCall(req, res) {
           seniority: true,
           userId: true,
           companyId: true,
+          company: true,
         },
       });
 
       if (!job) {
         return res.status(404).json({ message: "Job not found" });
       }
+
+      // Track interview start
+      await axios.post("https://app.posthog.com/capture/", {
+        api_key: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+        event: "Interview Started",
+        distinct_id: candidateId || 'anonymous',
+        properties: {
+          job_title: job.jobTitle,
+          company: job.company,
+          recording_url: recordingUrl,
+          $current_url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+        },
+        timestamp: new Date().toISOString()
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_POSTHOG_KEY}`
+        }
+      });
 
       // Prepare the questions array for the analysis
       const msg = await anthropic.messages.create({
@@ -181,24 +198,24 @@ export default async function analyzeCall(req, res) {
 
                 Now provide the score for the candidate's answer:
             `,
-          },
-          {
-            role: "assistant",
-            content: `{"score":`,
-          },
-        ],
+            },
+            {
+              role: "assistant",
+              content: `{"score":`,
+            },
+          ],
+        });
+
+        const scoreText = score.content[0].text;
+        const parsedScore = JSON5.parse(`{"score": ` + scoreText);
+        return {
+          score: parsedScore.score,
+          is_binary_question: parsedScore.is_binary_question,
+          reasoning: parsedScore.reasoning,
+        };
       });
 
-      const scoreText = score.content[0].text;
-      const parsedScore = JSON5.parse(`{"score": ` + scoreText);
-      return {
-        score: parsedScore.score,
-        is_binary_question: parsedScore.is_binary_question,
-        reasoning: parsedScore.reasoning,
-      };
-    });
-
-    const scores = await Promise.all(scorePromises);
+      const scores = await Promise.all(scorePromises);
       
       // Format the transcript into a string with proper prefixes
       const formattedTranscript = transcript
@@ -235,11 +252,36 @@ export default async function analyzeCall(req, res) {
         },
       });
 
+      // Track interview completion
+      await axios.post("https://app.posthog.com/capture/", {
+        api_key: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+        event: "Interview Analysis Completed",
+        distinct_id: candidateId || 'anonymous',
+        properties: {
+          job_title: job.jobTitle,
+          company: job.company,
+          question_count: updatedPhoneScreen.analysisV2.length,
+          average_score: updatedPhoneScreen.qualificationScore,
+          duration_seconds: updatedPhoneScreen.correctedDuration,
+          $current_url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+        },
+        timestamp: new Date().toISOString()
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_POSTHOG_KEY}`
+        }
+      });
+
       const candidate = await prisma.candidate.findUnique({
-        where: { id: parseInt(candidateId) },
+        where: {
+          id: candidateId,
+        },
         select: {
           name: true,
           email: true,
+          isOutbound: true,
+          hiringManagerEmail: true,
         },
       });
 
@@ -261,6 +303,7 @@ export default async function analyzeCall(req, res) {
           email: candidate.email,
           fromNumber: updatedPhoneScreen.from,
           toNumber: updatedPhoneScreen.to,
+          outbound: candidate.isOutbound,
         },
       };
 
@@ -295,14 +338,17 @@ export default async function analyzeCall(req, res) {
 
       // if phoneScreen.status === "call failed" then we don't want to create a meter event
       if (updatedPhoneScreen.status !== "call failed") {
-        const meterEvent = await stripe.billing.meterEvents.create({
-          event_name: "completed_screen",
-          payload: {
-            value: "1",
-            stripe_customer_id: billingCompany.stripeCustomerId, // Use the billing company's Stripe ID
-          },
-        });
-        console.log("Meter event created:", meterEvent);
+        // Only create meter event for inbound candidates (isOutbound = false)
+        if (!candidate.isOutbound) {
+          const meterEvent = await stripe.billing.meterEvents.create({
+            event_name: "completed_screen",
+            payload: {
+              value: "1",
+              stripe_customer_id: billingCompany.stripeCustomerId, // Use the billing company's Stripe ID
+            },
+          });
+          console.log("Meter event created:", meterEvent);
+        }
 
         await axios.post("https://app.posthog.com/capture/", captureEvent, {
           headers: {
@@ -310,22 +356,18 @@ export default async function analyzeCall(req, res) {
           },
         });
 
-        // Only send email if there's no parentCompanyId
-        if (!company.parentCompanyId) {
-          const subject = `Phone screen completed for the ${job.jobTitle} role`;
-
-          await sendEmail({
-            to: candidate.email,
-            subject: subject,
-            text: "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
-            html: generateEmailTemplate({
-              subject: subject,
-              toEmail: candidate.email,
-              fromEmail: "no-reply@phonescreen.ai",
-              content:
-                "Thank you for completing your phone screen. This email confirms that your answers will be shared with the recruiting team.",
-            }),
-          });
+        const isLocalDev = process.env.NEXT_PUBLIC_API_URL?.includes('localhost');
+        
+        // Only send emails for outbound candidates (isOutbound = true)
+        if (candidate.isOutbound) {
+          // Send email to hiring manager if:
+          // 1. We're in development environment (always send for testing), OR
+          // 2. We're in production and candidate scored >= 70
+          if (isLocalDev || updatedPhoneScreen.qualificationScore >= 70) {
+            // send email to hiring manager
+            await sendEmailHiringManager(updatedPhoneScreen, job, candidate);
+          }
+          await sendEmailCandidate(updatedPhoneScreen, job, candidate);
         }
       }
 

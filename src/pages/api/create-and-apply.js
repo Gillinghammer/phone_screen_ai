@@ -1,4 +1,3 @@
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -17,6 +16,7 @@ export default async function handler(req, res) {
       salary,
       remoteFriendly,
       interviewQuestions,
+      companyName,
       // Candidate details
       name,
       email,
@@ -45,6 +45,7 @@ export default async function handler(req, res) {
         salary,
         remoteFriendly,
         interviewQuestions,
+        companyName,
       }),
     });
 
@@ -66,6 +67,8 @@ export default async function handler(req, res) {
         email,
         phone,
         linkedinUrl,
+        hiringManagerEmail,
+        isOutbound: true, // Set to true for candidates created through this endpoint
         job: {
           jobTitle,
           jobLocation,

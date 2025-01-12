@@ -72,7 +72,8 @@ model Job {
   isArchived         Boolean       @default(false)
   companyId          Int?
   uuid               String        @default(uuid())
-  blandPathwayId     String? // Add this line
+  blandPathwayId     String? 
+  companyName        String?       // Optional company name field
   candidates         Candidate[]
   company            Company?      @relation(fields: [companyId], references: [id])
   user               User          @relation(fields: [userId], references: [id])
@@ -80,18 +81,20 @@ model Job {
 }
 
 model Candidate {
-  id          Int             @id @default(autoincrement())
-  jobPostId   Int
-  name        String
-  phone       String
-  email       String
-  resumeUrl   String
-  linkedinUrl String?
-  status      CandidateStatus @default(OPEN)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  jobPost     Job             @relation(fields: [jobPostId], references: [id])
-  phoneScreen PhoneScreen?
+  id                Int             @id @default(autoincrement())
+  jobPostId         Int
+  name              String
+  phone             String
+  email             String
+  resumeUrl         String?         // Made optional by adding ?
+  linkedinUrl       String?
+  isOutbound        Boolean         @default(false)  // New field with camelCase
+  hiringManagerEmail String?        // New optional field in camelCase
+  status            CandidateStatus @default(OPEN)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  jobPost           Job             @relation(fields: [jobPostId], references: [id])
+  phoneScreen       PhoneScreen?
 }
 
 model PhoneScreen {

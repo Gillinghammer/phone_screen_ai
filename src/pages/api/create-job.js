@@ -12,6 +12,7 @@ export default async function handler(req, res) {
   try {
     const {
       companyId,
+      companyName,
       userId,
       jobTitle,
       jobLocation,
@@ -43,6 +44,7 @@ export default async function handler(req, res) {
 
     const job = await prisma.job.create({
       data: {
+        companyName,
         jobDescription,
         jobLocation,
         jobTitle,

@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { NextPage } from 'next'
 import JobListingInput from '@/components/hire/JobListingInput'
 import JobDetails from '@/components/hire/JobDetails'
+import InterviewInProgress from '@/components/hire/InterviewInProgress'
 import { useToast } from '@/components/ui/use-toast'
 import LoadingSteps from '@/components/hire/LoadingSteps'
-import { FileTextIcon, ChatBubbleIcon } from '@radix-ui/react-icons'
+import { FileTextIcon, ChatBubbleIcon, RocketIcon, ArrowRightIcon } from '@radix-ui/react-icons'
+import { Button } from '@/components/ui/button'
+import { usePostHog } from 'posthog-js/react'
 
 interface ParsedJob {
   company: string
@@ -17,19 +20,61 @@ interface ParsedJob {
   requirements: string[]
   responsibilities: string[]
   interview_questions: string[]
+  candidate: {
+    name: string
+    email: string
+    linkedinUrl: string
+    hiringManagerEmail: string
+  }
 }
 
 const HirePage: NextPage = () => {
+  const [showWizard, setShowWizard] = useState(false)
   const [step, setStep] = useState(1)
   const [jobDescription, setJobDescription] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [jobUrl, setJobUrl] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const [parsedJob, setParsedJob] = useState<ParsedJob | null>(null)
+  const [candidateDetails, setCandidateDetails] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    linkedinUrl: '',
+    hiringManagerEmail: ''
+  })
   const { toast } = useToast()
+  const posthog = usePostHog()
+
+  // Track wizard start
+  useEffect(() => {
+    if (showWizard) {
+      posthog.capture('Hiring Wizard Started', {
+        step: 1,
+        has_job_url: Boolean(jobUrl),
+        $current_url: window.location.href
+      })
+    }
+  }, [showWizard])
+
+  // Track step changes
+  useEffect(() => {
+    if (step > 1) {
+      posthog.capture('Hiring Wizard Step Changed', {
+        step,
+        has_parsed_job: Boolean(parsedJob),
+        has_candidate_details: Boolean(candidateDetails.email),
+        $current_url: window.location.href
+      })
+    }
+  }, [step])
 
   const handleScrape = async () => {
     setIsLoading(true)
+    posthog.capture('Job URL Scrape Attempted', {
+      url: jobUrl,
+      $current_url: window.location.href
+    })
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 5000)
@@ -51,29 +96,59 @@ const HirePage: NextPage = () => {
 
       const data = await response.json()
       setJobDescription(data.jobDescription)
+      
+      if (data.jobDescription) {
+        posthog.capture('Job URL Scrape Completed', {
+          success: true,
+          url: jobUrl,
+          description_length: data.jobDescription.length,
+          $current_url: window.location.href
+        })
+      } else {
+        throw new Error('No job description found')
+      }
     } catch (error) {
       if (error.name === 'AbortError') {
         toast({
-          title: "Scraping took too long",
-          description: "Please copy and paste the job description directly into the text area.",
+          title: "Timeout",
+          description: "The request took too long. Please paste the job description directly.",
           variant: "destructive"
         })
       } else {
         toast({
-          title: "Error scraping job",
+          title: "Error",
           description: "Please copy and paste the job description directly into the text area.",
           variant: "destructive"
         })
       }
-      console.error('Error:', error)
+      console.error('Error scraping job:', error)
+      posthog.capture('Job URL Scrape Failed', {
+        error: error.message,
+        url: jobUrl,
+        $current_url: window.location.href
+      })
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleStartInterview = async () => {
+    if (!jobDescription.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a job description',
+        variant: 'destructive'
+      })
+      return
+    }
+
     setIsProcessing(true)
-    
+    posthog.capture('Job Description Submitted', {
+      description_length: jobDescription.length,
+      has_job_url: Boolean(jobUrl),
+      $current_url: window.location.href
+    })
+
     try {
       console.log('Starting interview process with job description:', jobDescription)
       
@@ -101,6 +176,14 @@ const HirePage: NextPage = () => {
       const parsedData = await parseResponse.json()
       console.log('Received parsed job data:', parsedData)
       setParsedJob(parsedData)
+      posthog.capture('Job Description Parsed', {
+        success: true,
+        company: parsedData.company,
+        job_title: parsedData.job_title,
+        has_requirements: Boolean(parsedData.requirements?.length),
+        question_count: parsedData.interview_questions?.length,
+        $current_url: window.location.href
+      })
 
       // Step 3: Crafting interview strategy
       await new Promise(resolve => setTimeout(resolve, 2000))
@@ -114,6 +197,10 @@ const HirePage: NextPage = () => {
       setStep(2)
     } catch (error) {
       console.error('Error in handleStartInterview:', error)
+      posthog.capture('Job Description Parse Failed', {
+        error: error.message,
+        $current_url: window.location.href
+      })
       toast({
         title: "Error preparing interview",
         description: "Failed to analyze the job description. Please try again.",
@@ -131,78 +218,160 @@ const HirePage: NextPage = () => {
     setIsLoading(false)
     setIsProcessing(false)
     setParsedJob(null)
+    setCandidateDetails({
+      name: '',
+      email: '',
+      phone: '',
+      linkedinUrl: '',
+      hiringManagerEmail: ''
+    })
+  }
+
+  if (!showWizard) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <main className="flex-1 flex flex-col items-center justify-center p-4">
+          <div className="max-w-4xl w-full space-y-12 text-center">
+            <div className="space-y-6">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+                Land Your{" "}
+                <span className="relative inline-block animate-fade-in">
+                  <span className="absolute -inset-3 bg-gradient-to-r from-primary/40 via-primary/30 to-primary/20 rounded-xl blur-lg animate-pulse"></span>
+                  <span className="relative inline-block">
+                    <span className="text-primary font-black bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-primary bg-[length:200%_auto] animate-gradient">
+                      Dream Job
+                    </span>
+                  </span>
+                </span>
+                {" "}Faster with AI-Powered Interviews
+              </h1>
+              <p className="text-xl leading-relaxed text-foreground/80 max-w-2xl mx-auto">
+                Our AI Agent interviews you, fast-tracking your way to getting hired. Share your details, 
+                take the interview, and we'll do the rest.
+              </p>
+            </div>
+
+            <div className="grid gap-10 md:grid-cols-3 text-left">
+              <div className="space-y-3">
+                <div className="relative">
+                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                    <FileTextIcon className="h-7 w-7 text-primary" />
+                  </div>
+                  <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 via-primary/20 to-transparent rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+                <h3 className="text-xl font-semibold">1. Share Job Details</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
+                  Paste the job description or URL. We'll create a personalized interview tailored to the role.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <div className="relative">
+                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                    <ChatBubbleIcon className="h-7 w-7 text-primary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold">2. Take the Interview</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
+                  Our AI Agent calls you and conducts a professional phone screen.
+                </p>
+              </div>
+              <div className="space-y-3">
+                <div className="relative">
+                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                    <RocketIcon className="h-7 w-7 text-primary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold">3. Get Hired</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
+                  We'll email your recording and transcript directly to hiring teams to fast-track your application.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-lg font-medium text-foreground/90">
+              Don’t wait—your dream job is just a call away!
+              </p>
+              <Button 
+                onClick={() => setShowWizard(true)}
+                size="lg"
+                className="relative group px-8 py-6 text-lg shadow-lg shadow-primary/10"
+              >
+                <span className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-md"></span>
+                Get Your Dream Job
+                <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+              </Button>
+            </div>
+
+            <div className="space-y-3 pt-8 border-t">
+              <p className="text-sm font-medium">Powered by PhoneScreen.AI</p>
+              <p className="text-sm text-muted-foreground">
+                Trusted by job seekers applying to Google, Meta, Amazon, and more. Join thousands getting hired faster with PhoneScreen.AI.
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   return (
-    <main className="container mx-auto p-4">
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6">AI Interview Agent</h1>
-          <div className="mb-8 flex justify-between items-center">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <div className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors ${
-                  step === 1 
-                  ? 'border-primary bg-primary text-primary-foreground' 
-                  : 'border-gray-300 text-gray-300'
-                }`}>
-                  <FileTextIcon className="h-4 w-4" />
-                </div>
-                <div className="hidden sm:block">
-                  <p className="font-medium">Job Details</p>
-                  <p className="text-sm text-muted-foreground">Enter job information</p>
-                </div>
-              </div>
-
-              <div className="h-px w-12 bg-gray-200" />
-
-              <div className="flex items-center gap-2">
-                <div className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors ${
-                  step === 2 
-                  ? 'border-primary bg-primary text-primary-foreground' 
-                  : 'border-gray-300 text-gray-300'
-                }`}>
-                  <ChatBubbleIcon className="h-4 w-4" />
-                </div>
-                <div className="hidden sm:block">
-                  <p className="font-medium">Interview</p>
-                  <p className="text-sm text-muted-foreground">Complete phone screen</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {isProcessing ? (
-            <LoadingSteps />
-          ) : step === 1 ? (
-            <JobListingInput
-              jobDescription={jobDescription}
-              setJobDescription={setJobDescription}
-              isLoading={isLoading}
-              setJobUrl={setJobUrl}
-              onScrape={handleScrape}
-              onSubmit={handleStartInterview}
-            />
-          ) : (
-            <>
-              <JobDetails
-                jobDescription={jobDescription}
-                parsedJob={parsedJob}
-                onBack={() => setStep(1)}
-              />
-              <div className="mt-6">
-                <button 
-                  className="px-4 py-2 border rounded hover:bg-gray-50"
-                  onClick={handleStartOver}
-                >
-                  Start Over
-                </button>
-              </div>
-            </>
-          )}
+    <div className="min-h-screen bg-background">
+      <style jsx>{`
+        @keyframes expand {
+          from {
+            transform: scaleX(0);
+          }
+          to {
+            transform: scaleX(1);
+          }
+        }
+      `}</style>
+      <main className="container py-6">
+        {/* Header Section */}
+        <div className="text-center space-y-2 mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">AI Interview Agent</h1>
+          <p className="text-muted-foreground">Land Your Dream Job Faster!</p>
         </div>
-      </div>
-    </main>
+
+
+        {isProcessing ? (
+          <LoadingSteps />
+        ) : step === 1 ? (
+          <JobListingInput
+            jobDescription={jobDescription}
+            setJobDescription={setJobDescription}
+            isLoading={isLoading}
+            setJobUrl={setJobUrl}
+            onScrape={handleScrape}
+            onSubmit={handleStartInterview}
+          />
+        ) : step === 2 ? (
+          <JobDetails
+            jobDescription={jobDescription}
+            parsedJob={parsedJob}
+            onBack={() => setStep(1)}
+            onComplete={(details) => {
+              setCandidateDetails(details)
+              setStep(3)
+              posthog.capture('Candidate Details Submitted', {
+                has_linkedin: Boolean(details.linkedinUrl),
+                has_hiring_manager: Boolean(details.hiringManagerEmail)
+              })
+            }}
+          />
+        ) : (
+          <InterviewInProgress
+            jobTitle={parsedJob?.job_title}
+            companyName={parsedJob?.company}
+            candidateName={candidateDetails.name}
+            candidateEmail={candidateDetails.email}
+            linkedinUrl={candidateDetails.linkedinUrl}
+            hiringManagerEmail={candidateDetails.hiringManagerEmail}
+          />
+        )}
+      </main>
+    </div>
   )
 }
 

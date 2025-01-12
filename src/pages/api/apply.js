@@ -1,8 +1,24 @@
 import { prisma } from '../../lib/prisma';
 import axios from 'axios';
 
+// Helper function to normalize interview questions
+function normalizeInterviewQuestions(questions) {
+  if (!questions) return [];
+  // If questions is an object with a 'set' property, extract the array
+  if (typeof questions === 'object' && 'set' in questions) {
+    return questions.set;
+  }
+  // If questions is already an array, return it
+  if (Array.isArray(questions)) {
+    return questions;
+  }
+  // If we get here, questions is in an unexpected format
+  console.warn('Unexpected interview questions format:', questions);
+  return [];
+}
+
 export default async function handle(req, res) {
-  const { name, email, phone, resumeUrl = '', linkedinUrl = '', jobId, job } = req.body;
+  const { name, email, phone, resumeUrl = '', linkedinUrl = '', hiringManagerEmail = '', isOutbound = false, jobId, job } = req.body;
 
   // Debug logging
   console.log('Received job:', JSON.stringify(job, null, 2));
@@ -21,7 +37,9 @@ export default async function handle(req, res) {
         email,
         phone,
         resumeUrl: '', // Always empty string as required
-        linkedinUrl, // Save linkedinUrl to its own field
+        linkedinUrl,
+        hiringManagerEmail,
+        isOutbound,
         jobPostId: parseInt(jobId, 10),
       },
     });
@@ -45,7 +63,7 @@ export default async function handle(req, res) {
       candidateId: candidate.id,
       phoneScreenId: phoneScreen.id,
       jobTitle: job.jobTitle,
-      questions: job.interviewQuestions,
+      questions: normalizeInterviewQuestions(job.interviewQuestions),
       transcript_webhook: process.env.TRANSCRIPT_WEBHOOK
     };
 
