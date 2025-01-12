@@ -84,7 +84,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack }: JobDet
           name,
           email,
           phone,
-          resumeUrl: linkedinUrl,
+          linkedinUrl,
           hiringManagerEmail,
         }),
       });

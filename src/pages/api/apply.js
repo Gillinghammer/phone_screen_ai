@@ -2,7 +2,7 @@ import { prisma } from '../../lib/prisma';
 import axios from 'axios';
 
 export default async function handle(req, res) {
-  const { name, email, phone, resumeUrl = '', jobId, job } = req.body;
+  const { name, email, phone, resumeUrl = '', linkedinUrl = '', jobId, job } = req.body;
 
   // Debug logging
   console.log('Received job:', JSON.stringify(job, null, 2));
@@ -20,7 +20,8 @@ export default async function handle(req, res) {
         name,
         email,
         phone,
-        resumeUrl,
+        resumeUrl: '', // Always empty string as required
+        linkedinUrl, // Save linkedinUrl to its own field
         jobPostId: parseInt(jobId, 10),
       },
     });

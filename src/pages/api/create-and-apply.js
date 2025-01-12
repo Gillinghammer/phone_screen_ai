@@ -1,4 +1,3 @@
-import { prisma } from '../../lib/prisma';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -22,7 +21,7 @@ export default async function handler(req, res) {
       name,
       email,
       phone,
-      resumeUrl,
+      linkedinUrl,
       hiringManagerEmail
     } = req.body;
 
@@ -66,7 +65,7 @@ export default async function handler(req, res) {
         name,
         email,
         phone,
-        resumeUrl,
+        linkedinUrl,
         job: {
           jobTitle,
           jobLocation,
