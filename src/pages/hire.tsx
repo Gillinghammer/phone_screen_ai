@@ -123,7 +123,7 @@ const HirePage: NextPage = () => {
       }
       console.error('Error scraping job:', error)
       posthog.capture('Job URL Scrape Failed', {
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         url: jobUrl,
         $current_url: window.location.href
       })
@@ -198,7 +198,7 @@ const HirePage: NextPage = () => {
     } catch (error) {
       console.error('Error in handleStartInterview:', error)
       posthog.capture('Job Description Parse Failed', {
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         $current_url: window.location.href
       })
       toast({
