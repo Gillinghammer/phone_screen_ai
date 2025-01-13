@@ -9,11 +9,5 @@
       "memory": 3008,
       "maxDuration": 300
     }
-  },
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/hire"
-    }
-  ]
+  }
 }
