@@ -55,7 +55,7 @@ const HirePage: NextPage = () => {
         $current_url: window.location.href
       })
     }
-  }, [showWizard])
+  }, [showWizard, jobUrl, posthog])
 
   // Track step changes
   useEffect(() => {
@@ -67,7 +67,7 @@ const HirePage: NextPage = () => {
         $current_url: window.location.href
       })
     }
-  }, [step])
+  }, [step, parsedJob, candidateDetails.email, posthog])
 
   const handleScrape = async () => {
     setIsLoading(true)
@@ -247,7 +247,7 @@ const HirePage: NextPage = () => {
               </h1>
               <p className="text-xl leading-relaxed text-foreground/80 max-w-2xl mx-auto">
                 Our AI Agent interviews you, fast-tracking your way to getting hired. Share your details, 
-                take the interview, and we'll do the rest.
+                take the interview, and we&apos;ll do the rest.
               </p>
             </div>
 
@@ -261,7 +261,7 @@ const HirePage: NextPage = () => {
                 </div>
                 <h3 className="text-xl font-semibold">1. Share Job Details</h3>
                 <p className="text-base text-foreground/75 leading-relaxed">
-                  Paste the job description or URL. We'll create a personalized interview tailored to the role.
+                  Paste the job description or URL. We&apos;ll create a personalized interview tailored to the role.
                 </p>
               </div>
               <div className="space-y-3">
@@ -283,7 +283,7 @@ const HirePage: NextPage = () => {
                 </div>
                 <h3 className="text-xl font-semibold">3. Get Hired</h3>
                 <p className="text-base text-foreground/75 leading-relaxed">
-                  We'll email your recording and transcript directly to hiring teams to fast-track your application.
+                  We&apos;ll email your recording and transcript directly to hiring teams to fast-track your application.
                 </p>
               </div>
             </div>

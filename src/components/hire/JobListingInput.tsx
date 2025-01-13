@@ -56,7 +56,7 @@ export default function JobListingInput({
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Enter Job Listing URL</h3>
-                <p className="text-foreground/70">Paste the job post link, and we'll analyze the details automatically.</p>
+                <p className="text-foreground/70">Paste the job post link, and we&apos;ll analyze the details automatically.</p>
               </div>
             </div>
             <div className="flex gap-3">
@@ -107,7 +107,7 @@ export default function JobListingInput({
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Or Paste Job Description</h3>
-                <p className="text-foreground/70">Copy and paste the full job description here if you don't have a URL.</p>
+                <p className="text-foreground/70">Copy and paste the full job description here if you don&apos;t have a URL.</p>
               </div>
             </div>
             <div className="relative">
@@ -140,7 +140,7 @@ export default function JobListingInput({
           </div>
           <div className="flex-1 text-base text-foreground/80 leading-relaxed">
             Once you submit, our AI will analyze the role and create a tailored interview experience. 
-            We'll focus on the key requirements and responsibilities to ensure a relevant conversation.
+            We&apos;ll focus on the key requirements and responsibilities to ensure a relevant conversation.
           </div>
         </div>
 

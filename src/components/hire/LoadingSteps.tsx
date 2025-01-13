@@ -64,7 +64,7 @@ export default function LoadingSteps() {
       clearInterval(progressInterval)
       clearInterval(stepInterval)
     }
-  }, [])
+  }, [steps.length])
 
   return (
     <div className="space-y-12 py-12">
@@ -73,7 +73,7 @@ export default function LoadingSteps() {
           Your AI Interview is Being Prepared
         </h2>
         <p className="text-lg text-foreground/80">
-          We're crafting a personalized interview experience just for you
+          We&apos;re crafting a personalized interview experience just for you
         </p>
       </div>
 

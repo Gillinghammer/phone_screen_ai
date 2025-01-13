@@ -24,7 +24,7 @@ export default function InterviewInProgress({
           Get Ready for Your AI-Powered Interview!
         </h2>
         <p className="text-lg text-foreground/80">
-          Your phone screen is about to begin—here's how to prepare:
+          Your phone screen is about to begin—here&apos;s how to prepare:
         </p>
       </div>
 
@@ -36,7 +36,7 @@ export default function InterviewInProgress({
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Incoming Call</h3>
             <p className="text-base text-foreground/70 leading-relaxed">
-              You'll receive a phone call shortly from our AI Agent. The call will come from a standard phone number.
+              You&apos;ll receive a phone call shortly from our AI Agent. The call will come from a standard phone number.
             </p>
           </div>
         </div>
@@ -48,7 +48,7 @@ export default function InterviewInProgress({
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Find a Quiet Place</h3>
             <p className="text-base text-foreground/70 leading-relaxed">
-              Make sure you're in a quiet environment with good phone reception to focus on the conversation.
+              Make sure you&apos;re in a quiet environment with good phone reception to focus on the conversation.
             </p>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function InterviewInProgress({
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Be Patient</h3>
             <p className="text-base text-foreground/70 leading-relaxed">
-              Give the AI Agent time to respond. Feel free to ask for questions to be repeated if needed—our AI is here to help you succeed.
+              Give the AI Agent time to respond. Feel free to ask for questions to be repeated if needed&mdash;our AI is here to help you succeed.
             </p>
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function InterviewInProgress({
               <h3 className="text-lg font-semibold">What Happens Next</h3>
             </div>
             <p className="text-base text-foreground/70 leading-relaxed">
-              After your interview, our AI will analyze and score your responses. If you're a good fit, we'll send your results—along with a recording 
+              After your interview, our AI will analyze and score your responses. If you&apos;re a good fit, we&apos;ll send your results&mdash;along with a recording 
               and transcript—to the hiring team to fast-track your application.
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function InterviewInProgress({
               <h3 className="text-lg font-semibold">Good Luck!</h3>
             </div>
             <p className="text-base text-foreground/70 leading-relaxed">
-              We're rooting for you! Let us know if you get an interview or land the job—we'd love to celebrate with you.
+              We&apos;re rooting for you! Let us know if you get an interview or land the job&mdash;we&apos;d love to celebrate with you.
             </p>
           </div>
         </div>
@@ -137,8 +137,8 @@ export default function InterviewInProgress({
 
       <div className="rounded-xl bg-yellow-50/50 border border-yellow-200/50 p-6">
         <p className="text-base text-yellow-800/90 leading-relaxed">
-          <strong>IMPORTANT:</strong> While we'll do everything we can to help you, we can't guarantee you'll hear back from the company. 
-          Best of luck—we're cheering you on!
+          <strong>IMPORTANT:</strong> While we&apos;ll do everything we can to help you, we can&apos;t guarantee you&apos;ll hear back from the company. 
+          Best of luck&mdash;we&apos;re cheering you on!
         </p>
       </div>
     </div>

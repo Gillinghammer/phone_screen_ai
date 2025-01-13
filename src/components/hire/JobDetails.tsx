@@ -158,7 +158,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
       all_consents_given: consentInterview && consentRecording && consentContact && consentQualified,
       $current_url: window.location.href
     })
-  }, [consentInterview, consentRecording, consentContact, consentQualified])
+  }, [consentInterview, consentRecording, consentContact, consentQualified, posthog])
 
   useEffect(() => {
     const guessHiringEmail = async () => {
@@ -186,7 +186,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
     };
 
     guessHiringEmail();
-  }, [parsedJob?.company]);
+  }, [parsedJob?.company, hiringManagerEmail]);
 
   if (!parsedJob) {
     console.log('No parsed job data available')
@@ -210,7 +210,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
         <div className="space-y-2">
           <h2 className="text-3xl font-bold">Your Tailored Phone Screen is Ready</h2>
           <p className="text-xl text-foreground/80">
-            We've designed a challenging yet fair interview to help you stand out.
+            We&apos;ve designed a challenging yet fair interview to help you stand out.
           </p>
         </div>
       </div>
@@ -296,7 +296,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
             <Card.CardHeader className="space-y-3">
               <Card.CardTitle className="text-2xl">Your Interview Details</Card.CardTitle>
               <Card.CardDescription className="text-base text-foreground/80">
-                We'll create a personalized AI interview based on your information. Our AI recruiter will call you shortly after submission.
+                We&apos;ll create a personalized AI interview based on your information. Our AI recruiter will call you shortly after submission.
               </Card.CardDescription>
             </Card.CardHeader>
             <Card.CardContent>
@@ -383,7 +383,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
                     />
                     <p className="text-sm text-yellow-800/90 bg-yellow-50/50 p-3 rounded-lg flex items-start gap-2 border border-yellow-200/50">
                       <InfoCircledIcon className="h-4 w-4 flex-shrink-0 mt-0.5 text-yellow-800/70" />
-                      We'll automatically send your interview results to the right hiring team and copy you on the email. If you know a specific recruiter's email at the company, add it here instead.<br /><br />Leave blank if you don't want to share your results.
+                      We&apos;ll automatically send your interview results to the right hiring team and copy you on the email. If you know a specific recruiter&apos;s email at the company, add it here instead.<br /><br />Leave blank if you don&apos;t want to share your results.
                     </p>
                   </div>
                 </div>
@@ -396,68 +396,44 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
                         id="consent-interview"
                         checked={consentInterview}
                         onCheckedChange={(checked) => handleConsentChange('consent-interview', checked as boolean)}
-                        className="mt-0.5"
+                        className="h-5 w-5"
                       />
-                      <div className="space-y-1">
-                        <label
-                          htmlFor="consent-interview"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          I consent to being called and interviewed by an AI Agent
-                        </label>
-                        <p className="text-xs text-foreground/60">Our AI will conduct a professional phone interview to assess your qualifications</p>
-                      </div>
+                      <label htmlFor="consent-interview" className="text-sm text-foreground/80">
+                        I understand that I&apos;ll be interviewed by an AI system and consent to this process.
+                      </label>
                     </div>
                     <div className="flex items-start space-x-3">
                       <Checkbox 
                         id="consent-recording"
                         checked={consentRecording}
                         onCheckedChange={(checked) => handleConsentChange('consent-recording', checked as boolean)}
-                        className="mt-0.5"
+                        className="h-5 w-5"
                       />
-                      <div className="space-y-1">
-                        <label
-                          htmlFor="consent-recording"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          I consent to the call being recorded and shared
-                        </label>
-                        <p className="text-xs text-foreground/60">The recording helps us improve our AI and may be shared with the hiring team</p>
-                      </div>
+                      <label htmlFor="consent-recording" className="text-sm text-foreground/80">
+                        I agree to have my interview recorded and transcribed. I understand that I&apos;ll have access to these recordings.
+                      </label>
                     </div>
                     <div className="flex items-start space-x-3">
                       <Checkbox 
                         id="consent-contact"
                         checked={consentContact}
                         onCheckedChange={(checked) => handleConsentChange('consent-contact', checked as boolean)}
-                        className="mt-0.5"
+                        className="h-5 w-5"
                       />
-                      <div className="space-y-1">
-                        <label
-                          htmlFor="consent-contact"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {parsedJob.company} may never contact you
-                        </label>
-                        <p className="text-xs text-foreground/60">We attempt to send your interview to the company's hiring team, but make no guarantees</p>
-                      </div>
+                      <label htmlFor="consent-contact" className="text-sm text-foreground/80">
+                        I agree to be contacted by phone and email regarding my application and interview.
+                      </label>
                     </div>
                     <div className="flex items-start space-x-3">
                       <Checkbox 
                         id="consent-qualified"
                         checked={consentQualified}
                         onCheckedChange={(checked) => handleConsentChange('consent-qualified', checked as boolean)}
-                        className="mt-0.5"
+                        className="h-5 w-5"
                       />
-                      <div className="space-y-1">
-                        <label
-                          htmlFor="consent-qualified"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Your interview will only be shared if our AI Agent deems you qualified
-                        </label>
-                        <p className="text-xs text-foreground/60">We respect your privacy and only share successful interviews with the hiring team</p>
-                      </div>
+                      <label htmlFor="consent-qualified" className="text-sm text-foreground/80">
+                        Your interview will only be shared if our AI Agent deems you qualified.
+                      </label>
                     </div>
                   </div>
 
