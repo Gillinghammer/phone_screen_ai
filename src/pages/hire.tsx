@@ -107,8 +107,8 @@ const HirePage: NextPage = () => {
       } else {
         throw new Error('No job description found')
       }
-    } catch (error) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         toast({
           title: "Timeout",
           description: "The request took too long. Please paste the job description directly.",
