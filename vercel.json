@@ -10,17 +10,27 @@
       "maxDuration": 300
     }
   },
-  "redirects": [
+  "rewrites": [
     {
       "source": "/",
-      "destination": "/hire",
-      "permanent": true,
       "has": [
         {
           "type": "host",
           "value": "crackedhire.com"
         }
-      ]
+      ],
+      "destination": "/hire"
+    },
+    {
+      "source": "//",
+      "has": [
+        {
+          "type": "host",
+          "value": "crackedhire.com"
+        }
+      ],
+      "destination": "/hire"
     }
-  ]
+  ],
+  "trailingSlash": false
 }
