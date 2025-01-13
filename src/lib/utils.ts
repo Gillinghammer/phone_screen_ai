@@ -4,21 +4,51 @@ import { Resend } from 'resend';
 import { generateEmailTemplate } from "@/components/email-template";
 import axios from "axios";
 
-
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(...inputs));
 }
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
+interface EmailParams {
+  to: string;
+  subject: string;
+  html: string;
+}
+
+interface Job {
+  id: string;
+  jobTitle: string;
+  company: string;
+  companyName: string;
+}
+
+interface Candidate {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  linkedinUrl?: string;
+  hiringManagerEmail?: string;
+}
+
+interface PhoneScreen {
+  recordingUrl: string;
+  concatenatedTranscript: string;
+  qualificationScore: number;
+  analysisV2: {
+    question: string;
+    answer: string;
+    score: number;
+    reasoning: string;
+  }[];
+}
+
 /**
  * Send an email using the Resend service
- * @param {Object} params
- * @param {string} params.to
- * @param {string} params.subject
- * @param {string} params.html
+ * @param {EmailParams} params - The email parameters
  */
-export async function sendEmail({ to, subject, html }) {
+export async function sendEmail({ to, subject, html }: EmailParams): Promise<void> {
   try {
     const emailParams = {
       from: "no-reply@phonescreen.ai",
@@ -38,7 +68,7 @@ export async function sendEmail({ to, subject, html }) {
  * @param {number} seconds
  * @returns {string}
  */
-export function formatCallDuration(seconds) {
+export function formatCallDuration(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
@@ -46,39 +76,47 @@ export function formatCallDuration(seconds) {
 
 /**
  * Perform a bulk action on candidates
- * @param {Object} job
- * @param {string} action
+ * @param {Job} job
+ * @param {keyof typeof statusMap} action
  * @param {string[]} candidateIds
  */
-export async function performBulkAction(job, action, candidateIds) {
-  const actionMap = {
-    approve: 'approved',
-    reject: 'rejected',
-    archive: 'archived'
+export async function performBulkAction(job: Job, action: keyof typeof statusMap, candidateIds: string[]) {
+  // Map the action to the correct status value
+  const statusMap = {
+    ACCEPT: 'ACCEPTED',
+    REJECT: 'REJECTED',
+    ARCHIVE: 'ARCHIVED',
+    RESET: 'OPEN'
   };
 
-  const newStatus = actionMap[action];
-  if (!newStatus) {
-    throw new Error(`Invalid action: ${action}`);
+  const status = statusMap[action] || action;
+
+  const response = await fetch('/api/changeCandidateStatus', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ candidateIds, status, job }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to perform bulk action');
   }
 
-  // Update each candidate's status
-  for (const candidateId of candidateIds) {
-    const candidateRef = doc(db, 'jobs', job.id, 'candidates', candidateId);
-    await updateDoc(candidateRef, {
-      status: newStatus,
-      updatedAt: serverTimestamp()
-    });
-  }
+  return await response.json();
 }
 
 /**
  * Send an email to the hiring manager for qualified candidates
- * @param {Object} phoneScreen - The phone screen data
- * @param {Object} job - The job data
- * @param {Object} candidate - The candidate data
+ * @param {PhoneScreen} phoneScreen - The phone screen data
+ * @param {Job} job - The job data
+ * @param {Candidate} candidate - The candidate data
  */
-export async function sendEmailHiringManager(phoneScreen, job, candidate) {
+export async function sendEmailHiringManager(
+  phoneScreen: PhoneScreen,
+  job: Job,
+  candidate: Candidate
+): Promise<void> {
   if (!candidate.hiringManagerEmail) {
     console.log('No hiring manager email found for candidate:', candidate.id);
     return;
@@ -198,11 +236,15 @@ export async function sendEmailHiringManager(phoneScreen, job, candidate) {
 
 /**
  * Send an email to the candidate with their interview feedback
- * @param {Object} phoneScreen - The phone screen data
- * @param {Object} job - The job data
- * @param {Object} candidate - The candidate data
+ * @param {PhoneScreen} phoneScreen - The phone screen data
+ * @param {Job} job - The job data
+ * @param {Candidate} candidate - The candidate data
  */
-export async function sendEmailCandidate(phoneScreen, job, candidate) {
+export async function sendEmailCandidate(
+  phoneScreen: PhoneScreen,
+  job: Job,
+  candidate: Candidate
+): Promise<void> {
   if (!candidate.email) {
     console.log('No candidate email found:', candidate.id);
     return;
