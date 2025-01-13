@@ -9,7 +9,7 @@ import axios from "axios";
  * @param {...import("clsx").ClassValue[]} inputs
  */
 export function cn(...inputs) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(...inputs));
 }
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
