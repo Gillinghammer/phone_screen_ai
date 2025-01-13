@@ -12,6 +12,17 @@
   },
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.crackedhire.com"
+        }
+      ],
+      "destination": "https://crackedhire.com/:path*",
+      "permanent": true
+    },
+    {
       "source": "/",
       "has": [
         {
@@ -20,17 +31,6 @@
         }
       ],
       "destination": "/hire",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "crackedhire.com"
-        }
-      ],
-      "destination": "/:path*",
       "permanent": true
     }
   ],
