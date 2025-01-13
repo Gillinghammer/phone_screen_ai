@@ -1,14 +1,11 @@
-import { clsx } from "clsx"
+import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Resend } from 'resend';
 import { generateEmailTemplate } from "@/components/email-template";
 import axios from "axios";
 
-/**
- * Merge class names with tailwind-merge
- * @param {...import("clsx").ClassValue[]} inputs
- */
-export function cn(...inputs) {
+
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(...inputs));
 }
 
