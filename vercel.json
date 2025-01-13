@@ -10,10 +10,11 @@
       "maxDuration": 300
     }
   },
-  "rewrites": [
+  "redirects": [
     {
       "source": "/",
       "destination": "/hire",
+      "permanent": true,
       "has": [
         {
           "type": "host",
