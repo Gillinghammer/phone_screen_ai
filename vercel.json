@@ -9,5 +9,19 @@
       "memory": 3008,
       "maxDuration": 300
     }
-  }
+  },
+  "trailingSlash": false,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "crackedhire.com"
+        }
+      ],
+      "destination": "/hire"
+    }
+  ]
 }
