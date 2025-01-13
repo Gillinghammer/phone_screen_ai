@@ -9,30 +9,5 @@
       "memory": 3008,
       "maxDuration": 300
     }
-  },
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.crackedhire.com"
-        }
-      ],
-      "destination": "https://crackedhire.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "crackedhire.com"
-        }
-      ],
-      "destination": "/hire",
-      "permanent": true
-    }
-  ],
-  "cleanUrls": true
+  }
 }
