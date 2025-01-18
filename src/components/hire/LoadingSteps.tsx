@@ -67,88 +67,81 @@ export default function LoadingSteps() {
   }, [steps.length])
 
   return (
-    <div className="space-y-12 py-12">
-      <div className="text-center space-y-4 mb-12">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+    <div className="space-y-8 sm:space-y-10 max-w-4xl mx-auto px-4 sm:px-6">
+      <div className="text-center space-y-3 sm:space-y-4">
+        <h1 className="text-2xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary to-primary/60 tracking-tight">
           Your AI Interview is Being Prepared
-        </h2>
-        <p className="text-lg text-foreground/80">
-          We&apos;re crafting a personalized interview experience just for you
+        </h1>
+        <p className="text-base sm:text-xl text-foreground/80 leading-relaxed max-w-2xl mx-auto">
+          We're crafting a personalized interview experience just for you
         </p>
       </div>
 
-      <div className="flex justify-center mb-12">
-        <div className="w-full max-w-4xl px-4">
-          <div className="h-3 bg-primary/5 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-300 ease-out relative"
-              style={{ width: `${progress}%` }}
-            >
-              <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]" 
-                style={{ 
-                  backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
-                  backgroundSize: '200% 100%',
-                }} 
-              />
-            </div>
-          </div>
-          <div className="mt-3 text-center">
-            <span className="text-sm font-medium bg-primary/10 text-primary px-3 py-1 rounded-full">
-              {Math.round(progress)}% Complete
-            </span>
-          </div>
+      <div className="relative pt-2 mt-6 sm:mt-8">
+        <div className="flex items-center justify-between mb-2 text-sm font-medium">
+          <div className="text-foreground/70">Progress</div>
+          <div className="text-primary">{Math.round(progress)}% Complete</div>
+        </div>
+        <div className="overflow-hidden h-2.5 sm:h-2 flex rounded-full bg-primary/10">
+          <div
+            style={{ width: `${progress}%` }}
+            className="flex rounded-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
+          />
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="space-y-4 sm:space-y-6">
         {steps.map((step, index) => {
-          const isComplete = index < currentStep
-          const isCurrent = index === currentStep
-
+          const isActive = index === currentStep
+          const isCompleted = index < currentStep
+          
           return (
             <div
               key={step.message}
               className={cn(
-                'flex items-start gap-4 transition-all duration-500',
-                {
-                  'opacity-100 translate-x-0': index <= currentStep,
-                  'opacity-40 translate-x-4': index > currentStep
-                }
+                "flex items-start gap-4 sm:gap-5 p-4 sm:p-6 rounded-xl transition-all duration-300",
+                isActive && "bg-primary/5 shadow-sm ring-1 ring-primary/10",
+                isCompleted && "opacity-60"
               )}
             >
               <div
                 className={cn(
-                  'flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300',
-                  {
-                    'bg-gradient-to-br from-primary to-primary/80 text-white shadow-lg shadow-primary/20': isComplete || isCurrent,
-                    'bg-primary/10 text-primary': !isComplete && !isCurrent
-                  }
+                  "h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm",
+                  isActive 
+                    ? "bg-gradient-to-br from-primary to-primary/90 text-white scale-110 shadow-lg shadow-primary/20" 
+                    : "bg-primary/10 text-primary"
                 )}
               >
                 <div className={cn(
-                  'transition-transform duration-300',
-                  (isComplete || isCurrent) && 'animate-[pulse_2s_infinite]'
+                  "h-5 w-5 sm:h-6 sm:w-6",
+                  isActive && "animate-pulse"
                 )}>
                   {step.icon}
                 </div>
               </div>
-
-              <div className="flex-1 space-y-2 pb-8">
-                <p className={cn(
-                  "font-semibold transition-colors duration-300",
-                  (isComplete || isCurrent) ? "text-primary text-lg" : "text-foreground/60"
-                )}>
-                  {step.message}
+              
+              <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-base sm:text-xl font-semibold leading-tight">
+                    {step.message}
+                  </h3>
+                  {isActive && (
+                    <div className="hidden sm:block animate-pulse">
+                      <div className="h-2 w-2 rounded-full bg-primary" />
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm sm:text-lg text-foreground/70 leading-relaxed">
+                  {step.detail}
                 </p>
-                <p className="text-base text-foreground/60 leading-relaxed">{step.detail}</p>
               </div>
             </div>
           )
         })}
       </div>
 
-      <div className="text-center">
-        <p className="text-sm text-foreground/60">
+      <div className="pt-4 sm:pt-6">
+        <p className="text-center text-sm sm:text-lg text-foreground/80 leading-relaxed font-medium">
           Your personalized interview experience will begin in just a moment
         </p>
       </div>

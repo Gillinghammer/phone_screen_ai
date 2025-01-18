@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowLeftIcon, HomeIcon, SewingPinIcon, PersonIcon, LaptopIcon, InfoCircledIcon } from '@radix-ui/react-icons'
+import { ArrowLeftIcon, HomeIcon, SewingPinIcon, PersonIcon, LaptopIcon, InfoCircledIcon, ArrowRightIcon } from '@radix-ui/react-icons'
 import * as Card from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { usePostHog } from 'posthog-js/react'
@@ -205,68 +205,68 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-4">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="space-y-2">
-          <h2 className="text-3xl font-bold">Your Tailored Phone Screen is Ready</h2>
-          <p className="text-xl text-foreground/80">
+          <h2 className="text-2xl sm:text-3xl font-bold">Your Tailored Phone Screen is Ready</h2>
+          <p className="text-base sm:text-xl text-foreground/80">
             We&apos;ve designed a challenging yet fair interview to help you stand out.
           </p>
         </div>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
         {/* Left Column - Job Information */}
         <div className="space-y-6">
-          <div className="bg-primary/5 rounded-xl p-6 space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="flex items-center gap-2 text-foreground/80">
+          <div className="bg-primary/5 rounded-xl p-4 sm:p-6 space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex items-center gap-2 text-sm sm:text-base text-foreground/80">
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <HomeIcon className="h-4 w-4 text-primary" />
                 </div>
-                <span>{parsedJob.company}</span>
+                <span className="truncate">{parsedJob.company}</span>
               </div>
-              <div className="flex items-center gap-2 text-foreground/80">
+              <div className="flex items-center gap-2 text-sm sm:text-base text-foreground/80">
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <SewingPinIcon className="h-4 w-4 text-primary" />
                 </div>
-                <span>{parsedJob.job_location}</span>
+                <span className="truncate">{parsedJob.job_location}</span>
               </div>
-              <div className="flex items-center gap-2 text-foreground/80">
+              <div className="flex items-center gap-2 text-sm sm:text-base text-foreground/80">
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <PersonIcon className="h-4 w-4 text-primary" />
                 </div>
-                <span>{parsedJob.seniority}</span>
+                <span className="truncate">{parsedJob.seniority}</span>
               </div>
-              <div className="flex items-center gap-2 text-foreground/80">
+              <div className="flex items-center gap-2 text-sm sm:text-base text-foreground/80">
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <LaptopIcon className="h-4 w-4 text-primary" />
                 </div>
-                <span>{parsedJob.remote_friendly ? 'Remote Friendly' : 'On-site'}</span>
+                <span className="truncate">{parsedJob.remote_friendly ? 'Remote Friendly' : 'On-site'}</span>
               </div>
             </div>
 
             {parsedJob.salary > 0 && (
               <div className="pt-2 border-t">
-                <h3 className="text-lg font-medium mb-2">Salary Range</h3>
-                <p className="text-2xl font-bold text-primary">{formatSalary(parsedJob.salary)}</p>
+                <h3 className="text-base sm:text-lg font-medium mb-2">Salary Range</h3>
+                <p className="text-xl sm:text-2xl font-bold text-primary">{formatSalary(parsedJob.salary)}</p>
               </div>
             )}
           </div>
 
           <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold mb-3">Role Overview</h3>
-              <p className="text-foreground/80 leading-relaxed">{parsedJob.job_description}</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Role Overview</h3>
+              <p className="text-sm sm:text-base text-foreground/80 leading-relaxed">{parsedJob.job_description}</p>
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold mb-3">Key Requirements</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Key Requirements</h3>
               <ul className="space-y-2">
                 {parsedJob.requirements.map((req, index) => (
-                  <li key={index} className="flex items-start gap-2 text-foreground/80">
+                  <li key={index} className="flex items-start gap-2 text-sm sm:text-base text-foreground/80">
                     <div className="h-6 w-6 rounded bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-primary text-sm font-medium">{index + 1}</span>
+                      <span className="text-primary text-xs sm:text-sm font-medium">{index + 1}</span>
                     </div>
                     <span className="leading-relaxed">{req}</span>
                   </li>
@@ -275,12 +275,12 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold mb-3">Core Responsibilities</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Core Responsibilities</h3>
               <ul className="space-y-2">
                 {parsedJob.responsibilities.map((resp, index) => (
-                  <li key={index} className="flex items-start gap-2 text-foreground/80">
+                  <li key={index} className="flex items-start gap-2 text-sm sm:text-base text-foreground/80">
                     <div className="h-6 w-6 rounded bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-primary text-sm font-medium">{index + 1}</span>
+                      <span className="text-primary text-xs sm:text-sm font-medium">{index + 1}</span>
                     </div>
                     <span className="leading-relaxed">{resp}</span>
                   </li>
@@ -293,9 +293,9 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
         {/* Right Column - Candidate Form */}
         <div>
           <Card.Card className="bg-white shadow-xl shadow-primary/5">
-            <Card.CardHeader className="space-y-3">
-              <Card.CardTitle className="text-2xl">Your Interview Details</Card.CardTitle>
-              <Card.CardDescription className="text-base text-foreground/80">
+            <Card.CardHeader className="space-y-3 p-4 sm:p-6">
+              <Card.CardTitle className="text-xl sm:text-2xl">Your Interview Details</Card.CardTitle>
+              <Card.CardDescription className="text-sm sm:text-base text-foreground/80">
                 We&apos;ll create a personalized AI interview based on your information. Our AI recruiter will call you shortly after submission.
               </Card.CardDescription>
             </Card.CardHeader>
@@ -303,7 +303,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
+                    <label htmlFor="name" className="text-sm sm:text-base font-medium flex items-center gap-2">
                       <PersonIcon className="h-4 w-4 text-primary" />
                       Full Name
                     </label>
@@ -317,7 +317,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+                    <label htmlFor="email" className="text-sm sm:text-base font-medium flex items-center gap-2">
                       <svg className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
@@ -334,7 +334,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
+                    <label htmlFor="phone" className="text-sm sm:text-base font-medium flex items-center gap-2">
                       <svg className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
@@ -351,7 +351,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="linkedin" className="text-sm font-medium flex items-center gap-2">
+                    <label htmlFor="linkedin" className="text-sm sm:text-base font-medium flex items-center gap-2">
                       <svg className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
                         <circle cx="4" cy="4" r="2" />
@@ -368,7 +368,7 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="hiringManager" className="text-sm font-medium flex items-center gap-2">
+                    <label htmlFor="hiringManager" className="text-sm sm:text-base font-medium flex items-center gap-2">
                       <InfoCircledIcon className="h-4 w-4 text-primary" />
                       Hiring Manager Email (Optional)
                     </label>
@@ -381,67 +381,80 @@ export default function JobDetails({ jobDescription, parsedJob, onBack, onComple
                       disabled={isGuessing}
                       className="h-12"
                     />
-                    <p className="text-sm text-yellow-800/90 bg-yellow-50/50 p-3 rounded-lg flex items-start gap-2 border border-yellow-200/50">
+                    <p className="text-sm sm:text-base text-yellow-800/90 bg-yellow-50/50 p-3 rounded-lg flex items-start gap-2 border border-yellow-200/50">
                       <InfoCircledIcon className="h-4 w-4 flex-shrink-0 mt-0.5 text-yellow-800/70" />
                       We&apos;ll automatically send your interview results to the right hiring team and copy you on the email. If you know a specific recruiter&apos;s email at the company, add it here instead.<br /><br />Leave blank if you don&apos;t want to share your results.
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="space-y-4 bg-primary/5 rounded-xl p-4">
-                    <h3 className="font-semibold text-foreground/80 mb-4">Required Consents</h3>
-                    <div className="flex items-start space-x-3">
-                      <Checkbox 
+                <div className="space-y-4 pt-4 border-t">
+                  <h4 className="text-base sm:text-lg font-semibold">Interview Consent</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <Checkbox
                         id="consent-interview"
                         checked={consentInterview}
                         onCheckedChange={(checked) => handleConsentChange('consent-interview', checked as boolean)}
-                        className="h-5 w-5"
+                        className="mt-1"
                       />
-                      <label htmlFor="consent-interview" className="text-sm text-foreground/80">
-                        I understand that I&apos;ll be interviewed by an AI system and consent to this process.
+                      <label htmlFor="consent-interview" className="text-sm sm:text-base text-foreground/80 leading-relaxed">
+                        I consent to having an AI-powered phone interview and understand that my responses will be analyzed by AI.
                       </label>
                     </div>
-                    <div className="flex items-start space-x-3">
-                      <Checkbox 
+                    <div className="flex items-start gap-3">
+                      <Checkbox
                         id="consent-recording"
                         checked={consentRecording}
                         onCheckedChange={(checked) => handleConsentChange('consent-recording', checked as boolean)}
-                        className="h-5 w-5"
+                        className="mt-1"
                       />
-                      <label htmlFor="consent-recording" className="text-sm text-foreground/80">
-                        I agree to have my interview recorded and transcribed. I understand that I&apos;ll have access to these recordings.
+                      <label htmlFor="consent-recording" className="text-sm sm:text-base text-foreground/80 leading-relaxed">
+                        I consent to having my interview recorded for quality assurance and training purposes.
                       </label>
                     </div>
-                    <div className="flex items-start space-x-3">
-                      <Checkbox 
+                    <div className="flex items-start gap-3">
+                      <Checkbox
                         id="consent-contact"
                         checked={consentContact}
                         onCheckedChange={(checked) => handleConsentChange('consent-contact', checked as boolean)}
-                        className="h-5 w-5"
+                        className="mt-1"
                       />
-                      <label htmlFor="consent-contact" className="text-sm text-foreground/80">
-                        I agree to be contacted by phone and email regarding my application and interview.
+                      <label htmlFor="consent-contact" className="text-sm sm:text-base text-foreground/80 leading-relaxed">
+                        I understand that PhoneScreen.AI will not contact me for marketing purposes or share my information with third parties.
                       </label>
                     </div>
-                    <div className="flex items-start space-x-3">
-                      <Checkbox 
+                    <div className="flex items-start gap-3">
+                      <Checkbox
                         id="consent-qualified"
                         checked={consentQualified}
                         onCheckedChange={(checked) => handleConsentChange('consent-qualified', checked as boolean)}
-                        className="h-5 w-5"
+                        className="mt-1"
                       />
-                      <label htmlFor="consent-qualified" className="text-sm text-foreground/80">
-                        Your interview will only be shared if our AI Agent deems you qualified.
+                      <label htmlFor="consent-qualified" className="text-sm sm:text-base text-foreground/80 leading-relaxed">
+                        I confirm that I meet the basic qualifications for this role and am actively seeking employment.
                       </label>
                     </div>
                   </div>
+                </div>
 
-                  <Button 
-                    className="w-full h-12 text-base font-medium bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary transition-all duration-300 shadow-lg shadow-primary/10"
-                    disabled={!name || !email || !phone || !consentInterview || !consentRecording || !consentContact || !consentQualified}
+                <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onBack}
+                    className="w-full sm:w-auto h-10 sm:h-12"
                   >
-                    Start my Interview Right Now!
+                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={!name || !email || !phone || !consentInterview || !consentRecording || !consentContact || !consentQualified}
+                    className="w-full sm:w-auto h-10 sm:h-12 font-medium"
+                  >
+                    Start Your Interview
+                    <ArrowRightIcon className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
               </form>

@@ -251,46 +251,60 @@ const HirePage: NextPage = () => {
               </p>
             </div>
 
-            <div className="grid gap-10 md:grid-cols-3 text-left">
-              <div className="space-y-3">
+            {/* Mobile-only CTA */}
+            <div className="block md:hidden">
+              <Button 
+                onClick={() => setShowWizard(true)}
+                size="lg"
+                className="relative group w-full py-7 text-lg shadow-lg shadow-primary/10"
+              >
+                <span className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-md"></span>
+                Get Your Dream Job
+                <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+              </Button>
+            </div>
+
+            <div className="grid gap-10 md:grid-cols-3 text-left md:text-left text-center">
+              <div className="space-y-3 flex flex-col items-center md:items-start">
                 <div className="relative">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
-                    <FileTextIcon className="h-7 w-7 text-primary" />
+                  <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                    <FileTextIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
                   </div>
                   <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 via-primary/20 to-transparent rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
-                <h3 className="text-xl font-semibold">1. Share Job Details</h3>
-                <p className="text-base text-foreground/75 leading-relaxed">
+                <h3 className="text-xl font-semibold max-[768px]:font-bold">1. Share Job Details</h3>
+                <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
                   Paste the job description or URL. We&apos;ll create a personalized interview tailored to the role.
                 </p>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 flex flex-col items-center md:items-start">
                 <div className="relative">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
-                    <ChatBubbleIcon className="h-7 w-7 text-primary" />
+                  <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                    <ChatBubbleIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold">2. Take the Interview</h3>
-                <p className="text-base text-foreground/75 leading-relaxed">
+                <h3 className="text-xl font-semibold max-[768px]:font-bold">2. Take the Interview</h3>
+                <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
                   Our AI Agent calls you and conducts a professional phone screen.
                 </p>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 flex flex-col items-center md:items-start">
                 <div className="relative">
-                  <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
-                    <RocketIcon className="h-7 w-7 text-primary" />
+                  <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                    <RocketIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold">3. Get Hired</h3>
-                <p className="text-base text-foreground/75 leading-relaxed">
+                <h3 className="text-xl font-semibold max-[768px]:font-bold">3. Get Hired</h3>
+                <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
                   We&apos;ll email your recording and transcript directly to hiring teams to fast-track your application.
                 </p>
               </div>
             </div>
 
-            <div className="space-y-4">
+            {/* Desktop CTA */}
+            <div className="hidden md:block space-y-4">
               <p className="text-lg font-medium text-foreground/90">
-              Don’t wait—your dream job is just a call away!
+                Don't wait—your dream job is just a call away!
               </p>
               <Button 
                 onClick={() => setShowWizard(true)}
@@ -304,8 +318,8 @@ const HirePage: NextPage = () => {
             </div>
 
             <div className="space-y-3 pt-8 border-t">
-              <p className="text-sm font-medium">Powered by PhoneScreen.AI</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm max-[768px]:text-base font-medium">Powered by PhoneScreen.AI</p>
+              <p className="text-sm max-[768px]:text-base text-muted-foreground">
                 Trusted by job seekers applying to Google, Meta, Amazon, and more. Join thousands getting hired faster with PhoneScreen.AI.
               </p>
             </div>
@@ -327,13 +341,7 @@ const HirePage: NextPage = () => {
           }
         }
       `}</style>
-      <main className="container py-6">
-        {/* Header Section */}
-        <div className="text-center space-y-2 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">AI Interview Agent</h1>
-          <p className="text-muted-foreground">Land Your Dream Job Faster!</p>
-        </div>
-
+      <main className="container py-6 px-4 sm:px-6">
 
         {isProcessing ? (
           <LoadingSteps />
