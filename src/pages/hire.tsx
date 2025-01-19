@@ -304,7 +304,7 @@ const HirePage: NextPage = () => {
             {/* Desktop CTA */}
             <div className="hidden md:block space-y-4">
               <p className="text-lg font-medium text-foreground/90">
-                Don't wait—your dream job is just a call away!
+                Don&apos;t wait—your dream job is just a call away!
               </p>
               <Button 
                 onClick={() => setShowWizard(true)}

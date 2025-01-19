@@ -73,7 +73,7 @@ export default function LoadingSteps() {
           Your AI Interview is Being Prepared
         </h1>
         <p className="text-base sm:text-xl text-foreground/80 leading-relaxed max-w-2xl mx-auto">
-          We're crafting a personalized interview experience just for you
+          We&apos;re crafting a personalized interview experience just for you
         </p>
       </div>
 

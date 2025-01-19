@@ -56,7 +56,7 @@ export default function JobListingInput({
                 Enter Job Listing URL
               </div>
               <p className="text-base sm:text-base text-foreground/60 leading-relaxed">
-                Paste the job post link, and we'll analyze the details automatically.
+                Paste the job post link, and we&apos;ll analyze the details automatically.
               </p>
             </div>
             
@@ -113,7 +113,7 @@ export default function JobListingInput({
                 Or Paste Job Description
               </div>
               <p className="text-base sm:text-base text-foreground/60 leading-relaxed">
-                Copy and paste the full job description here if you don't have a URL.
+                Copy and paste the full job description here if you don&apos;t have a URL.
               </p>
             </div>
             
