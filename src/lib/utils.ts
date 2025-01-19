@@ -194,9 +194,9 @@ export async function sendEmailHiringManager(
       to: toEmail,
       cc: ccEmail,
       bcc: "colin@phonescreen.ai",
-      subject: `${job.jobTitle} | Pre qualified candidate ready to go!`,
+      subject: `${job.jobTitle} at ${job.companyName} | Pre qualified candidate ready to go!`,
       html: generateEmailTemplate({
-        subject: `${job.jobTitle} | Pre qualified candidate ready to go!`,
+        subject: `${job.jobTitle} at ${job.companyName} | Pre qualified candidate ready to go!`,
         toEmail: toEmail,
         fromEmail: "ashley@phonescreen.ai",
         content: emailBody,
@@ -213,7 +213,7 @@ export async function sendEmailHiringManager(
       distinct_id: candidate.id || 'anonymous',
       properties: {
         job_title: job.jobTitle,
-        company: job.company,
+        company: job.companyName,
         qualification_score: phoneScreen.qualificationScore,
         email_type: "hiring_manager",
         development_mode: isLocalDev,
@@ -336,9 +336,9 @@ export async function sendEmailCandidate(
       <div style="margin-top: 30px; padding: 20px; background-color: #e9ecef; border-radius: 8px;">
         <h4 style="color: #2c3e50; margin: 0 0 10px 0;">What Happens Next?</h4>
         <p style="margin: 0;">
-          ${averageScore >= 70 
-            ? "Based on your performance score of 70 or above, we've forwarded your interview results to the hiring team. While we can't guarantee a response, we believe you've demonstrated strong potential for this role."
-            : "Thank you for participating in this interview. To maintain high-quality candidate submissions, we only share interview results with companies for candidates who score 70 or above. We encourage you to review the feedback above and consider applying for other positions."}
+          ${averageScore >= 50 
+            ? "Based on your performance score of 50 or above, we've forwarded your interview results to the hiring team. While we can't guarantee a response, we believe you've demonstrated strong potential for this role."
+            : "Thank you for participating in this interview. To maintain high-quality candidate submissions, we only share interview results with companies for candidates who score 50 or above. We encourage you to review the feedback above and consider applying for other positions."}
         </p>
         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
           <p style="margin: 0; font-size: 0.9em; color: #495057;">
@@ -353,9 +353,9 @@ export async function sendEmailCandidate(
     const emailParams = {
       from: "ashley@phonescreen.ai",
       to: toEmail,
-      subject: `Your Phone Screen Results for ${job.jobTitle} at ${job.company}`,
+      subject: `Your Phone Screen Results for ${job.jobTitle} at ${job.companyName}`,
       html: generateEmailTemplate({
-        subject: `Your Phone Screen Results for ${job.jobTitle} at ${job.company}`,
+        subject: `Your Phone Screen Results for ${job.jobTitle} at ${job.companyName}`,
         toEmail: toEmail,
         fromEmail: "ashley@phonescreen.ai",
         content: emailBody,
@@ -372,10 +372,10 @@ export async function sendEmailCandidate(
       distinct_id: candidate.id || 'anonymous',
       properties: {
         job_title: job.jobTitle,
-        company: job.company,
+        company: job.companyName,
         average_score: averageScore,
         qualification_score: phoneScreen.qualificationScore,
-        results_shared: averageScore >= 70,
+        results_shared: averageScore >= 50,
         email_type: "candidate_results",
         development_mode: isLocalDev,
         question_count: phoneScreen.analysisV2.length,

@@ -68,25 +68,35 @@ export default async function handle(req, res) {
     };
 
     console.log('Call payload:', JSON.stringify(callPayload, null, 2));
+    console.log('Conversational server URL:', process.env.CONVERSATIONAL_SERVER);
 
-    // Make the call request to the conversational server
-    const callResponse = await axios.post(
-      `${process.env.CONVERSATIONAL_SERVER}/call`,
-      callPayload
-    );
-
-    // Update the PhoneScreen record with the call ID
-    if (callResponse.data && callResponse.data.callId) {
-      await prisma.phoneScreen.update({
-        where: { id: phoneScreen.id },
-        data: { callId: callResponse.data.callId },
+    let callResponse;
+    try {
+      callResponse = await axios.post(
+        `${process.env.CONVERSATIONAL_SERVER}/call`,
+        callPayload
+      );
+      
+      // Update the PhoneScreen record with the call ID
+      if (callResponse.data && callResponse.data.callId) {
+        await prisma.phoneScreen.update({
+          where: { id: phoneScreen.id },
+          data: { callId: callResponse.data.callId },
+        });
+      }
+    } catch (error) {
+      console.error('Conversational server error:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
       });
+      throw error;
     }
 
     res.status(201).json({
       candidate,
       phoneScreen,
-      call: callResponse.data,
+      call: callResponse?.data || null,
     });
   } catch (error) {
     console.error('Error:', error);

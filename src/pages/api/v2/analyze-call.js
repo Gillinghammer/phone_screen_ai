@@ -43,6 +43,7 @@ export default async function analyzeCall(req, res) {
           userId: true,
           companyId: true,
           company: true,
+          companyName: true,
         },
       });
 
@@ -362,8 +363,8 @@ export default async function analyzeCall(req, res) {
         if (candidate.isOutbound) {
           // Send email to hiring manager if:
           // 1. We're in development environment (always send for testing), OR
-          // 2. We're in production and candidate scored >= 70
-          if (isLocalDev || updatedPhoneScreen.qualificationScore >= 70) {
+          // 2. We're in production and candidate scored >= 50
+          if (isLocalDev || updatedPhoneScreen.qualificationScore >= 50) {
             // send email to hiring manager
             await sendEmailHiringManager(updatedPhoneScreen, job, candidate);
           }
