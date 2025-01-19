@@ -1,3 +1,5 @@
+import { prisma } from '../../lib/prisma';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -26,6 +28,31 @@ export default async function handler(req, res) {
     } = req.body;
 
     console.log('Received job:', JSON.stringify(req.body, null, 2));
+
+    // Check for previous applications in the last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentApplication = await prisma.candidate.findFirst({
+      where: {
+        email,
+        createdAt: {
+          gte: thirtyDaysAgo
+        },
+        jobPost: {
+          companyName
+        }
+      },
+      include: {
+        jobPost: true
+      }
+    });
+
+    if (recentApplication) {
+      return res.status(400).json({
+        message: 'You have already applied to this company within the last 30 days. Please wait before applying again.'
+      });
+    }
 
     // First, create the job
     const jobResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/create-job`, {

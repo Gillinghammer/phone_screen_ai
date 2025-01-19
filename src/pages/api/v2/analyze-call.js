@@ -283,6 +283,8 @@ export default async function analyzeCall(req, res) {
           email: true,
           isOutbound: true,
           hiringManagerEmail: true,
+          phone: true,
+          linkedinUrl: true,
         },
       });
 
