@@ -341,6 +341,8 @@ const HirePage: NextPage = () => {
         <meta property="og:title" content="This AI Agent Helps You Get The Job" />
         <meta property="og:description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
         <meta property="og:image" content="/logos/cracked.png" />
+        <meta property="og:url" content={`${process.env.NEXT_PUBLIC_URL}/hire`} />
+        <meta property="og:site_name" content="Phone Screen AI" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
