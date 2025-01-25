@@ -337,18 +337,20 @@ const HirePage: NextPage = () => {
         <meta name="description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
         
         {/* Open Graph / Facebook */}
+        <meta property="og:url" content="https://app.phonescreen.ai/hire" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="This AI Agent Helps You Get The Job" />
         <meta property="og:description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
-        <meta property="og:image" content="/logos/cracked.png" />
-        <meta property="og:url" content={`${process.env.NEXT_PUBLIC_URL}/hire`} />
+        <meta property="og:image" content="https://app.phonescreen.ai/logos/cracked.png" />
         <meta property="og:site_name" content="Phone Screen AI" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="app.phonescreen.ai" />
+        <meta property="twitter:url" content="https://app.phonescreen.ai/hire" />
         <meta name="twitter:title" content="This AI Agent Helps You Get The Job" />
         <meta name="twitter:description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
-        <meta name="twitter:image" content="/logos/cracked.png" />
+        <meta name="twitter:image" content="https://app.phonescreen.ai/logos/cracked.png" />
       </Head>
       <div className="min-h-screen bg-background">
         <style jsx>{`
