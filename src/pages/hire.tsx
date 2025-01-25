@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { NextPage } from 'next'
+import type { NextPage, GetStaticProps } from 'next'
 import Head from 'next/head'
 import JobListingInput from '@/components/hire/JobListingInput'
 import JobDetails from '@/components/hire/JobDetails'
@@ -29,7 +29,25 @@ interface ParsedJob {
   }
 }
 
-const HirePage: NextPage = () => {
+interface HirePageProps {
+  title: string;
+  description: string;
+  image: string;
+  url: string;
+}
+
+export const getStaticProps: GetStaticProps = async () => {
+  return {
+    props: {
+      title: "This AI Agent Helps You Get The Job",
+      description: "AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers.",
+      image: "https://app.phonescreen.ai/logos/cracked.png",
+      url: "https://app.phonescreen.ai/hire"
+    }
+  }
+}
+
+const HirePage: NextPage<HirePageProps> = ({ title, description, image, url }) => {
   const [showWizard, setShowWizard] = useState(false)
   const [step, setStep] = useState(1)
   const [jobDescription, setJobDescription] = useState('')
@@ -333,24 +351,24 @@ const HirePage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>This AI Agent Helps You Get The Job</title>
-        <meta name="description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
+        <title>{title}</title>
+        <meta name="description" content={description} />
         
         {/* Open Graph / Facebook */}
-        <meta property="og:url" content="https://app.phonescreen.ai/hire" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="This AI Agent Helps You Get The Job" />
-        <meta property="og:description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
-        <meta property="og:image" content="https://app.phonescreen.ai/logos/cracked.png" />
+        <meta property="og:url" content={url} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={image} />
         <meta property="og:site_name" content="Phone Screen AI" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:domain" content="app.phonescreen.ai" />
-        <meta property="twitter:url" content="https://app.phonescreen.ai/hire" />
-        <meta name="twitter:title" content="This AI Agent Helps You Get The Job" />
-        <meta name="twitter:description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
-        <meta name="twitter:image" content="https://app.phonescreen.ai/logos/cracked.png" />
+        <meta property="twitter:url" content={url} />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={image} />
       </Head>
       <div className="min-h-screen bg-background">
         <style jsx>{`
