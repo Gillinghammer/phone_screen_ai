@@ -239,11 +239,11 @@ const HirePage: NextPage = () => {
           <meta name="description" content="AI Agent interviews you for your dream job, provides feedback and even sends your interview to the hiring team for consideration." />
           <meta name="keywords" content="AI Agent Recruiting, hiring, AI interviews, job recruitment, phone screen, hiring automation, interview practice, interview prep" />
           <meta name="author" content="PhoneScreen.AI" />
-          <meta property="og:title" content="AI Agent Interview Prep" />
+          <meta property="og:title" content="AI Interview Agent" />
           <meta property="og:description" content="AI Agent interviews you for your dream job, provides feedback and even sends your interview to the hiring team for consideration." />
           <meta property="og:url" content="https://crackedhire.com" />
           <meta property="og:type" content="website" />
-          <meta property="og:image" content="/logos/cracked.png" />
+          <meta property="og:image" content="https://app.phonescreen.ai/logos/cracked.png" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div className="min-h-screen bg-background flex flex-col">
