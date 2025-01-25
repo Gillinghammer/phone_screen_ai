@@ -99,7 +99,7 @@ function Header() {
             </div>
           </div>
           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-            Easily generate a custom interview by sharing the job details of your dream role. Start with a link, job description, or browse popular roles to get started.
+            Share a job posting to generate a customized technical interview. We&apos;ll analyze the requirements and create relevant questions.
           </p>
         </div>
       </div>
@@ -232,7 +232,7 @@ function DescriptionInput({ description, isOpen, onOpenChange, onDescriptionChan
         <CollapsibleContent>
           <div className="p-4 pt-6 space-y-3 bg-gray-200 border-t">
             <p className="text-base text-muted-foreground">
-              <span className="font-medium">Paste the full job description directly here</span> if you don't have a job link available.
+              <span className="font-medium">Paste the full job description directly here</span> if you don&apos;t have a job link available.
             </p>
             <Textarea
               placeholder="Paste the full job description here..."
@@ -304,7 +304,7 @@ function RoleSelector({ selectedJob, onJobSelect }: RoleSelectorProps) {
                       selectedJob === `${company.company} - ${role.title}` && "text-primary"
                     )}
                   >
-                    {role.title}
+                    {role.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}
                   </SelectItem>
                 ))}
               </SelectGroup>
