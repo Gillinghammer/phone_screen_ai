@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { NextPage } from 'next'
+import Head from 'next/head'
 import JobListingInput from '@/components/hire/JobListingInput'
 import JobDetails from '@/components/hire/JobDetails'
 import InterviewInProgress from '@/components/hire/InterviewInProgress'
@@ -330,56 +331,74 @@ const HirePage: NextPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <style jsx>{`
-        @keyframes expand {
-          from {
-            transform: scaleX(0);
+    <>
+      <Head>
+        <title>This AI Agent Helps You Get The Job</title>
+        <meta name="description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="This AI Agent Helps You Get The Job" />
+        <meta property="og:description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
+        <meta property="og:image" content="/logos/cracked.png" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="This AI Agent Helps You Get The Job" />
+        <meta name="twitter:description" content="AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers." />
+        <meta name="twitter:image" content="/logos/cracked.png" />
+      </Head>
+      <div className="min-h-screen bg-background">
+        <style jsx>{`
+          @keyframes expand {
+            from {
+              transform: scaleX(0);
+            }
+            to {
+              transform: scaleX(1);
+            }
           }
-          to {
-            transform: scaleX(1);
-          }
-        }
-      `}</style>
-      <main className="container py-6 px-4 sm:px-6">
+        `}</style>
+        <main className="container py-6 px-4 sm:px-6">
 
-        {isProcessing ? (
-          <LoadingSteps />
-        ) : step === 1 ? (
-          <JobListingInput
-            jobDescription={jobDescription}
-            setJobDescription={setJobDescription}
-            isLoading={isLoading}
-            setJobUrl={setJobUrl}
-            onScrape={handleScrape}
-            onSubmit={handleStartInterview}
-          />
-        ) : step === 2 ? (
-          <JobDetails
-            jobDescription={jobDescription}
-            parsedJob={parsedJob}
-            onBack={() => setStep(1)}
-            onComplete={(details) => {
-              setCandidateDetails(details)
-              setStep(3)
-              posthog.capture('Candidate Details Submitted', {
-                has_linkedin: Boolean(details.linkedinUrl),
-                has_hiring_manager: Boolean(details.hiringManagerEmail)
-              })
-            }}
-          />
-        ) : (
-          <InterviewInProgress
-            jobTitle={parsedJob?.job_title}
-            companyName={parsedJob?.company}
-            candidateName={candidateDetails.name}
-            candidateEmail={candidateDetails.email}
-            linkedinUrl={candidateDetails.linkedinUrl}
-            hiringManagerEmail={candidateDetails.hiringManagerEmail}
-          />
-        )}
-      </main>
-    </div>
+          {isProcessing ? (
+            <LoadingSteps />
+          ) : step === 1 ? (
+            <JobListingInput
+              jobDescription={jobDescription}
+              setJobDescription={setJobDescription}
+              isLoading={isLoading}
+              setJobUrl={setJobUrl}
+              onScrape={handleScrape}
+              onSubmit={handleStartInterview}
+            />
+          ) : step === 2 ? (
+            <JobDetails
+              jobDescription={jobDescription}
+              parsedJob={parsedJob}
+              onBack={() => setStep(1)}
+              onComplete={(details) => {
+                setCandidateDetails(details)
+                setStep(3)
+                posthog.capture('Candidate Details Submitted', {
+                  has_linkedin: Boolean(details.linkedinUrl),
+                  has_hiring_manager: Boolean(details.hiringManagerEmail)
+                })
+              }}
+            />
+          ) : (
+            <InterviewInProgress
+              jobTitle={parsedJob?.job_title}
+              companyName={parsedJob?.company}
+              candidateName={candidateDetails.name}
+              candidateEmail={candidateDetails.email}
+              linkedinUrl={candidateDetails.linkedinUrl}
+              hiringManagerEmail={candidateDetails.hiringManagerEmail}
+            />
+          )}
+        </main>
+      </div>
+    </>
   )
 }
 
