@@ -1,128 +1,69 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { Resend } from 'resend';
-import { generateEmailTemplate } from "@/components/email-template";
-import axios from "axios";
-
-export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(...inputs));
-}
-
+require('dotenv').config();
+const { Resend } = require('resend');
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
-interface EmailParams {
-  to: string;
-  subject: string;
-  html: string;
-}
+// Import mock data
+const mockJob = {
+  id: 'test-job-id',
+  jobTitle: 'Senior Software Engineer',
+  companyName: 'Test Company'
+};
 
-interface Job {
-  id: string;
-  jobTitle: string;
-  company: string;
-  companyName: string;
-}
+const mockCandidate = {
+  id: 'test-candidate-id',
+  name: 'John Doe',
+  email: 'colin+candidate@phonescreen.ai',
+  hiringManagerEmail: 'colin+manager@phonescreen.ai',
+  phone: '+1 (555) 123-4567',
+  linkedinUrl: 'https://linkedin.com/in/johndoe'
+};
 
-interface Candidate {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  linkedinUrl?: string;
-  hiringManagerEmail?: string;
-}
-
-interface PhoneScreen {
-  recordingUrl: string;
-  concatenatedTranscript: string;
-  qualificationScore: number;
-  analysisV2: {
-    question: string;
-    answer: string;
-    score: number;
-    reasoning: string;
-  }[];
-}
-
-/**
- * Send an email using the Resend service
- * @param {EmailParams} params - The email parameters
- */
-export async function sendEmail({ to, subject, html }: EmailParams): Promise<void> {
-  try {
-    const emailParams = {
-      from: "no-reply@phonescreen.ai",
-      to,
-      subject,
-      html
-    };
-    await resend.emails.send(emailParams);
-  } catch (error) {
-    console.error('Error sending email:', error);
-    throw error;
-  }
-}
-
-/**
- * Format call duration from seconds to minutes:seconds
- * @param {number} seconds
- * @returns {string}
- */
-export function formatCallDuration(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-}
-
-/**
- * Perform a bulk action on candidates
- * @param {Job} job
- * @param {keyof typeof statusMap} action
- * @param {string[]} candidateIds
- */
-export async function performBulkAction(job: Job, action: keyof typeof statusMap, candidateIds: string[]) {
-  // Map the action to the correct status value
-  const statusMap = {
-    ACCEPT: 'ACCEPTED',
-    REJECT: 'REJECTED',
-    ARCHIVE: 'ARCHIVED',
-    RESET: 'OPEN'
-  };
-
-  const status = statusMap[action] || action;
-
-  const response = await fetch('/api/changeCandidateStatus', {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
+const mockPhoneScreen = {
+  id: 'test-screen-id',
+  concatenatedTranscript: `
+assistant: Hi, I'm Ashley from PhoneScreen.AI. How are you today?
+user: I'm doing great, thanks for asking!
+assistant: Let's discuss your experience with React development.
+user: I've been working with React for 5 years, building complex web applications.`,
+  recordingUrl: 'https://example.com/mock-recording.mp3',
+  analysisV2: [
+    {
+      question: 'Tell me about your experience with React',
+      answer: 'I have 5 years of experience building complex web applications with React',
+      score: 85,
+      reasoning: 'Strong experience demonstrated with specific timeline and project types mentioned.'
     },
-    body: JSON.stringify({ candidateIds, status, job }),
-  });
+    {
+      question: 'What is your preferred state management solution?',
+      answer: 'I prefer Redux for large applications and React Context for simpler state management needs',
+      score: 90,
+      reasoning: 'Shows good understanding of different state management approaches and when to use them.'
+    }
+  ]
+};
 
-  if (!response.ok) {
-    throw new Error('Failed to perform bulk action');
-  }
-
-  return await response.json();
+// Email template generator
+function generateEmailTemplate({ subject, toEmail, fromEmail, content }) {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${subject}</title>
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>
+  `;
 }
 
-/**
- * Send an email to the hiring manager for qualified candidates
- * @param {PhoneScreen} phoneScreen - The phone screen data
- * @param {Job} job - The job data
- * @param {Candidate} candidate - The candidate data
- */
-export async function sendEmailHiringManager(
-  phoneScreen: PhoneScreen,
-  job: Job,
-  candidate: Candidate
-): Promise<void> {
+async function sendEmailHiringManager(phoneScreen, job, candidate) {
   if (!candidate.hiringManagerEmail) {
     console.log('No hiring manager email found for candidate:', candidate.id);
     return;
   }
 
-  const isLocalDev = process.env.NEXT_PUBLIC_API_URL?.includes('localhost');
+  const isLocalDev = true; // Force local dev mode
   
   // Store original email addresses for debug message
   const originalTo = candidate.hiringManagerEmail;
@@ -158,8 +99,6 @@ export async function sendEmailHiringManager(
     ${debugInfo}
     <div style="font-family: Arial, sans-serif; line-height: 1.6;">
       <p>You're receiving this email because <strong>${candidate.name}</strong> has just completed a live phone screen for the open <strong>${job.jobTitle}</strong> position.</p>
-
-      <p>PhoneScreen.AI is a conversational AI recruiter that automatically qualifies candidates. We're emailing you because the candidate scored well on our assessment and we believe it is worth your time to speak with the candidate.</p>
 
       <div style="margin: 25px 0; padding: 20px; background-color: #f0f4f8; border-radius: 8px; border-left: 4px solid #0066cc;">
         <h3 style="color: #0066cc; margin: 0 0 15px 0;">Candidate Details</h3>
@@ -206,54 +145,20 @@ export async function sendEmailHiringManager(
       }),
     };
     
-    console.log(`${isLocalDev ? 'Sending development email to: ' + toEmail : 'Sending production email to: ' + originalTo}`);
+    console.log(`Sending development email to: ${toEmail}`);
     await resend.emails.send(emailParams);
-
-    // Track email sent event in PostHog
-    const captureEvent = {
-      api_key: process.env.NEXT_PUBLIC_POSTHOG_KEY,
-      event: "Hiring Manager Email Sent",
-      distinct_id: candidate.id || 'anonymous',
-      properties: {
-        job_title: job.jobTitle,
-        company: job.companyName,
-        qualification_score: phoneScreen.qualificationScore,
-        email_type: "hiring_manager",
-        development_mode: isLocalDev,
-        $current_url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      },
-      timestamp: new Date().toISOString()
-    };
-
-    await axios.post("https://app.posthog.com/capture/", captureEvent, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_POSTHOG_KEY}`
-      },
-    });
   } catch (error) {
     console.error('Error sending hiring manager email:', error);
-    throw error;
   }
 }
 
-/**
- * Send an email to the candidate with their interview feedback
- * @param {PhoneScreen} phoneScreen - The phone screen data
- * @param {Job} job - The job data
- * @param {Candidate} candidate - The candidate data
- */
-export async function sendEmailCandidate(
-  phoneScreen: PhoneScreen,
-  job: Job,
-  candidate: Candidate
-): Promise<void> {
+async function sendEmailCandidate(phoneScreen, job, candidate) {
   if (!candidate.email) {
     console.log('No candidate email found:', candidate.id);
     return;
   }
 
-  const isLocalDev = process.env.NEXT_PUBLIC_API_URL?.includes('localhost');
+  const isLocalDev = true; // Force local dev mode
   
   // In local development, redirect emails to dev address
   const toEmail = isLocalDev ? 'colin+dev@phonescreen.ai' : candidate.email;
@@ -340,14 +245,9 @@ export async function sendEmailCandidate(
         <h4 style="color: #2c3e50; margin: 0 0 10px 0;">What Happens Next?</h4>
         <p style="margin: 0;">
           ${averageScore >= 50 
-            ? "Based on your performance score of 50 or above, we've forwarded your interview results to the hiring team. While we can't guarantee a response, we believe you've demonstrated strong potential for this role."
-            : "Thank you for participating in this interview. To maintain high-quality candidate submissions, we only share interview results with companies for candidates who score 50 or above. We encourage you to review the feedback above and consider applying for other positions."}
+            ? "Based on your performance score of 50 or above, we've forwarded your interview results to the hiring team. They will review your application and contact you if they wish to proceed with next steps."
+            : "Thank you for participating in this phone screen. While we appreciate your time, based on your performance score we do not recommend proceeding with your application at this time."}
         </p>
-        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
-          <p style="margin: 0; font-size: 0.9em; color: #495057;">
-            <strong>Note:</strong> To ensure fair consideration for all candidates, you may apply for one position per company every 30 days. However, you're welcome to apply for positions at other companies at any time.
-          </p>
-        </div>
       </div>
     </div>
   `;
@@ -365,36 +265,26 @@ export async function sendEmailCandidate(
       }),
     };
     
-    console.log(`${isLocalDev ? 'Sending development email to: ' + toEmail : 'Sending production email to: ' + candidate.email}`);
+    console.log(`Sending development email to: ${toEmail}`);
     await resend.emails.send(emailParams);
-
-    // Track email sent event in PostHog
-    const captureEvent = {
-      api_key: process.env.NEXT_PUBLIC_POSTHOG_KEY,
-      event: "Candidate Results Email Sent",
-      distinct_id: candidate.id || 'anonymous',
-      properties: {
-        job_title: job.jobTitle,
-        company: job.companyName,
-        average_score: averageScore,
-        qualification_score: phoneScreen.qualificationScore,
-        results_shared: averageScore >= 50,
-        email_type: "candidate_results",
-        development_mode: isLocalDev,
-        question_count: phoneScreen.analysisV2.length,
-        $current_url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      },
-      timestamp: new Date().toISOString()
-    };
-
-    await axios.post("https://app.posthog.com/capture/", captureEvent, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_POSTHOG_KEY}`
-      },
-    });
   } catch (error) {
-    console.error('Error sending candidate feedback email:', error);
-    throw error;
+    console.error('Error sending candidate email:', error);
   }
 }
+
+async function testEmails() {
+  try {
+    console.log('Sending test email to hiring manager...');
+    await sendEmailHiringManager(mockPhoneScreen, mockJob, mockCandidate);
+    
+    console.log('Sending test email to candidate...');
+    await sendEmailCandidate(mockPhoneScreen, mockJob, mockCandidate);
+    
+    console.log('Test emails sent successfully!');
+  } catch (error) {
+    console.error('Error sending test emails:', error);
+  }
+}
+
+// Run the test
+testEmails();
