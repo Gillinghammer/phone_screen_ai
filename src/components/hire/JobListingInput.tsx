@@ -404,11 +404,17 @@ export default function JobListingInput({
         </div>
       </div>
 
-      <div className="sticky bottom-4 sm:relative sm:bottom-0 px-4 -mx-4 sm:px-0 sm:mx-0 bg-gradient-to-t from-background via-background to-transparent pb-4 pt-8 sm:pb-0 sm:pt-0">
-        <div className="space-y-3">
+      <div className={cn(
+        // Mobile styles (default)
+        "bg-white p-6 rounded-lg shadow-sm border mt-8 space-y-4",
+        // Medium and larger devices
+        "sm:bg-transparent sm:p-0 sm:border-0 sm:shadow-none sm:mt-4 sm:sticky sm:bottom-4",
+        "sm:bg-gradient-to-t sm:from-background sm:via-background sm:to-transparent sm:pb-4 sm:pt-8"
+      )}>
+        <div className="space-y-3 bg-white">
           <div className="space-y-1 text-center">
             <p className="text-base text-muted-foreground">
-              Your AI generated interview will be tailored specifically for this job. 
+              Your AI generated interview will be tailored specifically for this job.
             </p>
             <p className="text-base font-medium text-muted-foreground">
               Click to start creating your interview!
@@ -416,14 +422,19 @@ export default function JobListingInput({
           </div>
           <Button
             className={cn(
-              "w-full h-14 sm:h-12 text-base font-medium gap-2",
-              "shadow-lg hover:shadow-xl transition-all",
-              "active:scale-[0.98] hover:scale-[1.02] transform transition-transform",
-              "hover:bg-primary/90",
-              "rounded-lg"
+              // Mobile styles (default)
+              "w-full h-12 text-base font-medium gap-2",
+              "shadow-sm hover:shadow-md transition-all",
+              "bg-primary text-primary-foreground",
+              "hover:bg-primary/90 hover:scale-[1.02]",
+              "rounded-lg",
+              // Medium and larger devices
+              "sm:h-14",
+              "sm:shadow-lg sm:hover:shadow-xl",
+              "sm:active:scale-[0.98]"
             )}
             onClick={onSubmit}
-            disabled={isLoading || (!jobDescription && !localUrl)}
+            disabled={!jobDescription}
           >
             <span className="text-base">Generate Interview</span>
             <ArrowRightIcon className="h-5 w-5" />
