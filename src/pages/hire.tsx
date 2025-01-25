@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react'
 import type { NextPage } from 'next'
-import Head from 'next/head'
+import JobListingInput from '@/components/hire/JobListingInput'
+import JobDetails from '@/components/hire/JobDetails'
+import InterviewInProgress from '@/components/hire/InterviewInProgress'
+import { useToast } from '@/components/ui/use-toast'
+import LoadingSteps from '@/components/hire/LoadingSteps'
+import { FileTextIcon, ChatBubbleIcon, RocketIcon, ArrowRightIcon } from '@radix-ui/react-icons'
+import { Button } from '@/components/ui/button'
+import { usePostHog } from 'posthog-js/react'
+import Head from 'next/head' // Import Head for metadata
+
 
 interface ParsedJob {
   company: string
@@ -20,15 +29,6 @@ interface ParsedJob {
     hiringManagerEmail: string
   }
 }
-
-const METADATA = {
-  title: "This AI Agent Helps You Get The Job",
-  description: "AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers.",
-  image: "https://app.phonescreen.ai/logos/cracked.png",
-  url: "https://app.phonescreen.ai/hire",
-  siteName: "Phone Screen AI",
-  domain: "app.phonescreen.ai"
-} as const;
 
 const HirePage: NextPage = () => {
   const [showWizard, setShowWizard] = useState(false)
@@ -229,130 +229,126 @@ const HirePage: NextPage = () => {
     })
   }
 
+  
+
   if (!showWizard) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <main className="flex-1 flex flex-col items-center justify-center p-4">
-          <div className="max-w-4xl w-full space-y-12 text-center">
-            <div className="space-y-6">
-              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-                Land Your{" "}
-                <span className="relative inline-block animate-fade-in">
-                  <span className="absolute -inset-3 bg-gradient-to-r from-primary/40 via-primary/30 to-primary/20 rounded-xl blur-lg animate-pulse"></span>
-                  <span className="relative inline-block">
-                    <span className="text-primary font-black bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-primary bg-[length:200%_auto] animate-gradient">
-                      Dream Job
+      <>
+        <Head>
+          <title>Hire Top Talent with AI-Powered Interviews</title>
+          <meta name="description" content="AI Agent interviews you for your dream job, provides feedback and even sends your interview to the hiring team for consideration." />
+          <meta name="keywords" content="AI Agent Recruiting, hiring, AI interviews, job recruitment, phone screen, hiring automation, interview practice, interview prep" />
+          <meta name="author" content="PhoneScreen.AI" />
+          <meta property="og:title" content="AI Agent Interview Prep" />
+          <meta property="og:description" content="AI Agent interviews you for your dream job, provides feedback and even sends your interview to the hiring team for consideration." />
+          <meta property="og:url" content="https://crackedhire.com" />
+          <meta property="og:type" content="website" />
+          <meta property="og:image" content="/logos/cracked.png" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="min-h-screen bg-background flex flex-col">
+          <main className="flex-1 flex flex-col items-center justify-center p-4">
+            <div className="max-w-4xl w-full space-y-12 text-center">
+              <div className="space-y-6">
+                <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+                  Land Your{" "}
+                  <span className="relative inline-block animate-fade-in">
+                    <span className="absolute -inset-3 bg-gradient-to-r from-primary/40 via-primary/30 to-primary/20 rounded-xl blur-lg animate-pulse"></span>
+                    <span className="relative inline-block">
+                      <span className="text-primary font-black bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-primary bg-[length:200%_auto] animate-gradient">
+                        Dream Job
+                      </span>
                     </span>
                   </span>
-                </span>
-                {" "}Faster with AI-Powered Interviews
-              </h1>
-              <p className="text-xl leading-relaxed text-foreground/80 max-w-2xl mx-auto">
-                Our AI Agent interviews you, fast-tracking your way to getting hired. Share your details, 
-                take the interview, and we&apos;ll do the rest.
-              </p>
-            </div>
-
-            {/* Mobile-only CTA */}
-            <div className="block md:hidden">
-              <Button 
-                onClick={() => setShowWizard(true)}
-                size="lg"
-                className="relative group w-full py-7 text-lg shadow-lg shadow-primary/10"
-              >
-                <span className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-md"></span>
-                Get Your Dream Job
-                <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
-              </Button>
-            </div>
-
-            <div className="grid gap-10 md:grid-cols-3 text-left md:text-left text-center">
-              <div className="space-y-3 flex flex-col items-center md:items-start">
-                <div className="relative">
-                  <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
-                    <FileTextIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
-                  </div>
-                  <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 via-primary/20 to-transparent rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="text-xl font-semibold max-[768px]:font-bold">1. Share Job Details</h3>
-                <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
-                  Paste the job description or URL. We&apos;ll create a personalized interview tailored to the role.
+                  {" "}Faster with AI-Powered Interviews
+                </h1>
+                <p className="text-xl leading-relaxed text-foreground/80 max-w-2xl mx-auto">
+                  Our AI Agent interviews you, fast-tracking your way to getting hired. Share your details, 
+                  take the interview, and we&apos;ll do the rest.
                 </p>
               </div>
-              <div className="space-y-3 flex flex-col items-center md:items-start">
-                <div className="relative">
-                  <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
-                    <ChatBubbleIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
+
+              {/* Mobile-only CTA */}
+              <div className="block md:hidden">
+                <Button 
+                  onClick={() => setShowWizard(true)}
+                  size="lg"
+                  className="relative group w-full py-7 text-lg shadow-lg shadow-primary/10"
+                >
+                  <span className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-md"></span>
+                  Get Your Dream Job
+                  <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </div>
+
+              <div className="grid gap-10 md:grid-cols-3 text-left md:text-left text-center">
+                <div className="space-y-3 flex flex-col items-center md:items-start">
+                  <div className="relative">
+                    <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                      <FileTextIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
+                    </div>
+                    <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 via-primary/20 to-transparent rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
+                  <h3 className="text-xl font-semibold max-[768px]:font-bold">1. Share Job Details</h3>
+                  <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
+                    Paste the job description or URL. We&apos;ll create a personalized interview tailored to the role.
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold max-[768px]:font-bold">2. Take the Interview</h3>
-                <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
-                  Our AI Agent calls you and conducts a professional phone screen.
+                <div className="space-y-3 flex flex-col items-center md:items-start">
+                  <div className="relative">
+                    <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                      <ChatBubbleIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold max-[768px]:font-bold">2. Take the Interview</h3>
+                  <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
+                    Our AI Agent calls you and conducts a professional phone screen.
+                  </p>
+                </div>
+                <div className="space-y-3 flex flex-col items-center md:items-start">
+                  <div className="relative">
+                    <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
+                      <RocketIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold max-[768px]:font-bold">3. Get Hired</h3>
+                  <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
+                    We&apos;ll email your recording and transcript directly to hiring teams to fast-track your application.
+                  </p>
+                </div>
+              </div>
+
+              {/* Desktop CTA */}
+              <div className="hidden md:block space-y-4">
+                <p className="text-lg font-medium text-foreground/90">
+                  Don&apos;t wait—your dream job is just a call away!
+                </p>
+                <Button 
+                  onClick={() => setShowWizard(true)}
+                  size="lg"
+                  className="relative group px-8 py-6 text-lg shadow-lg shadow-primary/10"
+                >
+                  <span className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-md"></span>
+                  Get Your Dream Job
+                  <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </div>
+
+              <div className="space-y-3 pt-8 border-t">
+                <p className="text-sm max-[768px]:text-base font-medium">Powered by PhoneScreen.AI</p>
+                <p className="text-sm max-[768px]:text-base text-muted-foreground">
+                  Trusted by job seekers applying to Google, Meta, Amazon, and more. Join thousands getting hired faster with PhoneScreen.AI.
                 </p>
               </div>
-              <div className="space-y-3 flex flex-col items-center md:items-start">
-                <div className="relative">
-                  <div className="h-14 w-14 max-[768px]:h-16 max-[768px]:w-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/5">
-                    <RocketIcon className="h-7 w-7 max-[768px]:h-8 max-[768px]:w-8 text-primary" aria-hidden="true" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold max-[768px]:font-bold">3. Get Hired</h3>
-                <p className="text-base text-foreground/75 leading-relaxed max-[768px]:leading-loose">
-                  We&apos;ll email your recording and transcript directly to hiring teams to fast-track your application.
-                </p>
-              </div>
             </div>
-
-            {/* Desktop CTA */}
-            <div className="hidden md:block space-y-4">
-              <p className="text-lg font-medium text-foreground/90">
-                Don&apos;t wait—your dream job is just a call away!
-              </p>
-              <Button 
-                onClick={() => setShowWizard(true)}
-                size="lg"
-                className="relative group px-8 py-6 text-lg shadow-lg shadow-primary/10"
-              >
-                <span className="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-md"></span>
-                Get Your Dream Job
-                <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
-              </Button>
-            </div>
-
-            <div className="space-y-3 pt-8 border-t">
-              <p className="text-sm max-[768px]:text-base font-medium">Powered by PhoneScreen.AI</p>
-              <p className="text-sm max-[768px]:text-base text-muted-foreground">
-                Trusted by job seekers applying to Google, Meta, Amazon, and more. Join thousands getting hired faster with PhoneScreen.AI.
-              </p>
-            </div>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
+      </>
     )
   }
 
   return (
     <>
-      <Head key="hire-metadata">
-        <title>{METADATA.title}</title>
-        <meta name="description" content={METADATA.description} key="description" />
-        
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" key="og:type" />
-        <meta property="og:url" content={METADATA.url} key="og:url" />
-        <meta property="og:title" content={METADATA.title} key="og:title" />
-        <meta property="og:description" content={METADATA.description} key="og:description" />
-        <meta property="og:image" content={METADATA.image} key="og:image" />
-        <meta property="og:site_name" content={METADATA.siteName} key="og:site_name" />
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" key="twitter:card" />
-        <meta property="twitter:domain" content={METADATA.domain} key="twitter:domain" />
-        <meta property="twitter:url" content={METADATA.url} key="twitter:url" />
-        <meta name="twitter:title" content={METADATA.title} key="twitter:title" />
-        <meta name="twitter:description" content={METADATA.description} key="twitter:description" />
-        <meta name="twitter:image" content={METADATA.image} key="twitter:image" />
-      </Head>
       <div className="min-h-screen bg-background">
         <style jsx>{`
           @keyframes expand {
