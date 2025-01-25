@@ -1,14 +1,6 @@
 import { useState, useEffect } from 'react'
-import type { NextPage, GetStaticProps } from 'next'
+import type { NextPage } from 'next'
 import Head from 'next/head'
-import JobListingInput from '@/components/hire/JobListingInput'
-import JobDetails from '@/components/hire/JobDetails'
-import InterviewInProgress from '@/components/hire/InterviewInProgress'
-import { useToast } from '@/components/ui/use-toast'
-import LoadingSteps from '@/components/hire/LoadingSteps'
-import { FileTextIcon, ChatBubbleIcon, RocketIcon, ArrowRightIcon } from '@radix-ui/react-icons'
-import { Button } from '@/components/ui/button'
-import { usePostHog } from 'posthog-js/react'
 
 interface ParsedJob {
   company: string
@@ -29,25 +21,16 @@ interface ParsedJob {
   }
 }
 
-interface HirePageProps {
-  title: string;
-  description: string;
-  image: string;
-  url: string;
-}
+const METADATA = {
+  title: "This AI Agent Helps You Get The Job",
+  description: "AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers.",
+  image: "https://app.phonescreen.ai/logos/cracked.png",
+  url: "https://app.phonescreen.ai/hire",
+  siteName: "Phone Screen AI",
+  domain: "app.phonescreen.ai"
+} as const;
 
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {
-      title: "This AI Agent Helps You Get The Job",
-      description: "AI generates a conversational phone screen for your dream job, calls you, and gives you feedback on your answers.",
-      image: "https://app.phonescreen.ai/logos/cracked.png",
-      url: "https://app.phonescreen.ai/hire"
-    }
-  }
-}
-
-const HirePage: NextPage<HirePageProps> = ({ title, description, image, url }) => {
+const HirePage: NextPage = () => {
   const [showWizard, setShowWizard] = useState(false)
   const [step, setStep] = useState(1)
   const [jobDescription, setJobDescription] = useState('')
@@ -350,25 +333,25 @@ const HirePage: NextPage<HirePageProps> = ({ title, description, image, url }) =
 
   return (
     <>
-      <Head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
+      <Head key="hire-metadata">
+        <title>{METADATA.title}</title>
+        <meta name="description" content={METADATA.description} key="description" />
         
         {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={url} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:image" content={image} />
-        <meta property="og:site_name" content="Phone Screen AI" />
+        <meta property="og:type" content="website" key="og:type" />
+        <meta property="og:url" content={METADATA.url} key="og:url" />
+        <meta property="og:title" content={METADATA.title} key="og:title" />
+        <meta property="og:description" content={METADATA.description} key="og:description" />
+        <meta property="og:image" content={METADATA.image} key="og:image" />
+        <meta property="og:site_name" content={METADATA.siteName} key="og:site_name" />
         
         {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta property="twitter:domain" content="app.phonescreen.ai" />
-        <meta property="twitter:url" content={url} />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={image} />
+        <meta name="twitter:card" content="summary_large_image" key="twitter:card" />
+        <meta property="twitter:domain" content={METADATA.domain} key="twitter:domain" />
+        <meta property="twitter:url" content={METADATA.url} key="twitter:url" />
+        <meta name="twitter:title" content={METADATA.title} key="twitter:title" />
+        <meta name="twitter:description" content={METADATA.description} key="twitter:description" />
+        <meta name="twitter:image" content={METADATA.image} key="twitter:image" />
       </Head>
       <div className="min-h-screen bg-background">
         <style jsx>{`
