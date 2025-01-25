@@ -126,7 +126,7 @@ function UrlInput({ url, isLoading, error, onUrlChange, onAnalyze }: UrlInputPro
             <span className="text-base font-medium">Paste Job Link</span>
           </div>
           <p className="text-base text-muted-foreground">
-            Paste the link to any job posting, and we'll automatically extract the details to build your interview.
+            Paste the link to any job posting, and we&apos;ll automatically extract the details to build your interview.
           </p>
         </div>
         <div className="space-y-3">
@@ -181,7 +181,7 @@ function UrlInput({ url, isLoading, error, onUrlChange, onAnalyze }: UrlInputPro
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="rounded-lg">
-                  We'll extract details from this link automatically to craft your custom interview.
+                  We&apos;ll extract details from this link automatically to craft your custom interview.
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -222,7 +222,7 @@ function DescriptionInput({ description, isOpen, onOpenChange, onDescriptionChan
         <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left hover:bg-gray-200 transition-colors rounded-lg">
           <div className="flex items-center gap-2">
             <FileTextIcon className="h-5 w-5 text-muted-foreground" />
-            <span className="text-base font-medium">Can't Use a Link?</span>
+            <span className="text-base font-medium">Can&apos;t Use a Link?</span>
           </div>
           <ChevronDownIcon className={cn(
             "h-5 w-5 text-muted-foreground transition-transform",
