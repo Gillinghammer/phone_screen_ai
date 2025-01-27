@@ -268,6 +268,23 @@ const HirePage: NextPage = () => {
                 </p>
               </div>
 
+              {/* Product Hunt Badge */}
+              <div className="flex justify-center -mt-4 mb-4">
+                <a 
+                  href="https://www.producthunt.com/posts/crackedhire-ai-interview-agent?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-crackedhire&#0045;ai&#0045;interview&#0045;agent" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img 
+                    src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=822983&theme=light&t=1737951631604" 
+                    alt="CrackedHire&#0058;&#0032;AI&#0032;Interview&#0032;Agent - AI&#0032;interviews&#0032;you&#0044;&#0032;gives&#0032;feedback&#0044;&#0032;and&#0032;emails&#0032;the&#0032;recruiter | Product Hunt" 
+                    style={{ width: "250px", height: "54px" }}
+                    width="250" 
+                    height="54" 
+                  />
+                </a>
+              </div>
+
               {/* Mobile-only CTA */}
               <div className="block md:hidden">
                 <Button 
