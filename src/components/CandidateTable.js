@@ -131,56 +131,71 @@ export default function CandidateTable({
             <SortableTableHead column="status">Status</SortableTableHead>
             <SortableTableHead column="qualification">Qualification</SortableTableHead>
             <SortableTableHead column="duration">Duration</SortableTableHead>
-            <TableHead className="text-center">Contact</TableHead>
+            <TableHead className="text-center w-[200px]">Contact</TableHead>
             <SortableTableHead column="screened">Screened</SortableTableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedCandidates.map((candidate) => (
-            <TableRow key={candidate.id}>
-              <TableCell className="text-center">
-                <Checkbox
-                  checked={selectedCandidates[candidate.id] || false}
-                  onCheckedChange={(checked) => handleSelectCandidate(candidate.id, checked)}
-                  aria-label={`Select ${candidate.name}`}
-                />
-              </TableCell>
-              <TableCell className="font-medium text-center">
-                <Link href={`/jobs/${jobId}/${candidate.id}`} className="text-black underline">
-                  {candidate.name}
-                </Link>
-              </TableCell>
-              <TableCell className="text-center">
-                <Badge 
-                  variant={getStatusVariant(candidate.status)}
-                  className={getStatusClassName(candidate.status)}
-                >
-                  {candidate.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-center">
-                {getQualificationLabel(candidate.phoneScreen)}
-              </TableCell>
-              <TableCell className="text-center">
-                {getDurationLabel(candidate.phoneScreen)}
-              </TableCell>
-              <TableCell className="text-center p-2">
-                <div className="flex flex-col items-start mx-auto w-fit">
-                  <div className="flex items-center">
-                    <MobileIcon className="w-4 h-4 mr-2" />
-                    <span>{candidate.phone}</span>
+          {sortedCandidates.map((candidate) => {
+            // Determine if the score indicates Voicemail, Dropped, or is missing/invalid
+            const isVoicemail = !candidate.phoneScreen || Object.keys(candidate.phoneScreen).length === 0;
+            const isDropped = candidate.phoneScreen?.qualificationScore === 0;
+            const isScoreMissing = candidate.phoneScreen && typeof candidate.phoneScreen.qualificationScore !== 'number' && candidate.phoneScreen.qualificationScore !== 0;
+            
+            // Name should only be linked if the screen was successful (not Voicemail, Dropped, or N/A score)
+            const shouldLinkName = !isVoicemail && !isDropped && !isScoreMissing;
+
+            return (
+              <TableRow key={candidate.id}>
+                <TableCell className="text-center">
+                  <Checkbox
+                    checked={selectedCandidates[candidate.id] || false}
+                    onCheckedChange={(checked) => handleSelectCandidate(candidate.id, checked)}
+                    aria-label={`Select ${candidate.name}`}
+                  />
+                </TableCell>
+                <TableCell className="font-medium text-center">
+                  {shouldLinkName ? (
+                    <Link href={`/jobs/${jobId}/${candidate.id}`} className="text-black underline">
+                      {candidate.name}
+                    </Link>
+                  ) : (
+                    candidate.name // Render plain text if no valid score/link
+                  )}
+                </TableCell>
+                <TableCell className="text-center">
+                  <Badge 
+                    variant={getStatusVariant(candidate.status)}
+                    className={getStatusClassName(candidate.status)}
+                  >
+                    {candidate.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-center">
+                  {getQualificationLabel(candidate.phoneScreen)}
+                </TableCell>
+                <TableCell className="text-center">
+                  {/* getDurationLabel will now handle 'No Answer' internally */}
+                  {getDurationLabel(candidate.phoneScreen)} 
+                </TableCell>
+                <TableCell className="p-2">
+                  <div className="flex flex-col items-start w-fit">
+                    <div className="flex items-center">
+                      <MobileIcon className="w-4 h-4 mr-2" />
+                      <span>{candidate.phone}</span>
+                    </div>
+                    <div className="flex items-center mt-1">
+                      <EnvelopeClosedIcon className="w-4 h-4 mr-2" />
+                      <span>{candidate.email}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center mt-1">
-                    <EnvelopeClosedIcon className="w-4 h-4 mr-2" />
-                    <span>{candidate.email}</span>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell className="text-center">
-                {getScreenedDays(candidate.phoneScreen)}
-              </TableCell>
-            </TableRow>
-          ))}
+                </TableCell>
+                <TableCell className="text-center">
+                  {getScreenedDays(candidate.phoneScreen)}
+                </TableCell>
+              </TableRow>
+            )
+          })}
         </TableBody>
       </Table>
     </>
@@ -191,16 +206,31 @@ function getQualificationLabel(phoneScreen) {
   if (!phoneScreen || Object.keys(phoneScreen).length === 0) {
     return <Badge variant="warning" className="bg-yellow-100 text-yellow-800">VOICEMAIL</Badge>;
   }
-  if (phoneScreen.qualificationScore === 0) {
+  // Check if the score is missing (not a number) or explicitly 0
+  if (typeof phoneScreen.qualificationScore !== 'number' || phoneScreen.qualificationScore === 0) {
     return <Badge variant="destructive" className="bg-red-100 text-red-800">DROPPED</Badge>;
   }
+  // Remove the separate check for N/A
+  // if (typeof phoneScreen.qualificationScore !== 'number') {
+  //   return <Badge variant="secondary">N/A</Badge>;
+  // }
+
+  // If it's a valid number (and not 0), format it
   return `${phoneScreen.qualificationScore.toFixed(0)}%`;
 }
 
 function getDurationLabel(phoneScreen) {
-  if (!phoneScreen || phoneScreen.qualificationScore === 0 || !phoneScreen.callLength) {
-    return '';
+  const isVoicemail = !phoneScreen || Object.keys(phoneScreen).length === 0;
+  const isDropped = phoneScreen?.qualificationScore === 0;
+  // Check if score exists but is not a number (and not explicitly 0 which is handled by isDropped)
+  const isScoreMissing = phoneScreen && typeof phoneScreen.qualificationScore !== 'number' && phoneScreen.qualificationScore !== 0;
+
+  // Return 'No Answer' if Voicemail, Dropped, score is missing, or callLength is missing
+  if (isVoicemail || isDropped || isScoreMissing || !phoneScreen?.callLength) {
+    return 'No Answer';
   }
+  
+  // Otherwise, calculate and format duration
   const minutes = Math.floor(phoneScreen.callLength);
   const seconds = Math.round((phoneScreen.callLength - minutes) * 60);
   return <Badge variant="secondary">{`${minutes}:${seconds.toString().padStart(2, '0')}`}</Badge>;

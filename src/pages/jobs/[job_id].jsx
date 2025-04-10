@@ -60,8 +60,16 @@ function JobDetailPage({ job, candidates }) {
       const matchesSearch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesArchived = hideArchived ? candidate.status !== 'ARCHIVED' : true;
-      const matchesDroppedMissed = hideDroppedMissed ? 
-        !(candidate.phoneScreen?.qualificationScore === 0 || !candidate.phoneScreen) : true;
+      
+      // Refined check for Dropped/Missed/Voicemail/Invalid Score
+      const hasPhoneScreen = candidate.phoneScreen;
+      const isVoicemail = !hasPhoneScreen;
+      const isScoreZero = hasPhoneScreen && candidate.phoneScreen.qualificationScore === 0;
+      const isScoreNotNumber = hasPhoneScreen && typeof candidate.phoneScreen.qualificationScore !== 'number';
+      const isDroppedOrMissed = isVoicemail || isScoreZero || isScoreNotNumber;
+
+      const matchesDroppedMissed = hideDroppedMissed ? !isDroppedOrMissed : true;
+      
       return matchesSearch && matchesArchived && matchesDroppedMissed;
     });
   }, [candidates, searchTerm, hideArchived, hideDroppedMissed]);

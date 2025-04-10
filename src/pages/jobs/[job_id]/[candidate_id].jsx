@@ -338,7 +338,9 @@ export default function CandidateDetailPage({ phoneScreen, job, role }) {
                   </Button>
                 )}
                 <div className="text-4xl md:text-6xl font-bold">
-                  {phoneScreen.qualificationScore.toFixed(2) ?? 0}
+                  {typeof phoneScreen.qualificationScore === 'number' 
+                    ? phoneScreen.qualificationScore.toFixed(2) 
+                    : 'N/A'}
                 </div>
                 <div className="text-lg md:text-xl">score</div>
                 <div className="mt-4 flex flex-col sm:flex-row sm:justify-center">
